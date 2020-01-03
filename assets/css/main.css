@@ -1,0 +1,289 @@
+*, ::before, ::after {
+    position: relative;
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    background: #18191b url("../img/bg.png") no-repeat;
+    font-size: 16px;
+    font-family: 'Exo 2', sans-serif;
+    line-height: 1;
+    color: white;
+}
+
+button, input {
+    font: inherit;
+    color: inherit;
+    line-height: 1;
+    background: unset;
+    border: unset;
+    outline: unset;
+}
+
+a {
+    text-decoration: none;
+}
+
+a.ghost {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 12;
+}
+
+/* Colours */
+
+.darkgray {
+    color: #3e4147;
+}
+
+.gray {
+    color: #686c75;
+}
+
+/* Skews */
+
+.skewed-text {
+    font-style: italic;
+}
+
+.skewed-element::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: inherit;
+    border-radius: inherit;
+    transform: skew(-12deg);
+    z-index: -1;
+}
+
+/* Default Button*/
+
+.stndfspin-button {
+    padding: 0.65em 0.9em;
+    border-radius: 0.25em;
+    cursor: pointer;
+}
+
+.stndfspin-button::before {
+    background: #313438;
+}
+
+.stndfspin-button--gray {}
+
+.stndfspin-button--unfilled::before {
+    background: transparent;
+    border: 0.125em solid #313438;
+}
+
+/* Icons */
+
+[class *="icon"] {
+    display: block;
+    background: no-repeat center/contain;
+}
+
+.icon__window {
+    background-image: url("../img/icons/window.png");
+    width: 1em;
+    height: 1.15em;
+}
+
+.icon__contract {
+    background-image: url("../img/icons/contract.png");
+    width: 1em;
+    height: 1.15em;
+}
+
+.icon__profile {
+    background-image: url("../img/icons/profile.png");
+    width: 1em;
+    height: 1.15em;
+}
+
+.icon__bar-chart {
+    background-image: url("../img/icons/bar-chart.png");
+    width: 1em;
+    height: 1.15em;
+}
+
+/* Topbar */
+
+.topbar {
+    display: flex;
+    align-items: stretch;
+    justify-content: space-between;
+    max-width: 1320px;
+    margin: 0 auto;
+}
+
+.topbar__logo {
+    align-self: center;
+}
+
+.topbar__logo--logo {
+    width: 10em;
+}
+
+.topbar-menu {
+    display: flex;
+    align-items: center;
+}
+
+.topbar-menu__link {
+    padding: 2em 0.25em;
+    margin: 0 0.75em;
+    font-weight: 600;
+    color: #686c75;
+    text-transform: uppercase;
+    transition: 0.3s ease font-style;
+}
+
+.topbar-menu__link:hover, .topbar-menu__link--active {
+    font-style: italic;
+    color: white;
+}
+
+.topbar-menu__link::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 0.2em;
+    background: #ffc500;
+    border-radius: 0.25em 0.25em 0 0;
+    opacity: 0;
+    transition: 0.3s ease opacity;
+}
+
+.topbar-menu__link:hover::before, .topbar-menu__link--active::before {
+    opacity: 1;
+}
+
+.topbar-language {
+    display: flex;
+    align-self: center;
+    padding: 1em;
+    font-weight: 600;
+    border-radius: 0.25em;
+    cursor: pointer;
+}
+
+.topbar-language::before {
+    background: #313438;
+    transition: 0.3s ease background-color;
+}
+
+.topbar-language:hover::before {
+    background: #ffc500;
+}
+
+.topbar-language__icon {}
+
+.topbar-profile {
+    display: flex;
+    align-items: stretch;
+}
+
+.topbar-profile__balance {
+    display: flex;
+    padding: 1.25em 2em;
+    padding-right: 3.5em;
+}
+
+.topbar-profile__balance::before {
+    background: rgba(255, 255, 255, 0.025);
+}
+
+.topbar-profile__button {
+    padding: 1em 1.5em;
+    margin-right: 0.75em;
+    background: #88cc31;
+    border-radius: 0.15em;
+    font-size: 0.9em;
+    font-weight: 600;
+    text-transform: uppercase;
+    cursor: pointer;
+}
+
+.topbar-profile__column {
+    display: grid;
+    grid-gap: 0.25em;
+}
+
+.topbar-profile__user {
+    display: flex;
+    align-items: center;
+    left: -1.5em;
+}
+
+.topbar-profile__avatar {
+    width: 3.25em;
+    height: 3.25em;
+    padding: 0.175em;
+    margin-right: 0.5em;
+    border: 0.15em solid #313438;
+    border-radius: 100%;
+}
+
+/* Features */
+
+.stndfspin-features {
+    display: flex;
+    align-items: center;
+    padding: 2em;
+    max-width: 1320px;
+    margin: 0 auto;
+}
+
+.stndfspin-features::before {
+    border: 0.125em solid #313438;
+}
+
+.stndfspin-features__options {
+    display: inherit;
+    align-items: inherit;
+    margin-right: 2em;
+}
+
+.stndfspin-features__options>* {
+    cursor: pointer;
+    user-select: none;
+}
+
+.stndfspin-features__stats {
+    display: inherit;
+    align-items: inherit;
+}
+
+.stndfspin-features__pattern {
+    display: flex;
+    align-items: center;
+    margin: 0 1em;
+}
+
+.stndfspin-features__icon {}
+
+.stndfspin-features__icon>svg {
+    display: flex;
+    width: 1.15em;
+    height: 1.15em;
+    fill: white;
+}
+
+.stndfspin-features__icon--green>svg {
+    fill: #88cc31;
+}
+
+.stndfspin-features__column {
+    display: grid;
+    grid-gap: 0.25em;
+    margin-left: 1em;
+}
