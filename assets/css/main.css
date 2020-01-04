@@ -73,6 +73,7 @@ a.ghost {
 
 .stndfspin-button::before {
     background: #313438;
+    transition: 0.3s ease background-color;
 }
 
 .stndfspin-button--gray {}
@@ -113,6 +114,18 @@ a.ghost {
     height: 1.15em;
 }
 
+.icon__vk {
+    background-image: url(https://standoffcasetest.ru/assets/img/icons/vk.png);
+}
+
+.icon__instagram {
+    background-image: url(https://standoffcasetest.ru/assets/img/icons/instagram.png);
+}
+
+.icon__youtube {
+    background-image: url(https://standoffcasetest.ru/assets/img/icons/youtube.png);
+}
+
 /* Topbar */
 
 .topbar {
@@ -142,7 +155,6 @@ a.ghost {
     font-weight: 600;
     color: #686c75;
     text-transform: uppercase;
-    transition: 0.3s ease font-style;
 }
 
 .topbar-menu__link:hover, .topbar-menu__link--active {
@@ -194,7 +206,7 @@ a.ghost {
 
 .topbar-profile__balance {
     display: flex;
-    padding: 1.25em 2em;
+    padding: 1.15em 2em;
     padding-right: 3.5em;
 }
 
@@ -228,7 +240,7 @@ a.ghost {
     width: 3.25em;
     height: 3.25em;
     padding: 0.175em;
-    margin-right: 0.5em;
+    margin-right: 0.75em;
     border: 0.15em solid #313438;
     border-radius: 100%;
 }
@@ -238,13 +250,13 @@ a.ghost {
 .stndfspin-features {
     display: flex;
     align-items: center;
-    padding: 2em;
+    padding: 2em 2.5em;
     max-width: 1320px;
     margin: 0 auto;
 }
 
 .stndfspin-features::before {
-    border: 0.125em solid #313438;
+    border: 0.125em solid rgba(255, 255, 255, 0.025);
 }
 
 .stndfspin-features__options {
@@ -275,7 +287,8 @@ a.ghost {
     display: flex;
     width: 1.15em;
     height: 1.15em;
-    fill: white;
+    fill: #a24a4a;
+    transition: 0.3s ease fill;
 }
 
 .stndfspin-features__icon--green>svg {
@@ -286,4 +299,212 @@ a.ghost {
     display: grid;
     grid-gap: 0.25em;
     margin-left: 1em;
+    font-size: 0.9em;
+}
+
+.stndfspin-features__column>b {
+    font-size: 1.25em;
+    text-transform: uppercase;
+}
+
+/* Scoial Networks */
+
+.social-row {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    flex: 1;
+    z-index: 1;
+}
+
+.social-row__title {
+    font-size: 1em;
+    font-weight: bold;
+    font-style: italic;
+    text-transform: uppercase;
+}
+
+.social-row__icon {
+    padding: 0.65em 0.75em;
+    margin-left: 1em;
+    border-radius: 0.25em;
+}
+
+.social-row__icon::before {
+    background: rgba(255, 255, 255, 0.025);
+}
+
+.social-row__icon--icon {
+    width: 1em;
+    height: 1em;
+    filter: contrast(0.1) opacity(0.5);
+    transition: .125s ease filter;
+}
+
+.social-row__icon:hover .social-row__icon--icon {
+    filter: contrast(1) opacity(1);
+}
+
+/* Weapon skins as you see */
+
+.weapon-skins {
+    display: flex;
+    overflow-y: visible;
+}
+
+.weapon-skins__weapon {
+    display: inline-grid;
+}
+
+.weapon-skins__unit {
+    cursor: pointer;
+}
+
+.weapon-skins__image {
+    width: 6.7em;
+    height: 3.8em;
+}
+
+.weapon-skins__unit .weapon-skins__image, .weapon-skins__unit .weapon-skins__quality {
+    z-index: 13;
+}
+
+.weapon-skins__quality {
+    position: absolute;
+    bottom: 0;
+    display: block;
+    width: 100%;
+    height: 0.175em;
+    background: #ccc;
+    border-radius: 100%;
+}
+
+.weapon-skins__quality--blue {
+    background: #0154c6;
+}
+
+.weapon-skins__quality--skyblue {
+    background: #579EFF;
+}
+
+.weapon-skins__quality--red {
+    background: #CC4450;
+}
+
+.weapon-skins__quality--pink {
+    background: #f140af;
+}
+
+.weapon-skins__quality--purple {
+    background: #8120ef;
+}
+
+.weapon-skins__quality--gold {
+    background: #FFD700;
+}
+
+/* Live Drops */
+
+.live-drops {
+    display: flex;
+    max-width: 1320px;
+    margin: 2em auto;
+    overflow: hidden;
+}
+
+.live-drops .weapon-skins__weapon {
+    margin-right: 1.5em;
+}
+
+.live-drops .weapon-skins__image {
+    width: 7em;
+    height: 3.7em;
+}
+
+.live-drops::before, .live-drops::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    width: 5em;
+    z-index: 1;
+}
+
+.live-drops::before {
+    right: unset;
+    box-shadow: inset 70px 0 30px -35px #18191b;
+}
+
+.live-drops::after {
+    left: unset;
+    box-shadow: inset -70px 0 30px -35px #18191b;
+}
+
+/* Footer */
+
+footer {
+    display: grid;
+    padding: 3em 0;
+    margin: 0 auto;
+    background: #151618;
+    box-shadow: 0 0 15px #151618;
+}
+
+.bottombar, .lastbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    max-width: 1320px;
+    margin: 0 auto;
+}
+
+.bottombar__logo {
+    align-self: center;
+}
+
+.bottombar__logo--logo {
+    width: 10em;
+    filter: contrast(0.25) opacity(0.75) saturate(0);
+}
+
+.bottombar__description {
+    width: 25em;
+}
+
+.bottombar .social-row {
+    flex: unset;
+}
+
+.bottombar-menu {
+    display: flex;
+    align-items: center;
+}
+
+.bottombar-menu__link {
+    margin-left: 1em;
+    font-weight: 600;
+    color: #686c75;
+    text-transform: uppercase;
+}
+
+.bottombar-menu__link:hover, .bottombar-menu__link--active {
+    font-style: italic;
+    color: white;
+}
+
+.bottombar-menu__link:first-child {
+    margin: 0;
+}
+
+.lastbar {
+    margin-top: 2em;
+}
+
+.copyright {
+    font-style: italic;
+    font-weight: bold;
+    color: #686c75;
 }
