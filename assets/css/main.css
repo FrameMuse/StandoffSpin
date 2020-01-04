@@ -199,6 +199,10 @@ a.ghost {
 
 .topbar-language__icon {}
 
+.topbar-language__text {
+    text-transform: uppercase;
+}
+
 .topbar-profile {
     display: flex;
     align-items: stretch;
