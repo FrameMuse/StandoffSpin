@@ -412,7 +412,7 @@ a.ghost {
 .live-drops {
     display: flex;
     max-width: 1320px;
-    margin: 2em auto;
+    margin: 2em auto 0;
     overflow: hidden;
 }
 
@@ -446,12 +446,218 @@ a.ghost {
     box-shadow: inset -70px 0 30px -35px #18191b;
 }
 
+/* Main */
+
+main {
+    max-width: 1320px;
+    margin: 0 auto;
+}
+
+/* Temporal Event */
+
+.temp-event {
+    display: flex;
+    align-items: center;
+    padding: 1.5em 3em;
+    margin: 6em 2em 4em;
+}
+
+.temp-event::before {
+    background: rgba(255, 255, 255, 0.025);
+    border: 0.125em solid rgba(255, 255, 255, 0.025);
+}
+
+.temp-event::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    border: 0.125em solid rgba(255, 255, 255, 0.025);
+    /* border-bottom: unset; */
+    transform: skew(-12deg) translate(-2.625em, -50%);
+    z-index: -2;
+}
+
+.temp-event__summary {
+    margin: 0;
+    font-size: 1.5em;
+    font-style: italic;
+}
+
+.temp-event__summary--marked {
+    color: #ffc500;
+    text-shadow: 0 0 0.25em rgba(255, 197, 0, 0.35);
+}
+
+.temp-event__end {
+    display: flex;
+    flex: 1;
+    justify-content: flex-end;
+}
+
+.timer-v2 {
+    display: flex;
+    align-items: center;
+}
+
+.timer-v2__text {
+    margin-right: 1.4em;
+    font-size: 0.85em;
+    font-style: italic;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.timer-v2__count {
+    display: flex;
+    align-items: center;
+    font-size: 1em;
+    font-weight: 700;
+}
+
+.timer-v2__count::after {
+    content: ':';
+    margin: 0.75em;
+    font-style: italic;
+}
+
+.timer-v2__count:last-child::after {
+    content: unset;
+}
+
+.timer-v2__number {
+    padding: 0.75em 0.85em;
+    margin-left: 0.25em;
+    width: 2.5em;
+    text-align: center;
+}
+
+.timer-v2__number:first-child {
+    margin: 0;
+}
+
+.timer-v2__number::before {
+    background: rgba(255, 255, 255, 0.035);
+}
+
+/* Page Part */
+
+.page-part {}
+
+.page-part__article {
+    display: grid;
+    justify-content: center;
+    margin-bottom: 2em;
+}
+
+.page-part__title {
+    margin: 0;
+    font-weight: 700;
+    font-style: italic;
+    text-transform: uppercase;
+}
+
+.page-part__container {}
+
+/* StandoffSping Cases */
+
+.stndfspin-cases {
+    display: grid;
+    grid-gap: 2em;
+    grid-template-columns: repeat(6, 1fr);
+    align-items: center;
+    justify-items: center;
+    text-align: center;
+}
+
+.stndfspin-cases__case {
+    padding: 1.25em;
+    transition: .125s linear background-color;
+}
+
+.stndfspin-cases__case:hover {
+    background: rgba(37, 38, 41, 0.5);
+}
+
+.stndfspin-cases__image {
+    width: 9.5em;
+    height: auto;
+}
+
+.stndfspin-cases__price {
+    top: -0.25em;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1;
+}
+
+.stndfspin-cases__cost {
+    font-size: 1em;
+    font-weight: 600;
+    padding: 0.65em 0.85em;
+    border-radius: 0.15em;
+}
+
+.stndfspin-cases__cost::before {
+    content: '';
+    background: #88cc31;
+}
+
+.stndfspin-cases__title {
+    font-size: 1.1em;
+    font-weight: 600;
+    font-style: italic;
+    text-transform: uppercase;
+    margin-top: 0.75em;
+}
+
+.stndfspin-cases__lumen {
+    display: flex;
+    top: 1.375em;
+    left: -1.25em;
+    justify-content: center;
+    width: calc(100% + 2.5em);
+    height: 0.125em;
+    background: rgb(36, 37, 39);
+}
+
+.stndfspin-cases__lumen::before {
+    content: '';
+    width: 35%;
+    height: 0.25em;
+    background: rgb(37, 38, 41);
+    border-radius: 0 0 0.25em 0.25em;
+    transition: .125s linear background-color, .125s linear box-shadow;
+}
+
+.stndfspin-cases__case:hover .stndfspin-cases__lumen::before {
+    background: #88cc31;
+    box-shadow: 0 0 12px #88cc31;
+}
+
+.stndfspin-cases__aside {
+    font-size: 0.75em;
+    font-weight: 600;
+    padding: 0.65em 0.85em;
+    border-radius: 0.15em;
+    position: absolute;
+    transform: translate(100%, -75%);
+}
+
+.stndfspin-cases__aside::before {
+    content: '';
+    background: #de3d43;
+}
+
 /* Footer */
 
 footer {
     display: grid;
     padding: 3em 0;
-    margin: 0 auto;
+    margin: 10em auto 0;
     background: #151618;
     box-shadow: 0 0 15px #151618;
 }
