@@ -37,11 +37,20 @@ $(".faq__summary").click(function () {
     $(this).parent().toggleClass("faq__clause--deployed");
 });
 
+$(".tab-swithcer__button").click(function () {
+    // Switching Active Button
+    $(".tab-swithcer__button").removeClass("tab-swithcer__button--active");
+    var tab = $(this).addClass("tab-swithcer__button--active").attr("tab");
+    // Switching Tab
+    $("[class *= 'js-tab-']").addClass("hidden");
+    $("[class *= 'js-tab-" + tab + "']").removeClass("hidden");
+});
+
 // Classes
 
 class features_lang {
     constructor() {
-        this.tap = "rus"; // Default "ru"
+        this.tap = "rus"; // Default "rus"
         this.onclick = function () { };
         this.path = "/assets/img/icons/";
         const $this = this;
@@ -228,7 +237,7 @@ const features = new class {
         this.sound = new features_sound();
         this.lang = new features_lang();
         this.timer = new features_timer();
-        this.wheel = new features_wheel();
+        //this.wheel = new features_wheel();
     }
 }
 
