@@ -33,7 +33,9 @@ $.fn.extend({
 
 // Events
 
-
+$(".faq__summary").click(function () {
+    $(this).parent().toggleClass("faq__clause--deployed");
+});
 
 // Classes
 
