@@ -1,5 +1,9 @@
 // Extending Functions
 
+String.prototype.intConvert = function () {
+    return parseInt(this, 10);
+}
+
 String.prototype.num_split = function() {
     var output = [],
         string = this.toString(),
@@ -229,12 +233,145 @@ class features_wheel {
     }
 }
 
+class features_popup {
+    constructor() {
+        this.html = `<div class="popup" hidden="hidden"><div class="popup__cover"></div><div class="popup-window scale-out"><div class="popup-window__close">✖</div><div class="popup-window__article"><span class="popup-window__title"></span><span class="popup-window__summary"></span></div><div class="popup-window__content"></div><div class="popup-window__help">Есть вопросы? Пишите в <a href="https://vk.com/standoffroll" classname="popup-window__marked">группу поддержки VK</a></div></div></div>`;
+        this.on = function () { };
+        this.default();
+    }
+
+    default() {
+        if ($(".popup").length == 0) {
+            $("body").append(this.html);
+        }
+        // Events
+        $(".popup-window__close, .popup__cover").click(function () {
+            var popup = $(".popup");
+            popup.find(".popup-window").removeClass("scale-out scale-in").addClass("scale-out");
+            setTimeout(() => {
+                return popup.attr("hidden", "");
+            }, 200);
+        });
+    }
+
+    tend(option) {
+        var element = ".popup-window__" + option;
+        return $(element);
+    }
+
+    wEdit(options = {}) {
+        for (var option in options) {
+            this.tend(option).html(options[option]);
+        }
+    }
+
+    open($window, options = {}) {
+        // Fetching
+        this.wText = function(ref) {
+            var wText = "popup." + $window + ".";
+            return getLanguage(wText + ref);
+        }
+        this.title = this.wText("title");
+        this.summary = this.wText("summary");
+
+        // Clearing
+        this.wEdit({
+            title: null,
+            summary: null,
+            content: null,
+            help: getLanguage('popup.help.html')
+        });
+
+        this.on($window, options);
+
+        // Animation
+        $(".popup").removeAttr("hidden");
+        setTimeout(() => $(".popup-window").removeClass("scale-out scale-in").addClass("scale-in"), 50);
+    }
+
+    close() {
+        $(".popup-window__close, .popup__cover").click();
+    }
+}
+
+class features_referal {
+    init() {
+        this.name = name;
+        this.default();
+        this.progress_block = '<div class="goal__line"><div class="goal__line--line-progress"></div><div class="goal__counter"><span class="goal__counter--icon"></span><span class="goal__counter--amount"></span></div></div>';
+        this.commit_progress(2, 89);
+    }
+
+    default() {
+        this.goals_number = $(".goal").length;
+        this.width = $(this.name).outerWidth();
+        this.goal_width = $(".goal").outerWidth();
+        this.goal_height = $(".goal__image").outerHeight();
+        this.goal_indent = $(".goal[data-goal-id='2']").css("margin-left").replace("px", "").intConvert();
+        this.goal_image = $(".goal__image").outerWidth();
+        this.goal_goal_height = $(".goal__goal").outerHeight();
+    }
+
+    create_progress_block() {
+        if (this.goals_number <= 1) {
+            console.error("Too few elements at the page (" + this.goals_number + ")");
+            return;
+        }
+        $(this.name).append(this.progress_block);
+    }
+
+    create_goal(goal__goal, goal__level, goal__image, goal__rewards, goal__reached = "") {
+        if (goal__reached) var goal__reached = "goal__reached";
+        var goal_sample = '<div class="goal ' + goal__reached + '" data-goal-id="' + this.goals_number + '"><div class="goal__goal">' + goal__goal + '</div><div class="goal__image"><img class="goal__image--image" src="' + goal__image + '"></div><div class="goal__level">' + goal__level + '</div><div class="goal__rewards">' + goal__rewards + '</div>';
+        this.goals_number++;
+        return goal_sample;
+    }
+
+    add_goal(options) {
+        var html = this.create_goal(options["goal"], options["level"], options["image"], options["rewards"], options["reached"]);
+        $(this.name).append(html);
+    }
+
+    get_progress(goal_number, percent) {
+        var step = this.goal_width + this.goal_indent;
+        var indent = step * goal_number;
+        var percent = percent / 100;
+        var progress = (indent - step) + (this.goal_width) + ((step * percent)) - step;
+        return progress;
+    }
+
+    commit_progress(goal_number, percent, counter) {
+        var progress = this.get_progress(goal_number, percent);
+        if (progress > this.width) {
+            console.log(progress);
+            console.error("Commited line is too big for '" + this.name + "'");
+            return progress + "px";
+        }
+        if (progress < 0) progress = 0;
+        if (this.goals_number <= 1) {
+            console.error("Too few elements at the page (" + this.goals_number + ")");
+            return;
+        }
+        if ((percent >= 70 && percent <= 100) || (percent >= 30 && percent <= 2)) {
+            $(".goal__counter").addClass("hidden");
+        } else {
+            $(".goal__counter").removeClass("hidden");
+        }
+        if (counter) $(".goal__counter--amount").html(counter);
+        $(".goal__line--line-progress").css("width", progress + "px");
+        $(".goal__counter").css("left", progress - ($(".goal__counter").outerWidth() / 2) + "px");
+        $(".goal__line").css("top", this.goal_image_indent + this.goal_goal_height + (this.goal_height / 2) + "px");
+    }
+}
+
 const features = new class {
     constructor() {
         this.sound = new features_sound();
         this.lang = new features_lang();
         this.timer = new features_timer();
         this.wheel = new features_wheel();
+        this.popup = new features_popup();
+        this.referal = new features_referal();
     }
 }
 
@@ -251,4 +388,9 @@ function num_split(number = 0, bandwidth = 0) {
     }
 
     return output;
+}
+
+function getLanguage(...data) {
+    console.log(...data);
+    return "jopa";
 }

@@ -4,7 +4,7 @@
     <title>Document</title>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link href="https://fonts.googleapis.com/css?family=Exo+2:300,300i,400,400i,500,500i,600,600i,700,700i,800,800i,900,900i&display=swap&subset=cyrillic,cyrillic-ext,latin-ext" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=Exo+2:400,400i,500,500i,600,600i,700,700i&display=swap&subset=cyrillic,cyrillic-ext,latin-ext" rel="stylesheet">
     <link rel="stylesheet" href="assets/css/main.css">
 </head>
 <body>
@@ -27,7 +27,7 @@
             </div>
             <div class="topbar-profile">
                 <div class="topbar-profile__balance skewed-element">
-                    <button class="topbar-profile__button">Пополнить</button>
+                    <button class="topbar-profile__button" onclick="features.popup.open('top_up')">Пополнить</button>
                     <div class="topbar-profile__column">
                         <b>БАЛАНС</b>
                         <span>917289371893</span>
@@ -326,7 +326,7 @@
         </div>
         <!--Scripts-->
         <script src="assets/js/jquery-3.3.1.min.js"></script>
-        <script src="assets/js/hangouts.js?"></script>
+        <script src="assets/js/hangouts.min.js?"></script>
         <script src="assets/js/handlers.js?"></script>
     </footer>
 </body>
