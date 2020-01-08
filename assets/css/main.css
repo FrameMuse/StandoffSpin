@@ -1004,6 +1004,7 @@ article {
     padding: 1.5em;
     background: #212326;
     border-bottom: 0.125em solid;
+    border-radius: 0.25em 0.25em 0 0;
 }
 
 .sorted-skins__unit--blue {
@@ -1551,6 +1552,69 @@ b {
 
 .contacts__marked {
     color: #ffc500;
+}
+
+/* Contracts */
+
+.contract {
+    display: grid;
+    justify-content: center;
+    margin: 5em 0;
+}
+
+.contract__disposal {
+    display: grid;
+    grid-gap: 2em;
+    grid-template-columns: repeat(5, 1fr);
+    align-items: center;
+    text-align: center;
+}
+
+.contract__spot {
+    background: rgba(33, 35, 38, 0.5);
+    border-radius: 0.25em;
+    width: 100%;
+    height: 11.7125em;
+}
+
+.contract__flex {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 3.5em;
+}
+
+.contract__column {
+    display: grid;
+    grid-gap: 0.25em;
+    font-size: 0.75em;
+    text-transform: uppercase;
+    text-align: center;
+    width: 12em;
+}
+
+.contract__text {
+    font-size: 1.75em;
+    font-weight: 700;
+}
+
+.contract__button {
+    padding: 1.25em 3.5em;
+    margin: 0 2em;
+    border-radius: 0.175em;
+    font-size: 1em;
+    font-weight: 600;
+    text-transform: uppercase;
+    cursor: pointer;
+}
+
+.contract__button::before {
+    background: #88cc31;
+}
+
+.contract__caution {
+    margin-top: 1.5em;
+    text-align: center;
 }
 
 /* Footer */

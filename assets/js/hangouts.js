@@ -139,7 +139,7 @@ class features_timer {
 }
 
 class features_wheel {
-    constructor() {
+    init() {
         var points = {};
         $(".fortune__circle > *").each(function (i, e) {
             points[i] = $(e);
@@ -193,9 +193,6 @@ class features_wheel {
         return this.promise = new Promise(resolve => {
             setTimeout(() => {
                 var interval = setInterval(() => {
-                    console.log(this.getRotationDegrees(obj));
-                    console.log(this.getRotationDegrees($(".fortune__circle")));
-                    
                     if ((this.getRotationDegrees(obj) + this.getRotationDegrees($(".fortune__circle"))) == 360) {
                         clearInterval(interval);
                         resolve();
@@ -237,7 +234,7 @@ const features = new class {
         this.sound = new features_sound();
         this.lang = new features_lang();
         this.timer = new features_timer();
-        //this.wheel = new features_wheel();
+        this.wheel = new features_wheel();
     }
 }
 

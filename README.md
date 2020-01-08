@@ -53,6 +53,16 @@ features.timer.initiate({
 
 ## Wheel
 
+### Init
+
+Before you can start using the wheel it's needed to be intiated via init() function like that:
+
+```JS
+
+features.wheel.init();
+
+```
+
 ### Choosing a winner
 
 To "choose a winner" function win() definitely helps you. It will be spinning to certain id and for your additional convenience it will change the data at the proper moment.
