@@ -1,5 +1,7 @@
 # Документация по StandoffSpin
 
+Автор настоятельно сука рекомендует создать собственный файл например handlers.js и писать там всё что душе угодится.
+
 ## Оглавление
 
 - [Minor Functionalities](#Minor-Functionalities)
