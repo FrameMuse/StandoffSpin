@@ -227,10 +227,14 @@ a.ghost {
 }
 
 .topbar-language:hover::before {
-    background: #ffc500;
+    background: #42474d;
 }
 
-.topbar-language__icon {}
+.topbar-language__icon {
+    width: 1.15em;
+    height: 1.15em;
+    margin-right: 0.5em;
+}
 
 .topbar-language__text {
     text-transform: uppercase;
@@ -453,7 +457,7 @@ a.ghost {
 }
 
 .live-drops .weapon-skins__weapon {
-    margin-right: 1.5em;
+    margin-right: 0;
 }
 
 .live-drops .weapon-skins__image {
