@@ -1,0 +1,14 @@
+@media screen and (max-width: 1320px) {
+    body {
+        font-size: 14px;
+    }
+    .topbar, .stndfspin-features, .live-drops, main, .bottombar, .lastbar {
+        width: 1160px;
+    }
+}
+
+@media screen and (max-width: 1160px) {
+    body {
+        width: 1160px;
+    }
+}
