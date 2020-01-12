@@ -7,6 +7,15 @@
     }
 }
 
+@keyframes weapon-fade-in {
+    0% {
+        opacity: 0;
+    }
+    100% {
+        opacity: 1;
+    }
+}
+
 *, ::before, ::after {
     position: relative;
     box-sizing: border-box;
@@ -114,6 +123,11 @@ a.ghost {
 .stndfspin-button--unfilled::before {
     background: transparent;
     border: 0.125em solid #313438;
+    transition: .125s linear border-color;
+}
+
+.stndfspin-button--unfilled:hover::before {
+    border-color: #4d5158;
 }
 
 /* Icons */
@@ -398,6 +412,7 @@ a.ghost {
 
 .weapon-skins__weapon {
     display: inline-grid;
+    animation: 0.24s ease weapon-fade-in;
 }
 
 .weapon-skins__unit {
@@ -2121,11 +2136,17 @@ input.promocode__input:focus::placeholder {
     content: unset;
 }
 
-/* Invites Row & Feeder */
+/* Invites Row & Feeder & Bonuses */
 
 .invites-row {
     display: flex;
     margin-top: 5em;
+}
+
+.bonuses {
+    display: grid;
+    grid-gap: 2em;
+    grid-template-columns: repeat(2, 1fr);
 }
 
 .feeder {
@@ -2134,69 +2155,85 @@ input.promocode__input:focus::placeholder {
     background: transparent;
 }
 
+.feeder--filled {
+    background: rgba(34, 35, 38, 0.5);
+}
+
 .feeder__title {
+    display: flex;
+    align-items: center;
+    margin-bottom: 1.5em;
     font-size: 1em;
-    font-weight: 600;
+    font-weight: 700;
     font-style: italic;
     text-transform: uppercase;
-    margin-bottom: 1.5em;
 }
 
 .feeder__text {
     color: #686c75;
-    font-size: 0.9em;
-    font-weight: 500;
+    font-size: 0.825em;
+    font-weight: 700;
     font-style: italic;
     line-height: 1.25;
     text-transform: uppercase;
 }
 
-.feeder:first-child {
-    margin-right: 30px
-}
-
-.inputs {
+.feeder__flex {
     display: flex;
     margin-top: 1.5em;
 }
 
-.inputs>* {
+.feeder__flex>* {
     border: unset;
     outline: unset;
     line-height: 1
 }
 
-.inputs__button[disabled] {
+.feeder__button[disabled] {
     cursor: not-allowed;
     color: #707070!important;
     border-color: #707070!important
 }
 
-.inputs__button[disabled]:hover {
+.feeder__button[disabled]:hover {
     background: unset;
     cursor: not-allowed;
     color: #707070!important;
     border-color: #707070!important
 }
 
-.inputs__gap {
+.feeder__gap {
     flex: 1;
     padding: 1em 1.5em;
     background: rgba(255, 255, 255, 0.025);
-    border-radius: 0.25em;
+    border: 0.05em solid transparent;
+    border-radius: 0.15em;
     color: #fff;
     font-size: 0.9em;
-    font-weight: 600;
+    font-weight: 700;
     font-style: italic;
     text-transform: uppercase;
     cursor: text;
+    transition: .125s linear border-color;
 }
 
-.inputs__gap::placeholder {
+.feeder__gap:focus {
+    border-color: #686c75;
+}
+
+.feeder__gap::placeholder {
     color: #686c75;
 }
 
-.inputs__button {
+.feeder__gap--style-0 {
+    border-color: #a24254;
+}
+
+.feeder__gap--style-1 {
+    border-color: #88cc31;
+}
+
+.feeder__button {
     padding: 1em 1.5em;
     margin-left: 1em;
     background: #88cc31;
@@ -2205,11 +2242,74 @@ input.promocode__input:focus::placeholder {
     font-weight: 600;
     text-transform: uppercase;
     cursor: pointer;
+    transition: .125s linear background-color;
 }
 
-.inputs__button:hover {
-    background: #ffc500;
-    color: #fff
+.feeder__button:hover {
+    background: #75b026;
+    color: #fff;
+}
+
+.feeder__title--image {
+    width: 3.5em;
+    height: 3.5em;
+    object-fit: contain;
+    margin-right: 0.75em;
+}
+
+.feeder__user {
+    display: flex;
+    align-items: center;
+    margin-top: 1.5em;
+}
+
+.feeder__user--avatar {
+    width: 3em;
+    height: 3em;
+    object-fit: cover;
+    background: black;
+    border-radius: 100%;
+    margin-right: 1em;
+}
+
+.feeder__pattern {
+    display: flex;
+    align-items: center;
+    font-size: 0.725em;
+    flex-grow: 1;
+    text-transform: uppercase;
+}
+
+.feeder__pattern--column {
+    display: grid;
+    grid-gap: 0.25em;
+}
+
+.feeder__pattern--0 {
+    color: #686c75;
+    font-weight: 600;
+    margin-right: 0.5em;
+}
+
+.feeder__pattern--1 {
+    font-size: 1.5em;
+    font-weight: 700;
+    font-style: italic;
+}
+
+.feeder__pattern--2 {
+    font-size: 0.725em;
+}
+
+.feeder__caution {
+    font-size: 0.825em;
+    font-weight: 700;
+    font-style: italic;
+    text-align: center;
+    text-transform: uppercase;
+    color: #c60126;
+    margin-top: 1.5em;
+    margin-right: 12.52em;
 }
 
 /* Footer */
