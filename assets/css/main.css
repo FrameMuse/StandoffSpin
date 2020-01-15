@@ -22,9 +22,9 @@
 }
 
 :root {
-    --wheel-font-size: 12px;
+    --wheel-font-size: 13px;
     --wheel-item-size: 13em;
-    --wheel-item-skew: 27.36842105263158px;
+    --wheel-item-skew: 29.649122807017545px;
     --wheel-indent: -41em;
 }
 
@@ -102,6 +102,7 @@ a.ghost {
     background: inherit;
     border-radius: inherit;
     transform: skew(-10deg);
+    transition: inherit;
     z-index: -1;
 }
 
@@ -732,6 +733,46 @@ article {
 
 /* Page with wheel */
 
+.box {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    margin-bottom: 2em;
+}
+
+.box__view {
+    display: grid;
+    grid-gap: 2em;
+    align-content: center;
+    justify-items: center;
+    text-align: center;
+    width: 30em;
+}
+
+.box__multiply {
+    display: flex;
+}
+
+.box__input {
+    padding: 0.65em 1.1em;
+    margin: 0 0.15em;
+    border-radius: 0.15em;
+    font-size: 1em;
+    font-weight: 600;
+    font-style: italic;
+    cursor: pointer;
+    user-select: none;
+    transition: .125s linear background;
+}
+
+.box__input::before {
+    background: #222426;
+}
+
+.box__input--active::before, .box__input:hover::before {
+    background: #89cc32;
+}
+
 .fortune__circle {
     display: flex;
     width: inherit;
@@ -774,9 +815,9 @@ article {
 
 .fortune__item::after {
     content: '';
-    border-top: 8px solid #84c430;
-    border-left: 1.4035087719298245px solid transparent;
-    border-right: 1.4035087719298245px solid transparent;
+    border-top: 0.625em solid #84c430;
+    border-left: var(--wheel-underline-width) solid transparent;
+    border-right: var(--wheel-underline-width) solid transparent;
     position: absolute;
     left: 14%;
     right: 0;
@@ -858,7 +899,8 @@ article {
 }
 
 .fortune-wheel {
-    width: 100%;
+    display: inline-flex;
+    width: 110em;
     height: 51em;
     padding-top: 5em;
     margin: 0 auto;
@@ -874,7 +916,7 @@ article {
     right: 0;
     bottom: 0;
     height: 6em;
-    box-shadow: inset 0 -75px 30px -30px #18191b;
+    box-shadow: inset 0 -4.6875em 1.875em -1.875em #18191b;
     z-index: 1;
 }
 
@@ -889,7 +931,7 @@ article {
     left: -35%;
     width: 170%;
     height: 225%;
-    background: url(../img/wheel_curves_1.png) no-repeat center/58.5%;
+    background: url(../img/wheel_curves_1.png) no-repeat center/110em;
     border-radius: 100%;
 }
 
@@ -899,7 +941,7 @@ article {
     left: -35%;
     width: 170%;
     height: 225%;
-    background: url(../img/wheel_curves_2.png) no-repeat center/34%;
+    background: url(../img/wheel_curves_2.png) no-repeat center/64em;
     border-radius: 100%;
 }
 
@@ -925,11 +967,10 @@ article {
     align-content: center;
     justify-items: center;
     text-align: center;
-    width: 40%;
+    width: 30em;
     height: 70%;
     top: 30%;
-    left: 30%;
-    border-radius: 100%;
+    left: calc(50% - 15em);
 }
 
 .fortune-wheel__inner--0 {
@@ -999,8 +1040,8 @@ article {
 
 .fortune-wheel__win-cover {
     background-image: url("../img/win_cover.png");
-    background-size: 150%;
-    background-position: 49% 25.5%;
+    background-size: 90em;
+    background-position: 46% 20%;
     position: absolute;
     top: -150%;
     left: -300%;

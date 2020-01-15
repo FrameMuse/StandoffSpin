@@ -259,8 +259,24 @@
             </div>
         </div>
         <div class="page-part">
-            <div class="page-part__container">
-                <div class="fortune-wheel">
+            <div class="page-part__container box">
+                <div class="box__view">
+                    <span class="fortune-wheel__text darkgray">Вы открываете</span>
+                    <span class="fortune-wheel__image" style="--bg: url('../img/noob.png')">Читер</span>
+                    <div class="fortune-wheel__buttons">
+                        <button class="fortune-wheel__button--0 skewed-element skewed-text" onclick="wheel_start()">Открыть быстро</button>
+                        <button class="fortune-wheel__button--1 skewed-element skewed-text">Открыть за 190 Р</button>
+                    </div>
+                    <div class="box__multiply">
+                        <span class="box__input box__input--active skewed-element" data-id="0">1</span>
+                        <span class="box__input skewed-element" data-id="1">2</span>
+                        <span class="box__input skewed-element" data-id="2">3</span>
+                        <span class="box__input skewed-element" data-id="3">4</span>
+                        <span class="box__input skewed-element" data-id="4">5</span>
+                        <span class="box__input skewed-element" data-id="5">10</span>
+                    </div>
+                </div>
+                <div class="fortune-wheel hidden">
                     <div class="fortune-wheel__curve-1"></div>
                     <div class="fortune-wheel__curve-2"></div>
                     <ul class="fortune__circle weapon-skins">
@@ -373,14 +389,6 @@
                             <div class="sorted-skins__skin-title">m4a4 l Skin Name</div>
                         </li>
                     </ul>
-                    <div class="fortune-wheel__inner">
-                        <span class="fortune-wheel__text darkgray">Вы открываете</span>
-                        <span class="fortune-wheel__image" style="--bg: url('../img/noob.png')">Читер</span>
-                        <div class="fortune-wheel__buttons">
-                            <button class="fortune-wheel__button--0 skewed-element skewed-text">Открыть быстро</button>
-                            <button class="fortune-wheel__button--1 skewed-element skewed-text">Открыть за 190 Р</button>
-                        </div>
-                    </div>
                     <div class="fortune-wheel__inner fortune-wheel__inner--0 hidden">
                         <span class="fortune-wheel__header">Вы выиграли</span>
                         <div class="sorted-skins__unit sorted-skins__unit--pink">
@@ -523,7 +531,7 @@
         </div>
         <!--Scripts-->
         <script src="assets/js/jquery-3.3.1.min.js"></script>
-        <script src="assets/js/hangouts.min.js?"></script>
+        <script src="assets/js/hangouts_new.js?"></script>
         <script src="assets/js/handlers.js?"></script>
     </footer>
 </body>
