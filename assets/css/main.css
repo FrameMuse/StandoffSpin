@@ -1052,6 +1052,8 @@ article {
 
 /* Weapon Pattern */
 
+/* Sorted Skins */
+
 .sorted-skins {
     display: grid;
     grid-gap: 2em;
@@ -1091,6 +1093,43 @@ article {
     border-color: #FFD700;
 }
 
+.sorted-skins__unit[pickable] {
+    display: grid;
+    align-items: center;
+    justify-items: center;
+    cursor: pointer;
+}
+
+.sorted-skins__unit[pickable]::before, .sorted-skins__unit[pickable]::after {
+    content: '';
+    opacity: 0;
+    cursor: pointer;
+    transition: .125s linear opacity;
+}
+
+.sorted-skins__unit[pickable]:hover::after {
+    content: attr(pickable);
+    position: absolute;
+    padding: 1.5em 2em;
+    margin-top: 1em;
+    background: rgba(255, 255, 255, 0.075);
+    border-radius: 0.25em;
+    font-size: 0.85em;
+    font-weight: 700;
+    font-style: italic;
+    text-transform: uppercase;
+    opacity: 1;
+    z-index: 2;
+}
+
+.sorted-skins__unit[pickable] .weapon-skins__weapon {
+    transition: .125s linear opacity;
+}
+
+.sorted-skins__unit[pickable]:hover .weapon-skins__weapon {
+    opacity: 0;
+}
+
 .sorted-skins__skin-title {
     font-size: 1em;
     font-weight: 600;
@@ -1099,13 +1138,10 @@ article {
     margin-top: 1em;
 }
 
-.profile-stats__title {
-    font-size: 0.9em;
-}
-
 .sorted-skins__marks {
     display: flex;
     align-items: stretch;
+    justify-self: stretch;
     margin-bottom: 1em;
 }
 
@@ -1489,6 +1525,10 @@ b {
     align-items: center;
 }
 
+.profile-stats__title {
+    font-size: 0.9em;
+}
+
 .profile-stats__column {
     display: grid;
     grid-gap: 0.35em;
@@ -1633,7 +1673,7 @@ b {
 .contract__spot {
     background: rgba(33, 35, 38, 0.5);
     border-radius: 0.25em;
-    width: 100%;
+    width: 12em;
     height: 11.7125em;
 }
 
@@ -1675,6 +1715,148 @@ b {
 .contract__caution {
     margin-top: 1.5em;
     text-align: center;
+}
+
+/* Contract Window */
+
+.contract-window {
+    display: grid;
+    background: linear-gradient(to top, #14161a 0%, #151618 100%);
+}
+
+.contract-window__header, .contract-window__bottom {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 3em;
+}
+
+.contract-window__logo {}
+
+.contract-window__logo--logo {
+    width: 10em;
+}
+
+.contract-window__info {
+    display: grid;
+    grid-gap: 0.25em;
+    text-transform: uppercase;
+}
+
+.contract-window__info--0 {
+    font-size: 1.5em;
+    font-weight: 700;
+}
+
+.contract-window__info--1 {
+    font-size: 0.9em;
+    font-weight: 600;
+}
+
+.contract-window__sign {
+    display: flex;
+    align-items: center;
+}
+
+.contract-window__sign--text {
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.contract-window__canvas {
+    width: 12em;
+    height: 4em;
+    margin-left: 1em;
+    border-bottom: 0.125em solid #88cc31;
+    border-radius: 0.125em;
+}
+
+.contract-window__bill {
+    display: flex;
+    align-items: center;
+}
+
+.contract-window__bill--text {
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+span.contract-window__bill--numeric {
+    font-size: 1.75em;
+    font-weight: 700;
+    margin: 0 0.5em;
+}
+
+.contract-window__button {
+    padding: 1em 1.5em;
+    margin-right: 0.75em;
+    background: #88cc31;
+    border-radius: 0.15em;
+    font-size: 0.9em;
+    font-weight: 600;
+    text-transform: uppercase;
+    cursor: pointer;
+}
+
+.contract-window__main {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+}
+
+.contract-window__table {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+}
+
+.contract-window__table--row {
+    display: flex;
+    padding: 1.5em;
+    border: 0.125em solid rgba(255, 255, 255, 0.025);
+    border-bottom: unset;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.contract-window__table--row:not(:nth-child(2n)) {
+    border-right: unset;
+}
+
+.contract-window__table--row:nth-last-child(1), .contract-window__table--row:nth-last-child(2) {
+    border-bottom: 0.125em solid rgba(255, 255, 255, 0.025);
+}
+
+.contract-window__result {
+    padding: 3em;
+}
+
+.contract-result {
+    display: grid;
+    align-content: space-between;
+    height: 100%;
+}
+
+.contract-result__column {
+    display: grid;
+    grid-gap: 1em;
+    align-content: flex-start;
+}
+
+.contract-result__text {
+    font-size: 1.25em;
+    font-weight: 700;
+    font-style: italic;
+    text-transform: uppercase;
+}
+
+.contract-result__input {
+    padding: 1.25em 1.5em;
+    margin-right: 0.75em;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 0.15em;
+    font-size: 1em;
+    font-weight: 600;
+    font-style: italic;
+    text-transform: uppercase;
 }
 
 /* Popup */
