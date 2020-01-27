@@ -1100,6 +1100,10 @@ article {
     cursor: pointer;
 }
 
+.sorted-skins__unit[pickable]:active {
+    user-select: none;
+}
+
 .sorted-skins__unit[pickable]::before, .sorted-skins__unit[pickable]::after {
     content: '';
     opacity: 0;

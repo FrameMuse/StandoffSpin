@@ -136,7 +136,7 @@ features.popup.on = function ($window, options = {}) {
             this.wEdit({
                 title: this.title,
                 summary: this.summary.replace('{itemPrice}', itemPrice),
-                content: `<div style="display:flex;justify-content:center;flex-direction:column;align-items:center;"><input class="popup-window__button button1" withdraw-skin placeholder="${getLanguage(`popup.${$window}.other.placeholder`)}"><button class="popup-window__button button2" onclick="withdrawConfirm(${item.id}, ${options.rnd})">${getLanguage(`popup.${$window}.other.button`)}</button></div>`,
+                content: `<div style="display:flex;justify-content:center;flex-direction:column;align-items:center;"><input class="popup-window__button button1" withdraw-skin placeholder="${this.getLanguage(`popup.${$window}.other.placeholder`)}"><button class="popup-window__button button2" onclick="withdrawConfirm(${item.id}, ${options.rnd})">${this.getLanguage(`popup.${$window}.other.button`)}</button></div>`,
             });
             break;
 
@@ -151,7 +151,7 @@ features.popup.on = function ($window, options = {}) {
             this.wEdit({
                 title: this.title,
                 summary: this.summary,
-                content: "<form class='avatar-change' method='POST' enctype='multipart/form-data' action='/api/v1/user/avatar'><div class='avatar-change__title'>" + getLanguage("popup.withdraw_avatar.avatar_change__title") + "</div><img src='/img/guest.png' class='avatar-change__avatar'><label><a class='avatar-change__input button1'>" + getLanguage("popup.withdraw_avatar.avatar_change__input") + "</a><input accept='.jpg, .png, .jpeg, .gif, .bmp, .tif, .tiff|image/*' type='file' onchange='this.form.submit();' name='file' style='display: none; position: absolute;' ></label></form>",
+                content: "<form class='avatar-change' method='POST' enctype='multipart/form-data' action='/api/v1/user/avatar'><div class='avatar-change__title'>" + this.getLanguage("popup.withdraw_avatar.avatar_change__title") + "</div><img src='/img/guest.png' class='avatar-change__avatar'><label><a class='avatar-change__input button1'>" + this.getLanguage("popup.withdraw_avatar.avatar_change__input") + "</a><input accept='.jpg, .png, .jpeg, .gif, .bmp, .tif, .tiff|image/*' type='file' onchange='this.form.submit();' name='file' style='display: none; position: absolute;' ></label></form>",
             });
             break;
 
@@ -159,14 +159,14 @@ features.popup.on = function ($window, options = {}) {
             this.wEdit({
                 title: this.title,
                 content: '<div class="auth"><a href="/auth/vk" class="auth__button auth__button--vkontakte">Вконтакте</a><a href="/auth/twitch" class="auth__button auth__button--twitch">Twitch</a><a href="/auth/youtube" class="auth__button auth__button--youtube">Youtube</a></div>',
-                help: getLanguage(`popup.${$window}.help`),
+                help: this.getLanguage(`popup.${$window}.help`),
             });
             break;
         case "sell_all":
             this.wEdit({
                 title: this.title,
                 summary: this.summary.replace("{price}", options.inventoryPrice),
-                content: `<div style="display:flex;justify-content:center;"><button class="popup-window__button button2" onclick="features.popup.close();">${getLanguage("popup." + $window + ".buttons.no")}</button><button class="popup-window__button button1" onclick="${options.callback2}">${getLanguage("popup." + $window + ".buttons.yes")}</button></div>`,
+                content: `<div style="display:flex;justify-content:center;"><button class="popup-window__button button2" onclick="features.popup.close();">${this.getLanguage("popup." + $window + ".buttons.no")}</button><button class="popup-window__button button1" onclick="${options.callback2}">${this.getLanguage("popup." + $window + ".buttons.yes")}</button></div>`,
             });
             break;
         case "sell_all_error":
@@ -201,14 +201,14 @@ features.popup.on = function ($window, options = {}) {
             $(".popup-window__top-up--big-input").on('input', function () {
                 var value = $(this).val();
                 if (value == "") {
-                    $(".top_up_text").text(getLanguage("popup.top_up.promocode.default"));
+                    $(".top_up_text").text(this.getLanguage("popup.top_up.promocode.default"));
                     return;
                 }
                 $.get("/api/v1/user/promo?name=" + encodeURIComponent(value), (data) => {
                     if (data.percent) {
-                        $(".top_up_text").text(getLanguage("popup.top_up.promocode.percent").replace("{percent}", data.percent));
+                        $(".top_up_text").text(this.getLanguage("popup.top_up.promocode.percent").replace("{percent}", data.percent));
                     } else {
-                        $(".top_up_text").text(getLanguage("popup.top_up.promocode.not_found"));
+                        $(".top_up_text").text(this.getLanguage("popup.top_up.promocode.not_found"));
                     }
                 });
             });
@@ -228,7 +228,7 @@ features.popup.on = function ($window, options = {}) {
             this.wEdit({
                 title: this.title,
                 summary: this.summary,
-                content: `<div style="display:flex;justify-content:center;"><button class="popup-window__button button2" onclick="${options.callback1}">${getLanguage("popup." + $window + ".buttons.yes")}</button><button class="popup-window__button button1" onclick="${options.callback2}">${getLanguage("popup." + $window + ".buttons.no")}</button></div>`,
+                content: `<div style="display:flex;justify-content:center;"><button class="popup-window__button button2" onclick="${options.callback1}">${this.getLanguage("popup." + $window + ".buttons.yes")}</button><button class="popup-window__button button1" onclick="${options.callback2}">${this.getLanguage("popup." + $window + ".buttons.no")}</button></div>`,
             });
             break;
 
