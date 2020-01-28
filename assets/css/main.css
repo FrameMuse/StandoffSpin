@@ -515,7 +515,8 @@ main {
     display: flex;
     align-items: center;
     padding: 1.5em 3em;
-    margin: 6em 2em 4em;
+    margin: 6em auto 4em;
+    max-width: 1320px;
 }
 
 .temp-event::before {

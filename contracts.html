@@ -12,14 +12,14 @@
         <div class="topbar">
             <div class="topbar__logo">
                 <img src="assets/img/logo.svg" class="topbar__logo--logo">
-                <a href="#!/logo" class="ghost"></a>
+                <a href="#!/logo" class="ghost ajax-link"></a>
             </div>
             <nav class="topbar-menu">
-                <a href="#link" class="topbar-menu__link topbar-menu__link--active">Главная</a>
-                <a href="#link" class="topbar-menu__link">Контракты</a>
-                <a href="#link" class="topbar-menu__link">Топ</a>
-                <a href="#link" class="topbar-menu__link">Бонусы</a>
-                <a href="#link" class="topbar-menu__link">FAQ</a>
+                <a href="#link" class="topbar-menu__link topbar-menu__link--active ajax-link">Главная</a>
+                <a href="#link" class="topbar-menu__link ajax-link">Контракты</a>
+                <a href="#link" class="topbar-menu__link ajax-link">Топ</a>
+                <a href="#link" class="topbar-menu__link ajax-link">Бонусы</a>
+                <a href="#link" class="topbar-menu__link ajax-link">FAQ</a>
             </nav>
             <div class="topbar-language skewed-element js-option-lang">
                 <span class="topbar-language__icon"></span>
@@ -233,31 +233,31 @@
             </div>
         </div>
     </header>
-    <main>
-        <div class="temp-event skewed-element">
-            <span class="temp-event__image icon"></span>
-            <h1 class="temp-event__summary">
-                <span>Осенние скидки</span>
-                <span class="temp-event__summary--marked">-50% на всё</span>
-            </h1>
-            <div class="temp-event__end">
-                <div class="timer-v2">
-                    <span class="timer-v2__text darkgray">До конца скидок:</span>
-                    <div class="timer-v2__count" data-count="hours">
-                        <span class="timer-v2__number skewed-element skewed-text">0</span>
-                        <span class="timer-v2__number skewed-element skewed-text">6</span>
-                    </div>
-                    <div class="timer-v2__count" data-count="minutes">
-                        <span class="timer-v2__number skewed-element skewed-text">5</span>
-                        <span class="timer-v2__number skewed-element skewed-text">3</span>
-                    </div>
-                    <div class="timer-v2__count" data-count="seconds">
-                        <span class="timer-v2__number skewed-element skewed-text">2</span>
-                        <span class="timer-v2__number skewed-element skewed-text">1</span>
-                    </div>
+    <div class="temp-event skewed-element">
+        <span class="temp-event__image icon"></span>
+        <h1 class="temp-event__summary">
+            <span>Осенние скидки</span>
+            <span class="temp-event__summary--marked">-50% на всё</span>
+        </h1>
+        <div class="temp-event__end">
+            <div class="timer-v2">
+                <span class="timer-v2__text darkgray">До конца скидок:</span>
+                <div class="timer-v2__count" data-count="hours">
+                    <span class="timer-v2__number skewed-element skewed-text">0</span>
+                    <span class="timer-v2__number skewed-element skewed-text">6</span>
+                </div>
+                <div class="timer-v2__count" data-count="minutes">
+                    <span class="timer-v2__number skewed-element skewed-text">5</span>
+                    <span class="timer-v2__number skewed-element skewed-text">3</span>
+                </div>
+                <div class="timer-v2__count" data-count="seconds">
+                    <span class="timer-v2__number skewed-element skewed-text">2</span>
+                    <span class="timer-v2__number skewed-element skewed-text">1</span>
                 </div>
             </div>
         </div>
+    </div>
+    <main class="ajax-fickle">
         <div class="page-part">
             <div class="page-part__article">
                 <h2 class="page-part__title">Ваш профиль</h2>
