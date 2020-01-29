@@ -1931,7 +1931,6 @@ input.promocode__input:focus::placeholder {
     background: linear-gradient(to top, #14161a 0%, #151618 100%);
     opacity: 0;
     transform: scale(0.75);
-    transition: .175s linear transform, .15s linear opacity;
     z-index: 26;
 }
 
@@ -2087,14 +2086,14 @@ span.contract-window__bill--numeric {
 
 .scale-out {
     transform: scale(0.75);
-    opacity: 0.25;
-    transition: .175s linear transform, .15s linear opacity;
+    opacity: 0;
+    transition: .175s linear transform, .125s linear opacity;
 }
 
 .scale-in {
     transform: scale(1);
     opacity: 1;
-    transition: .175s linear transform, .15s linear opacity;
+    transition: .175s linear transform, .125s linear opacity;
 }
 
 /* Pay systems */
@@ -2556,6 +2555,28 @@ span.contract-window__bill--numeric {
     color: #c60126;
     margin-top: 1.5em;
     margin-right: 12.52em;
+}
+
+/* Progress Load Bar | Load Indicator */
+
+.load-indicator {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 0.15em;
+    background: #202f0c;
+    z-index: 99;
+    transition: .1s linear opacity;
+}
+
+.load-indicator__fill {
+    position: absolute;
+    background: rgb(136, 204, 49);
+    width: 0%;
+    height: 100%;
+    z-index: inherit;
+    transition: 0.2s ease-in-out width;
 }
 
 /* Footer */
