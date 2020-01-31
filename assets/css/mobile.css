@@ -1,9 +1,9 @@
-@media screen and (max-width: 1320px) {
+@media screen and (max-width: 1120px) {
     body {
-        font-size: 14px;
+        font-size: 18px;
     }
-    .topbar, .stndfspin-features, .live-drops, main, .bottombar, .lastbar {
-        width: 1160px;
+    .topbar, .stndfspin-features, .live-drops, main, .bottombar, .lastbar, .temp-event {
+        max-width: unset;
     }
 }
 
