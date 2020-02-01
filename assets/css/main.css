@@ -22,10 +22,10 @@
 }
 
 :root {
-    --wheel-font-size: 13px;
-    --wheel-item-size: 13em;
-    --wheel-item-skew: 29.649122807017545px;
-    --wheel-indent: -41em;
+    --wheel-font-size: 9px;
+    --wheel-item-size: 20em;
+    --wheel-item-skew: 31.578947368421055px;
+    --wheel-indent: -44.5em;
 }
 
 body {
@@ -57,6 +57,7 @@ strong {
 }
 
 a {
+    color: #767d8c;
     text-decoration: none;
 }
 
@@ -823,12 +824,14 @@ article {
 
 .fortune__circle {
     display: flex;
-    width: inherit;
-    height: 212%;
+    width: 109em;
+    height: 109em;
     padding: 0;
-    margin: 0;
+    margin: auto;
     will-change: transform;
     backface-visibility: hidden;
+    border-radius: 100%;
+    overflow: hidden;
     transition: 16s cubic-bezier(.1, 0, 0, 1) transform;
     animation: 100s linear spinning infinite;
 }
@@ -842,9 +845,9 @@ article {
     justify-items: center;
     align-content: center;
     position: absolute;
-    top: calc(50% - 6.5em);
-    left: calc(50% - 8.125em);
-    width: calc(var(--wheel-item-size) * 1.25);
+    top: calc(50% - (var(--wheel-item-size) / 2));
+    left: calc(50% - ((var(--wheel-item-size) * 1.4) / 2));
+    width: calc(var(--wheel-item-size) * 1.4);
     height: var(--wheel-item-size);
 }
 
@@ -853,7 +856,7 @@ article {
     border-top: var(--wheel-item-size) solid rgba(255, 255, 255, 0.025);
     border-left: var(--wheel-item-skew) solid transparent;
     border-right: var(--wheel-item-skew) solid transparent;
-    border-radius: 100% / 10% 10% 0 0;
+    /* border-radius: 100% 141% 26% 41% / 25% 188% 1% 9%; */
     position: absolute;
     top: 0;
     left: 0;
@@ -867,90 +870,22 @@ article {
     border-left: var(--wheel-underline-width) solid transparent;
     border-right: var(--wheel-underline-width) solid transparent;
     position: absolute;
-    left: 14%;
+    left: 18%;
     right: 0;
     bottom: 0;
-    width: 72.5%;
+    width: 64%;
     z-index: -1;
 }
 
-.fortune__item:first-of-type {
-    transform: rotate(0deg) translateY(var(--wheel-indent));
-}
-
-.fortune__item:nth-of-type(2) {
-    transform: rotateZ(20deg) translateY(var(--wheel-indent));
-}
-
-.fortune__item:nth-of-type(3) {
-    transform: rotate(40deg) translateY(var(--wheel-indent));
-}
-
-.fortune__item:nth-of-type(4) {
-    transform: rotate(60deg) translateY(var(--wheel-indent));
-}
-
-.fortune__item:nth-of-type(5) {
-    transform: rotate(80deg) translateY(var(--wheel-indent))
-}
-
-.fortune__item:nth-of-type(6) {
-    transform: rotate(100deg) translateY(var(--wheel-indent))
-}
-
-.fortune__item:nth-of-type(7) {
-    transform: rotate(120deg) translateY(var(--wheel-indent))
-}
-
-.fortune__item:nth-of-type(8) {
-    transform: rotate(140deg) translateY(var(--wheel-indent))
-}
-
-.fortune__item:nth-of-type(9) {
-    transform: rotate(160deg) translateY(var(--wheel-indent))
-}
-
-.fortune__item:nth-of-type(10) {
-    transform: rotate(180deg) translateY(var(--wheel-indent))
-}
-
-.fortune__item:nth-of-type(11) {
-    transform: rotate(200deg) translateY(var(--wheel-indent))
-}
-
-.fortune__item:nth-of-type(12) {
-    transform: rotate(220deg) translateY(var(--wheel-indent));
-}
-
-.fortune__item:nth-of-type(13) {
-    transform: rotate(240deg) translateY(var(--wheel-indent));
-}
-
-.fortune__item:nth-of-type(14) {
-    transform: rotate(260deg) translateY(var(--wheel-indent));
-}
-
-.fortune__item:nth-of-type(15) {
-    transform: rotate(280deg) translateY(var(--wheel-indent));
-}
-
-.fortune__item:nth-of-type(16) {
-    transform: rotate(300deg) translateY(var(--wheel-indent));
-}
-
-.fortune__item:nth-of-type(17) {
-    transform: rotate(320deg) translateY(var(--wheel-indent));
-}
-
-.fortune__item:nth-of-type(18) {
-    transform: rotate(340deg) translateY(var(--wheel-indent));
+.fortune__item>* {
+    font-size: 1.75em !important;
 }
 
 .fortune-wheel {
     display: inline-flex;
-    width: 110em;
-    height: 51em;
-    padding-top: 5em;
+    width: 121em;
+    height: 60.5em;
+    padding-top: 7.5em;
     margin: 0 auto;
     position: relative;
     font-size: var(--wheel-font-size);
@@ -975,28 +910,28 @@ article {
 
 .fortune-wheel__curve-1 {
     position: absolute;
-    top: -5%;
-    left: -35%;
-    width: 170%;
-    height: 225%;
-    background: url(../img/wheel_curves_1.png) no-repeat center/110em;
+    top: 2%;
+    left: 0%;
+    width: 100%;
+    height: 200%;
+    background: url(../img/wheel_curves_1.png) no-repeat center/contain;
     border-radius: 100%;
 }
 
 .fortune-wheel__curve-2 {
     position: absolute;
-    top: -10%;
-    left: -35%;
-    width: 170%;
-    height: 225%;
-    background: url(../img/wheel_curves_2.png) no-repeat center/64em;
+    top: 48%;
+    left: 25%;
+    width: 50%;
+    height: 100%;
+    background: url(../img/wheel_curves_2.png) no-repeat center/contain;
     border-radius: 100%;
 }
 
 .fortune-wheel::after {
     content: '';
     position: absolute;
-    top: 1em;
+    top: 2.5em;
     left: calc(50% - 2em);
     width: 4em;
     height: 6.5em;
@@ -1108,6 +1043,7 @@ article {
     grid-template-columns: repeat(6, 1fr);
     align-items: center;
     text-align: center;
+    width: 100%;
 }
 
 .sorted-skins__unit {
@@ -1250,6 +1186,19 @@ article {
     z-index: 2;
 }
 
+.sorted-skins__empty {
+    position: absolute;
+    display: none;
+    margin-top: 5em;
+    width: 100%;
+}
+
+.sorted-skins__empty:only-child {
+    display: unset;
+}
+
+/* Sorted Contracts */
+
 .sorted-cotracts {
     display: grid;
     grid-gap: 2em;
@@ -1341,6 +1290,7 @@ article {
     display: flex;
     align-items: center;
     justify-content: space-around;
+    width: 100%;
     font-size: 0.85em;
 }
 

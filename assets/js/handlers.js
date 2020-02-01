@@ -18,11 +18,9 @@ features.timer.initiate({
     minutes: 6, 
 });
 
-console.log("Timer", features.timer.promise);
-
 // Wheel
 
-function wheel_start() {
+function wheel_start(fast = false) {
     features.wheel.init();
 
     /*
@@ -45,82 +43,8 @@ function wheel_start() {
                 title: "Skin бомжа0",
             }
         },
-
-        1: {
-            id: 7,
-            skin: {
-                image: "https://standoffcase.ru/img/hFRns34E7g-Screenshot_8.jpg",
-                title: "Skin бомжа0",
-            }
-        },
-
-        2: {
-            id: 7,
-            skin: {
-                image: "https://standoffcase.ru/img/hFRns34E7g-Screenshot_8.jpg",
-                title: "Skin бомжа0",
-            }
-        },
-
-        3: {
-            id: 7,
-            skin: {
-                image: "https://standoffcase.ru/img/hFRns34E7g-Screenshot_8.jpg",
-                title: "Skin бомжа0",
-            }
-        },
-
-        4: {
-            id: 7,
-            skin: {
-                image: "https://standoffcase.ru/img/hFRns34E7g-Screenshot_8.jpg",
-                title: "Skin бомжа0",
-            }
-        },
-
-        5: {
-            id: 7,
-            skin: {
-                image: "https://standoffcase.ru/img/hFRns34E7g-Screenshot_8.jpg",
-                title: "Skin бомжа0",
-            }
-        },
-
-        6: {
-            id: 7,
-            skin: {
-                image: "https://standoffcase.ru/img/hFRns34E7g-Screenshot_8.jpg",
-                title: "Skin бомжа0",
-            }
-        },
-
-        7: {
-            id: 7,
-            skin: {
-                image: "https://standoffcase.ru/img/hFRns34E7g-Screenshot_8.jpg",
-                title: "Skin бомжа0",
-            }
-        },
-
-        8: {
-            id: 7,
-            skin: {
-                image: "https://standoffcase.ru/img/hFRns34E7g-Screenshot_8.jpg",
-                title: "Skin бомжа0",
-            }
-        },
-
-        9: {
-            id: 7,
-            skin: {
-                image: "https://standoffcase.ru/img/hFRns34E7g-Screenshot_8.jpg",
-                title: "Skin бомжа0",
-            }
-        },
-    });
+    }, fast);
 }
-
-console.log("Wheel", features.wheel.promise);
 /*
 features.wheel.reopen.onclick = function () {
     console.log("The wheel has been reopenned");
