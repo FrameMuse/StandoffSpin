@@ -1238,6 +1238,7 @@ article {
 .faq {
     display: grid;
     grid-gap: 0.5em;
+    width: 100%;
 }
 
 .faq__clause {
@@ -2402,7 +2403,9 @@ span.contract-window__bill--numeric {
 }
 
 .feeder--filled {
+    padding: 2em;
     background: rgba(34, 35, 38, 0.5);
+    border-radius: 0.125em;
 }
 
 .feeder__title {
