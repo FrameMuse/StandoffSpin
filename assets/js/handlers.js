@@ -1,23 +1,5 @@
 // Handlers
 
-// Minor Functions
-
-features.sound.onclick = function (tap) {
-    console.log("Sound has been turned " + tap);
-}
-
-features.lang.onclick = function (tap) {
-    console.log("Language has been switched to " + tap);
-}
-
-// Timer
-
-features.timer.initiate({
-    seconds: 14,
-    hours: 2,
-    minutes: 6, 
-});
-
 // Wheel
 
 function wheel_start(fast = false) {
@@ -37,6 +19,27 @@ function wheel_start(fast = false) {
 
     features.wheel.multiple_win({
         0: {
+            id: 7,
+            skin: {
+                image: "https://standoffcase.ru/img/hFRns34E7g-Screenshot_8.jpg",
+                title: "Skin бомжа0",
+            }
+        },
+        1: {
+            id: 7,
+            skin: {
+                image: "https://standoffcase.ru/img/hFRns34E7g-Screenshot_8.jpg",
+                title: "Skin бомжа0",
+            }
+        },
+        2: {
+            id: 7,
+            skin: {
+                image: "https://standoffcase.ru/img/hFRns34E7g-Screenshot_8.jpg",
+                title: "Skin бомжа0",
+            }
+        },
+        3: {
             id: 7,
             skin: {
                 image: "https://standoffcase.ru/img/hFRns34E7g-Screenshot_8.jpg",
