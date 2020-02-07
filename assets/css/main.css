@@ -267,6 +267,7 @@ a.ghost {
 }
 
 .topbar-language__text {
+    width: 2em;
     text-transform: uppercase;
 }
 
@@ -1430,6 +1431,7 @@ article {
     display: flex;
     align-items: stretch;
     justify-content: space-between;
+    width: 100%;
     margin: 5em 0;
     font-size: 0.95em;
 }
@@ -2396,10 +2398,6 @@ span.contract-window__bill--numeric {
 .feeder {
     flex: 1;
     background: transparent;
-}
-
-.feeder:first-child {
-    margin-right: 3em;
 }
 
 .feeder--filled {
