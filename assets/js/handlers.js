@@ -43,7 +43,7 @@ features.wheel.release = function (fast = false) {
     features.wheel.init();
     // API Connection
     api.post("/case/open", {
-        id: features.paging.PageLoaded,
+        id: features.paging.pageLoaded[2],
         multiplier: features.wheel.data.multiplier
     }, result => {
         features.wheel.multiple_win(result.itemList, fast);
