@@ -1,58 +1,58 @@
 // Handlers
 
+features.sound.onclick(tap => {
+
+});
+
+function socket() {
+    var socket = io('/', {
+        reconnectionDelay: 10
+    });
+
+    socket.on('standoffspin:App\\Events\\LiveEvent', (data) => {
+        data = data.result;
+
+        switch (data.action) {
+            case "online":
+                // Обновление статистики
+                break;
+            case "livedrop":
+                // Добавление дропа в ленту
+                break;
+        }
+
+    });
+}
+
+// Contracts
+
+features.paging.addPage("/contracts", () => {
+    features.contract.init();
+    features.contract.spot.init();
+    features.canvas.init();
+});
+
 // Wheel
 
-function wheel_start(fast = false) {
+features.wheel.events.release = (fast = false) => {
     features.wheel.init();
-
-    /*
-    
-    features.wheel.win({
-        id: 14,
-        skin: {
-            image: "https://standoffcase.ru/img/hFRns34E7g-Screenshot_8.jpg",
-            title: "Skin бомжа",
-        },
+    // API Connection
+    api.post("/case/open", {
+        id: features.paging.PageLoaded,
+        multiplier: this.data.multiplier
+    }, result => {
+        features.wheel.multiple_win(result, fast);
     });
-    
-    */
+}
 
-    features.wheel.multiple_win({
-        0: {
-            id: 7,
-            skin: {
-                image: "https://standoffcase.ru/img/hFRns34E7g-Screenshot_8.jpg",
-                title: "Skin бомжа0",
-            }
-        },
-        1: {
-            id: 7,
-            skin: {
-                image: "https://standoffcase.ru/img/hFRns34E7g-Screenshot_8.jpg",
-                title: "Skin бомжа0",
-            }
-        },
-        2: {
-            id: 7,
-            skin: {
-                image: "https://standoffcase.ru/img/hFRns34E7g-Screenshot_8.jpg",
-                title: "Skin бомжа0",
-            }
-        },
-        3: {
-            id: 7,
-            skin: {
-                image: "https://standoffcase.ru/img/hFRns34E7g-Screenshot_8.jpg",
-                title: "Skin бомжа0",
-            }
-        },
-    }, fast);
-}
-/*
-features.wheel.reopen.onclick = function () {
-    console.log("The wheel has been reopenned");
-}
-*/
+$(document).on("click", ".fortune-wheel__button--0", () => {
+    features.wheel.events.release(true)
+});
+$(document).on("click", ".fortune-wheel__button--1", () => {
+    features.wheel.events.release(false)
+});
+
+
 // Popup
 
 features.popup.on = function ($window, options = {}) {
