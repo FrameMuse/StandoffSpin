@@ -1,7 +1,9 @@
 // Handlers
 
-features.sound.onclick(tap => {
-
+features.lang.onclick(tap => {
+    api.post("/language/set/" + tap, null, function () {
+        window.location.reload();
+    });
 });
 
 function socket() {
@@ -26,7 +28,7 @@ function socket() {
 
 // Contracts
 
-features.paging.addPage("/contracts", () => {
+features.paging.addPage("/contracts.html", () => {
     features.contract.init();
     features.contract.spot.init();
     features.canvas.init();
@@ -34,22 +36,22 @@ features.paging.addPage("/contracts", () => {
 
 // Wheel
 
-features.wheel.events.release = (fast = false) => {
+features.wheel.release = function (fast = false) {
     features.wheel.init();
     // API Connection
     api.post("/case/open", {
         id: features.paging.PageLoaded,
-        multiplier: this.data.multiplier
+        multiplier: features.wheel.data.multiplier
     }, result => {
-        features.wheel.multiple_win(result, fast);
+        features.wheel.multiple_win(result.itemList, fast);
     });
 }
 
 $(document).on("click", ".fortune-wheel__button--0", () => {
-    features.wheel.events.release(true)
+    features.wheel.release(true)
 });
 $(document).on("click", ".fortune-wheel__button--1", () => {
-    features.wheel.events.release(false)
+    features.wheel.release(false)
 });
 
 
