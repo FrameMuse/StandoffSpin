@@ -50,9 +50,11 @@ features.wheel.release = function (fast = false) {
         id: features.paging.pageLoaded[2],
         multiplier: features.wheel.data.multiplier
     }, result => {
+        if (error in result)
+            features.paging.notify("error", result.error_msg)
         features.wheel.multiple_win(result.itemList, fast);
         // Balance Update
-        DOM.update("required-update", {balance: result.balance});
+        DOM.update("required-update", {balance: split_number(result.balance) + " Р"});
     });
 }
 
