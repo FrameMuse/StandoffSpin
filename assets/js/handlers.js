@@ -1,30 +1,33 @@
 // Handlers
 
+// Socket
+
+postLoader.add(() => {
+    const socket = io('/', {
+        reconnectionDelay: 10
+    });
+
+    socket.on('standoffspin:App\\Events\\LiveEvent', (data) => {
+        var action = data.result.action;
+        delete data.result.action;
+        var result = data.result;
+        switch (action) {
+            case "online":
+                DOM.update("socket-update", result);
+                break;
+            case "livedrop":
+                features.liveFeed.add();
+                break;
+        }
+    });
+});
+
+
 features.lang.onclick(tap => {
     api.post("/language/set/" + tap, null, function () {
         window.location.reload();
     });
 });
-
-function socket() {
-    var socket = io('/', {
-        reconnectionDelay: 10
-    });
-
-    socket.on('standoffspin:App\\Events\\LiveEvent', (data) => {
-        data = data.result;
-
-        switch (data.action) {
-            case "online":
-                // Обновление статистики
-                break;
-            case "livedrop":
-                // Добавление дропа в ленту
-                break;
-        }
-
-    });
-}
 
 // Contracts
 
@@ -44,6 +47,8 @@ features.wheel.release = function (fast = false) {
         multiplier: features.wheel.data.multiplier
     }, result => {
         features.wheel.multiple_win(result.itemList, fast);
+        // Balance Update
+        DOM.update("required-update", {balance: result.balance});
     });
 }
 
