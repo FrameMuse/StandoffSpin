@@ -24,20 +24,24 @@ postLoader.add(() => {
 
 
 features.lang.onclick(tap => {
-    api.post("/language/set/" + tap, null, function () {
+    api.post("/language/set/" + tap, { }, function () {
         window.location.reload();
     });
 });
 
 // Contracts
 
-features.paging.addPage("/contracts.html", () => {
+features.paging.addPage("/contracts", () => {
     features.contract.init();
     features.contract.spot.init();
     features.canvas.init();
 });
 
 // Wheel
+
+features.wheel.reopen.onclick = function () {
+    features.paging.load(window.location.pathname);
+}
 
 features.wheel.release = function (fast = false) {
     features.wheel.init();
@@ -52,10 +56,10 @@ features.wheel.release = function (fast = false) {
     });
 }
 
-$(document).on("click", ".fortune-wheel__button--0", () => {
+$(document).on("click", ".box__view .fortune-wheel__button--0", () => {
     features.wheel.release(true)
 });
-$(document).on("click", ".fortune-wheel__button--1", () => {
+$(document).on("click", ".box__view .fortune-wheel__button--1", () => {
     features.wheel.release(false)
 });
 
