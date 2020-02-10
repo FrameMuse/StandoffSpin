@@ -2,11 +2,11 @@
 
 // Socket
 
-postLoader.add(() => {
-    const socket = io('/', {
-        reconnectionDelay: 10
-    });
+const socket = io('/', {
+    reconnectionDelay: 10
+});
 
+postLoader.add(() => {
     socket.on('standoffspin:App\\Events\\LiveEvent', (data) => {
         var action = data.result.action;
         delete data.result.action;
