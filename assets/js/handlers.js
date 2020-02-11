@@ -136,6 +136,35 @@ $(document).on("click", ".js-referal-save-button", function () {
     });
 });
 
+// FAQ
+
+$(document).on("click", ".faq__summary", function () {
+    $(this).parent().toggleClass("faq__clause--deployed");
+});
+
+// Profile
+
+$(document).on("click", ".tab-swithcer__button", function () {
+    // Switching Active Button
+    $(".tab-swithcer__button").removeClass("tab-swithcer__button--active");
+    var tab = $(this).addClass("tab-swithcer__button--active").attr("tab");
+    // Switching Tab
+    $("[class *= 'js-tab-']").addClass("hidden");
+    $("[class *= 'js-tab-" + tab + "']").removeClass("hidden");
+});
+
+// Skins
+
+$(document).on("click", ".sorted-skins .sorted-skins__unit[pickable]", function () {
+    features.contract.spot.takePlace($(this));
+    features.contract.update_DOM();
+});
+
+$(document).on("click", ".contract__spot .sorted-skins__unit[pickable]", function () {
+    features.contract.spot.freeUpPlace($(this));
+    features.contract.update_DOM();
+});
+
 // Popup
 
 features.popup.on = function ($window, options = {}) {
