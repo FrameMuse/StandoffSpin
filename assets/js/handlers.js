@@ -101,18 +101,20 @@ $(document).on("click", ".box__view .fortune-wheel__button--1", () => {
 // Bonuses
 
 $(document).on("click", ".feeder[data-id] .feeder__button:not([disabled])", function () {
-    api.post("/bonus/request", {
-        id: +$(this).parent().attr("data-id"),
-    }, (result) => {
-        $(this).val(result.success_msg)
+    $(this).each(function () {
+        api.post("/bonus/request", {
+            id: +$(this).parent().attr("data-id"),
+        }, (result) => {
+            $(this).val(result.success_message)
+        });
     });
 });
 
 $(document).on("click", ".js-bonus-balance-button", function () {
-    api.post("/bonus/request", {
+    api.post("/bonus/prize_promo", {
         promo: $(".js-bonus-balance-gap").val(),
     }, (result) => {
-        features.paging.notify("success", result.success_msg)
+        features.paging.notify("success", result.success_message)
     });
 });
 
@@ -122,7 +124,7 @@ $(document).on("click", ".js-referal-active-button", function () {
     api.post("/referal/active", {
         code: $(".js-referal-active-gap").val(),
     }, (result) => {
-        features.paging.notify("success", result.success_msg)
+        features.paging.notify("success", result.success_message)
     });
 });
 
@@ -130,7 +132,7 @@ $(document).on("click", ".js-referal-save-button", function () {
     api.post("/referal/save", {
         code: $(".js-referal-save-gap").val(),
     }, (result) => {
-        features.paging.notify("success", result.success_msg)
+        features.paging.notify("success", result.success_message)
     });
 });
 
