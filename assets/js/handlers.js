@@ -1,12 +1,19 @@
 // Handlers
 
-// Socket
+// DOM Listening for LiveFeed Change
 
-const socket = io('/', {
-    reconnectionDelay: 10
+DOM.listen(".live-drops__inner", (type, element) => {
+    if (type != "childList") return;
+    var length = $(element).find(".weapon-skins__weapon").length;
+    if (length > 25) features.liveFeed.removeLast();
 });
 
-postLoader.add(() => {
+// Socket
+
+(function () {
+    const socket = io('/', {
+        reconnectionDelay: 10
+    });
     socket.on('standoffspin:App\\Events\\LiveEvent', (data) => {
         var action = data.result.action;
         delete data.result.action;
@@ -16,20 +23,23 @@ postLoader.add(() => {
                 DOM.update("socket-update", result);
                 break;
             case "livedrop":
-                features.liveFeed.add();
+                for (const item in result.items) {
+                    features.liveFeed.add(item);
+                }
                 break;
         }
     });
-});
+})()
 
+// Language
 
-features.lang.onclick(tap => {
-    api.post("/language/set/" + tap, { }, function () {
+features.lang.onclick = function (tap) {
+    api.post("/language/set/" + tap, {}, function () {
         window.location.reload();
     });
-});
+}
 
-// Contracts
+// Pages
 
 features.paging.addPage("/contracts", () => {
     features.contract.init();
@@ -37,7 +47,15 @@ features.paging.addPage("/contracts", () => {
     features.canvas.init();
 });
 
-// Wheel
+features.paging.addPage("/referal", () => {
+    features.referal.init();
+});
+
+features.paging.addPage("/bonuses", () => {
+    // Бонусики
+});
+
+// Opencase Wheel
 
 features.wheel.reopen.onclick = function () {
     features.paging.load(window.location.pathname);
@@ -50,8 +68,10 @@ features.wheel.release = function (fast = false) {
         id: features.paging.pageLoaded[2],
         multiplier: features.wheel.data.multiplier
     }, result => {
-        if (error in result)
+        if (error in result) {
             features.paging.notify("error", result.error_msg)
+            return;
+        }
         features.wheel.multiple_win(result.itemList, fast);
         // Balance Update
         DOM.update("required-update", {balance: split_number(result.balance) + " Р"});
