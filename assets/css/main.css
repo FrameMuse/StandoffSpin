@@ -1049,6 +1049,7 @@ article {
     grid-template-columns: repeat(6, 1fr);
     align-items: center;
     text-align: center;
+    margin-bottom: 5em;
     width: 100%;
 }
 
@@ -1562,7 +1563,7 @@ b {
 
 .profile-info::before, .profile-confirmation::before {
     left: unset;
-    right: -4em;
+    right: -2.5em;
     width: 0.125em;
     background: linear-gradient(to bottom, transparent, rgba(255, 255, 255, 0.25), transparent);
 }
@@ -2394,10 +2395,6 @@ span.contract-window__bill--numeric {
     margin-top: 5em;
 }
 
-.invites-row .feeder:first-child {
-    margin-right: 5em;
-}
-
 .bonuses {
     display: grid;
     grid-gap: 2em;
@@ -2447,15 +2444,12 @@ span.contract-window__bill--numeric {
 
 .feeder__button[disabled] {
     cursor: not-allowed;
-    color: #707070!important;
-    border-color: #707070!important
+    background: rgba(136, 204, 49, 0.1);
+    border: 0.1em solid #88cc31;
 }
 
 .feeder__button[disabled]:hover {
-    background: unset;
-    cursor: not-allowed;
-    color: #707070!important;
-    border-color: #707070!important
+    background: transparent;
 }
 
 .feeder__gap {
@@ -2606,7 +2600,7 @@ span.contract-window__bill--numeric {
     position: absolute;
     bottom: 0;
     width: 100%;
-    height: 0.15em;
+    height: 0.15fortune-wheel__inner--1em;
 }
 
 /* Footer */
@@ -2614,7 +2608,7 @@ span.contract-window__bill--numeric {
 footer {
     display: grid;
     padding: 3em 5em;
-    margin: 10em 0 0;
+    margin: 5em 0 0;
     background: #151618;
     box-shadow: 0 0 15px #151618;
 }

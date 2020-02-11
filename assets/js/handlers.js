@@ -22,6 +22,11 @@ DOM.listen(".live-drops__inner", (type, element) => {
             case "online":
                 DOM.update("socket-update", result);
                 break;
+            
+            case "bonus_update":
+                DOM.update("bonus-update", result);
+                break;
+            
             case "livedrop":
                 for (const item in result.items) {
                     features.liveFeed.add(item);
@@ -29,6 +34,12 @@ DOM.listen(".live-drops__inner", (type, element) => {
                 break;
         }
     });
+})();
+
+(function () {
+    setInterval(() => {
+        api.post("/user/update");
+    }, 270000);
 })()
 
 // Language
@@ -68,13 +79,15 @@ features.wheel.release = function (fast = false) {
         id: features.paging.pageLoaded[2],
         multiplier: features.wheel.data.multiplier
     }, result => {
-        if (error in result) {
+        if ("error" in result) {
             features.paging.notify("error", result.error_msg)
             return;
         }
         features.wheel.multiple_win(result.itemList, fast);
         // Balance Update
-        DOM.update("required-update", {balance: split_number(result.balance) + " Р"});
+        DOM.update("required-update", {
+            balance: split_number(result.balance) + " Р"
+        });
     });
 }
 
@@ -85,6 +98,41 @@ $(document).on("click", ".box__view .fortune-wheel__button--1", () => {
     features.wheel.release(false)
 });
 
+// Bonuses
+
+$(document).on("click", ".feeder[data-id] .feeder__button:not([disabled])", function () {
+    api.post("/bonus/request", {
+        id: +$(this).parent().attr("data-id"),
+    }, (result) => {
+        $(this).val(result.success_msg)
+    });
+});
+
+$(document).on("click", ".js-bonus-balance-button", function () {
+    api.post("/bonus/request", {
+        promo: $(".js-bonus-balance-gap").val(),
+    }, (result) => {
+        features.paging.notify("success", result.success_msg)
+    });
+});
+
+// Referal
+
+$(document).on("click", ".js-referal-active-button", function () {
+    api.post("/referal/active", {
+        code: $(".js-referal-active-gap").val(),
+    }, (result) => {
+        features.paging.notify("success", result.success_msg)
+    });
+});
+
+$(document).on("click", ".js-referal-save-button", function () {
+    api.post("/referal/save", {
+        code: $(".js-referal-save-gap").val(),
+    }, (result) => {
+        features.paging.notify("success", result.success_msg)
+    });
+});
 
 // Popup
 
