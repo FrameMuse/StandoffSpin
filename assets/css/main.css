@@ -2600,7 +2600,7 @@ span.contract-window__bill--numeric {
     position: absolute;
     bottom: 0;
     width: 100%;
-    height: 0.15fortune-wheel__inner--1em;
+    height: 0.15em;
 }
 
 /* Footer */
