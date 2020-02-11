@@ -24,7 +24,7 @@ DOM.listen(".live-drops__inner", (type, element) => {
                 break;
             
             case "bonus_update":
-                DOM.update("bonus-update", result);
+                DOM.update("bonus-update--" + result.bonus_id, result);
                 break;
             
             case "livedrop":
