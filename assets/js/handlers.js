@@ -20,11 +20,11 @@ DOM.listen(".live-drops__inner", (type, element) => {
         var result = data.result;
         switch (action) {
             case "online":
-                DOM.update("socket-update", result);
+                DOM.update("socket-update", result, true);
                 break;
             
             case "bonus_update":
-                DOM.update("bonus-update--" + result.bonus_id, result);
+                DOM.update("bonus-update--" + result.bonus_id, result, true);
                 break;
             
             case "livedrop":
@@ -164,6 +164,16 @@ $(document).on("click", ".contract__spot .sorted-skins__unit[pickable]", functio
     features.contract.spot.freeUpPlace($(this));
     features.contract.update_DOM();
 });
+
+// Contracts
+
+$(document).on("click", ".popup-window__close, .popup__cover", () => {
+    features.popup.fadeOut();
+});
+
+// Timer
+
+$("[data-time]").timer(false); // True, если нужны дни
 
 // Popup
 

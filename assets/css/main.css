@@ -302,7 +302,7 @@ a.ghost {
 
 .topbar-profile__column {
     display: grid;
-    grid-gap: 0.375em;
+    column-gap: 0.375em;
     text-transform: uppercase;
     font-size: 0.875em;
 }
@@ -398,7 +398,7 @@ a.ghost {
 
 .stndfspin-features__column {
     display: grid;
-    grid-gap: 0.5em;
+    column-gap: 0.5em;
     margin-left: 1em;
     font-weight: 600;
     font-size: 0.75em;
@@ -459,6 +459,7 @@ a.ghost {
 .weapon-skins__weapon {
     display: inline-grid;
     animation: 0.24s ease weapon-fade-in;
+    cursor: pointer;
 }
 
 .weapon-skins__unit {
@@ -523,6 +524,27 @@ a.ghost {
 .live-drops .weapon-skins__image {
     width: 7em;
     height: 3.7em;
+    transition: 0.225s linear transform 0.225s;
+}
+
+.weapon-skins-owner {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background: rebeccapurple;
+    transform: rotateY(90deg);
+    transition: 0.225s linear transform 0s;
+    z-index: -1;
+}
+
+.live-drops .weapon-skins__weapon:hover .weapon-skins__image {
+    transform: rotateY(90deg);
+    transition-delay: 0s;
+}
+
+.live-drops .weapon-skins__weapon:hover .weapon-skins-owner {
+    transform: rotateY(0deg);
+    transition-delay: 0.225s;
 }
 
 .live-drops::before, .live-drops::after {
@@ -694,7 +716,8 @@ article {
 
 .stndfspin-cases {
     display: grid;
-    grid-gap: 2em;
+    row-gap: 2em;
+    column-gap: 2em;
     grid-template-columns: repeat(6, 1fr);
     align-items: center;
     justify-items: center;
@@ -792,7 +815,7 @@ article {
 
 .box__view {
     display: grid;
-    grid-gap: 2em;
+    row-gap: 2em;
     align-content: center;
     justify-items: center;
     text-align: center;
@@ -947,7 +970,7 @@ article {
 .fortune-wheel__inner {
     position: absolute;
     display: grid;
-    grid-gap: 2em;
+    row-gap: 2em;
     align-content: center;
     justify-items: center;
     text-align: center;
@@ -1045,7 +1068,8 @@ article {
 
 .sorted-skins {
     display: grid;
-    grid-gap: 2em;
+    row-gap: 2em;
+    column-gap: 2em;
     grid-template-columns: repeat(6, 1fr);
     align-items: center;
     text-align: center;
@@ -1126,11 +1150,16 @@ article {
 }
 
 .sorted-skins__skin-title {
+    display: grid;
+    row-gap: 0.5em;
+    margin-top: 1em;
+}
+
+.sorted-skins__skin-title--0, .sorted-skins__skin-title--1 {
     font-size: 1em;
     font-weight: 600;
     font-style: italic;
     text-transform: uppercase;
-    margin-top: 1em;
 }
 
 .sorted-skins__marks {
@@ -1208,7 +1237,8 @@ article {
 
 .sorted-cotracts {
     display: grid;
-    grid-gap: 2em;
+    row-gap: 2em;
+    column-gap: 2em;
     grid-template-columns: repeat(2, 1fr);
     text-align: center;
 }
@@ -1228,7 +1258,8 @@ article {
 
 .sorted-cotracts__skins {
     display: grid;
-    grid-gap: 1.5em 1.25em;
+    row-gap: 1.5em;
+    column-gap: 1.25em;
     grid-template-columns: repeat(5, 1fr);
     font-size: 0.625em;
 }
@@ -1244,7 +1275,7 @@ article {
 
 .faq {
     display: grid;
-    grid-gap: 0.5em;
+    row-gap: 0.5em;
     width: 100%;
 }
 
@@ -1324,7 +1355,7 @@ article {
 
 .top__column {
     display: grid;
-    grid-gap: 0.5em;
+    column-gap: 0.5em;
     text-align: center;
     text-transform: uppercase;
     width: 8em;
@@ -1457,7 +1488,7 @@ article {
 
 .profile-info__column {
     display: grid;
-    grid-gap: 0.25em;
+    column-gap: 0.25em;
     margin-left: 1.5em;
 }
 
@@ -1542,7 +1573,7 @@ b {
 
 .profile-stats__column {
     display: grid;
-    grid-gap: 0.35em;
+    column-gap: 0.35em;
     margin-left: 1em;
     text-transform: uppercase;
     text-align: center;
@@ -1650,7 +1681,7 @@ b {
 
 .tab-swithcer {
     display: grid;
-    grid-gap: 1em;
+    column-gap: 1em;
     grid-auto-flow: column;
 }
 
@@ -1876,7 +1907,7 @@ input.promocode__input:focus::placeholder {
 
 .contract__disposal {
     display: grid;
-    grid-gap: 2em;
+    column-gap: 2em;
     grid-template-columns: repeat(5, 1fr);
     align-items: center;
     text-align: center;
@@ -1898,7 +1929,7 @@ input.promocode__input:focus::placeholder {
 
 .contract__column {
     display: grid;
-    grid-gap: 0.25em;
+    column-gap: 0.25em;
     font-size: 0.75em;
     text-transform: uppercase;
     text-align: center;
@@ -1968,7 +1999,7 @@ input.promocode__input:focus::placeholder {
 
 .contract-window__info {
     display: grid;
-    grid-gap: 0.25em;
+    row-gap: 0.25em;
     text-transform: uppercase;
 }
 
@@ -2066,7 +2097,7 @@ span.contract-window__bill--numeric {
 
 .contract-result__column {
     display: grid;
-    grid-gap: 1em;
+    column-gap: 1em;
     align-content: flex-start;
 }
 
@@ -2397,7 +2428,7 @@ span.contract-window__bill--numeric {
 
 .bonuses {
     display: grid;
-    grid-gap: 2em;
+    row-gap: 2em;
     grid-template-columns: repeat(2, 1fr);
 }
 
@@ -2532,7 +2563,7 @@ span.contract-window__bill--numeric {
 
 .feeder__pattern--column {
     display: grid;
-    grid-gap: 0.25em;
+    column-gap: 0.25em;
 }
 
 .feeder__pattern--0 {
@@ -2601,6 +2632,56 @@ span.contract-window__bill--numeric {
     bottom: 0;
     width: 100%;
     height: 0.15em;
+}
+
+/* Dev Notifier */
+
+.dev-log {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    display: grid;
+    align-content: flex-start;
+    justify-content: center;
+    padding: 3em 10em;
+    background: #f1f1f1;
+    max-width: 100%;
+    z-index: 999;
+}
+
+.dev-log__header {
+    display: flex;
+    justify-content: space-between;
+    width: 50em;
+    background: hsla(280, 25%, 50%, 0.85);
+    box-shadow: 0 0 5px -2px black;
+}
+
+.dev-log__header>span {
+    display: inline-block;
+    background: rgba(0, 0, 0, 0.1);
+    padding: 0.9em 1.5em;
+}
+
+.dev-log__body {
+    padding: 2em 1.1em;
+    margin: 0;
+    background: white;
+    box-shadow: 0 0 5px -2px #c5c5c5;
+    width: 55.5em;
+    overflow: auto;
+    color: #333;
+    font-size: 0.9em;
+    /* font-family: "Open Sans"; */
+    letter-spacing: -0.5px;
+    line-height: 1.25;
+}
+
+.dev-log__color {
+    color: hsla(280, 51%, 50%, 1);
+    font-weight: 500;
 }
 
 /* Footer */
