@@ -302,7 +302,7 @@ a.ghost {
 
 .topbar-profile__column {
     display: grid;
-    column-gap: 0.375em;
+    row-gap: 0.375em;
     text-transform: uppercase;
     font-size: 0.875em;
 }
@@ -398,7 +398,7 @@ a.ghost {
 
 .stndfspin-features__column {
     display: grid;
-    column-gap: 0.5em;
+    row-gap: 0.5em;
     margin-left: 1em;
     font-weight: 600;
     font-size: 0.75em;
@@ -482,6 +482,7 @@ a.ghost {
     width: 100%;
     height: 0.175em;
     background: #ccc;
+    z-index: 3;
 }
 
 .weapon-skins__quality--blue {
@@ -525,16 +526,22 @@ a.ghost {
     width: 7em;
     height: 3.7em;
     transition: 0.225s linear transform 0.225s;
+    z-index: 2;
 }
 
 .weapon-skins-owner {
     position: absolute;
+    display: grid;
+    align-items: center;
+    justify-content: center;
+    padding: 1em;
+    background: #565558;
     width: 100%;
     height: 100%;
-    background: rebeccapurple;
+    font-size: 0.45em;
     transform: rotateY(90deg);
     transition: 0.225s linear transform 0s;
-    z-index: -1;
+    z-index: 3;
 }
 
 .live-drops .weapon-skins__weapon:hover .weapon-skins__image {
@@ -547,6 +554,17 @@ a.ghost {
     transition-delay: 0.225s;
 }
 
+.weapon-skins-owner__case-image {
+    width: 5em;
+    height: 5em;
+    object-fit: contain;
+}
+
+.weapon-skins-owner__name {
+    font-size: 1.25em;
+    text-align: center;
+}
+
 .live-drops::before, .live-drops::after {
     content: '';
     position: absolute;
@@ -555,7 +573,7 @@ a.ghost {
     right: 0;
     bottom: 0;
     width: 5em;
-    z-index: 1;
+    z-index: 4;
 }
 
 .live-drops::before {
@@ -685,7 +703,26 @@ main {
 .page-part__article {
     display: grid;
     justify-content: center;
+}
+
+.page-part>.page-part__article {
     margin-bottom: 2em;
+}
+
+.page-part__article-flex {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 2em;
+}
+
+.page-part__article--center {
+    display: grid;
+}
+
+.page-part__article--right {
+    position: absolute;
+    right: 0;
+    font-size: 0.85em;
 }
 
 .page-part__title {
@@ -1078,6 +1115,7 @@ article {
 }
 
 .sorted-skins__unit {
+    width: 12em;
     padding: 1.5em;
     background: #212326;
     border-bottom: 0.125em solid;
@@ -1153,6 +1191,7 @@ article {
     display: grid;
     row-gap: 0.5em;
     margin-top: 1em;
+    text-align: center;
 }
 
 .sorted-skins__skin-title--0, .sorted-skins__skin-title--1 {
@@ -1488,7 +1527,7 @@ article {
 
 .profile-info__column {
     display: grid;
-    column-gap: 0.25em;
+    row-gap: 0.25em;
     margin-left: 1.5em;
 }
 
@@ -1573,7 +1612,7 @@ b {
 
 .profile-stats__column {
     display: grid;
-    column-gap: 0.35em;
+    row-gap: 0.35em;
     margin-left: 1em;
     text-transform: uppercase;
     text-align: center;
@@ -1665,18 +1704,23 @@ b {
 .tab-swithcer__button {
     padding: 1em 2em;
     border-radius: 0.25em;
+    background: rgba(255, 255, 255, 0.05);
     font-size: 1em;
     font-weight: 500;
     text-transform: uppercase;
     cursor: pointer;
 }
 
-.tab-swithcer__button::before {
-    background: rgba(255, 255, 255, 0.05);
+.tab-swithcer__button--active {
+    background: rgba(255, 255, 255, 0.15);
 }
 
-.tab-swithcer__button--active::before {
-    background: rgba(255, 255, 255, 0.15);
+.skewed-element.tab-swithcer__button {
+    background: unset;
+}
+
+.skewed-element.tab-swithcer__button::before {
+    background: rgba(255, 255, 255, 0.05);
 }
 
 .tab-swithcer {
@@ -1907,6 +1951,7 @@ input.promocode__input:focus::placeholder {
 
 .contract__disposal {
     display: grid;
+    row-gap: 2em;
     column-gap: 2em;
     grid-template-columns: repeat(5, 1fr);
     align-items: center;

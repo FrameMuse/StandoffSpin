@@ -5,7 +5,7 @@
 DOM.listen(".live-drops__inner", (type, element) => {
     if (type != "childList") return;
     var length = $(element).find(".weapon-skins__weapon").length;
-    if (length > 25) features.liveFeed.removeLast();
+    if (length > 25) page.liveFeed.removeLast();
 });
 
 // Socket
@@ -29,7 +29,7 @@ DOM.listen(".live-drops__inner", (type, element) => {
             
             case "livedrop":
                 for (const item in result.items) {
-                    features.liveFeed.add(item);
+                    page.liveFeed.add(item);
                 }
                 break;
         }
@@ -42,9 +42,13 @@ DOM.listen(".live-drops__inner", (type, element) => {
     }, 270000);
 })()
 
+// Timer
+
+$("[data-time]").timer(false); // True, если нужны дни
+
 // Language
 
-features.lang.onclick = function (tap) {
+page.lang.onclick = function (tap) {
     api.post("/language/set/" + tap, {}, function () {
         window.location.reload();
     });
@@ -52,50 +56,52 @@ features.lang.onclick = function (tap) {
 
 // Pages
 
-features.paging.addPage("/contracts", () => {
-    features.contract.init();
-    features.contract.spot.init();
-    features.canvas.init();
+page.support.addPage("/contracts", () => {
+    page.contract.init();
+    page.contract.spot.init();
+    page.canvas.init();
 });
 
-features.paging.addPage("/referal", () => {
-    features.referal.init();
+page.support.addPage("/referal", () => {
+    page.referal.init();
 });
 
-features.paging.addPage("/bonuses", () => {
+page.support.addPage("/bonuses", () => {
     // Бонусики
 });
 
-// Opencase Wheel
+// Wheel Opencase
 
-features.wheel.reopen.onclick = function () {
-    features.paging.load(window.location.pathname);
+page.wheel.reopen.onclick = function () {
+    page.support.load(window.location.pathname);
 }
 
-features.wheel.release = function (fast = false) {
-    features.wheel.init();
+page.wheel.release = function (fast = false) {
+    page.wheel.init();
     // API Connection
     api.post("/case/open", {
-        id: features.paging.pageLoaded[2],
-        multiplier: features.wheel.data.multiplier
+        id: page.support.pageLoaded[2],
+        multiplier: page.wheel.data.multiplier
     }, result => {
         if ("error" in result) {
-            features.paging.notify("error", result.error_msg)
+            page.support.notify("error", result.error_msg)
             return;
         }
-        features.wheel.multiple_win(result.itemList, fast);
+        page.wheel.multiple_win(result.itemList, fast);
         // Balance Update
         DOM.update("required-update", {
             balance: split_number(result.balance) + " Р"
         });
+        // Audio
+        if (result.sound != null) new Audio(`/assets/sound/${result.sound}`)
     });
 }
 
 $(document).on("click", ".box__view .fortune-wheel__button--0", () => {
-    features.wheel.release(true)
+    page.wheel.release(true)
 });
 $(document).on("click", ".box__view .fortune-wheel__button--1", () => {
-    features.wheel.release(false)
+    page.wheel.release(false)
 });
 
 // Bonuses
@@ -111,10 +117,10 @@ $(document).on("click", ".feeder[data-id] .feeder__button:not([disabled])", func
 });
 
 $(document).on("click", ".js-bonus-balance-button", function () {
-    api.post("/bonus/prize_promo", {
+    api.post("/promo/prize_promo", {
         promo: $(".js-bonus-balance-gap").val(),
     }, (result) => {
-        features.paging.notify("success", result.success_message)
+        page.support.notify("success", result.success_message)
     });
 });
 
@@ -124,7 +130,7 @@ $(document).on("click", ".js-referal-active-button", function () {
     api.post("/referal/active", {
         code: $(".js-referal-active-gap").val(),
     }, (result) => {
-        features.paging.notify("success", result.success_message)
+        page.support.notify("success", result.success_message)
     });
 });
 
@@ -132,7 +138,7 @@ $(document).on("click", ".js-referal-save-button", function () {
     api.post("/referal/save", {
         code: $(".js-referal-save-gap").val(),
     }, (result) => {
-        features.paging.notify("success", result.success_message)
+        page.support.notify("success", result.success_message)
     });
 });
 
@@ -156,28 +162,43 @@ $(document).on("click", ".tab-swithcer__button", function () {
 // Skins
 
 $(document).on("click", ".sorted-skins .sorted-skins__unit[pickable]", function () {
-    features.contract.spot.takePlace($(this));
-    features.contract.update_DOM();
+    page.contract.spot.takePlace($(this));
+    page.contract.update_DOM();
 });
 
 $(document).on("click", ".contract__spot .sorted-skins__unit[pickable]", function () {
-    features.contract.spot.freeUpPlace($(this));
-    features.contract.update_DOM();
+    page.contract.spot.freeUpPlace($(this));
+    page.contract.update_DOM();
 });
 
-// Contracts
+// Contract
 
-$(document).on("click", ".popup-window__close, .popup__cover", () => {
-    features.popup.fadeOut();
+$(document).on("click", ".contract-window__button", function () {
+    var items;
+    page.contract.spot.spots.filter(function (spot) {
+        items.push(spot.weapon_id);
+    });
+    // API Connection
+    api.post("/contract/create", {
+        items: items
+    }, function (result) {
+        var gap = {
+            0: result.item.name + " | " + result.item.subname,
+            1: result.item.price + " Р",
+        }
+        $(".contract-result__input").each(function (i, e) {
+            $(e).html( gap[i] );
+        });
+    });
 });
-
-// Timer
-
-$("[data-time]").timer(false); // True, если нужны дни
 
 // Popup
 
-features.popup.on = function ($window, options = {}) {
+$(document).on("click", ".popup-window__close, .popup__cover", () => {
+    page.popup.fadeOut();
+});
+
+page.popup.on = function ($window, options = {}) {
     switch ($window) {
         case "withdraw":
             let itemPrice = convert(parseFloat(options.item.price) + parseFloat(options.rnd));
@@ -185,7 +206,7 @@ features.popup.on = function ($window, options = {}) {
             this.wEdit({
                 title: this.title,
                 summary: this.summary.replace('{itemPrice}', itemPrice),
-                content: `<div style="display:flex;justify-content:center;flex-direction:column;align-items:center;"><input class="popup-window__button button1" withdraw-skin placeholder="${this.getLanguage(`popup.${$window}.other.placeholder`)}"><button class="popup-window__button button2" onclick="withdrawConfirm(${item.id}, ${options.rnd})">${this.getLanguage(`popup.${$window}.other.button`)}</button></div>`,
+                content: `<div style="display:flex;justify-content:center;flex-direction:column;align-items:center;"><input class="popup-window__button button1" withdraw-skin placeholder="${getLanguage(`popup.${$window}.other.placeholder`)}"><button class="popup-window__button button2" onclick="withdrawConfirm(${item.id}, ${options.rnd})">${getLanguage(`popup.${$window}.other.button`)}</button></div>`,
             });
             break;
 
@@ -200,7 +221,7 @@ features.popup.on = function ($window, options = {}) {
             this.wEdit({
                 title: this.title,
                 summary: this.summary,
-                content: "<form class='avatar-change' method='POST' enctype='multipart/form-data' action='/api/v1/user/avatar'><div class='avatar-change__title'>" + this.getLanguage("popup.withdraw_avatar.avatar_change__title") + "</div><img src='/img/guest.png' class='avatar-change__avatar'><label><a class='avatar-change__input button1'>" + this.getLanguage("popup.withdraw_avatar.avatar_change__input") + "</a><input accept='.jpg, .png, .jpeg, .gif, .bmp, .tif, .tiff|image/*' type='file' onchange='this.form.submit();' name='file' style='display: none; position: absolute;' ></label></form>",
+                content: "<form class='avatar-change' method='POST' enctype='multipart/form-data' action='/api/v1/user/avatar'><div class='avatar-change__title'>" + getLanguage("popup.withdraw_avatar.avatar_change__title") + "</div><img src='/img/guest.png' class='avatar-change__avatar'><label><a class='avatar-change__input button1'>" + getLanguage("popup.withdraw_avatar.avatar_change__input") + "</a><input accept='.jpg, .png, .jpeg, .gif, .bmp, .tif, .tiff|image/*' type='file' onchange='this.form.submit();' name='file' style='display: none; position: absolute;' ></label></form>",
             });
             break;
 
@@ -208,14 +229,14 @@ features.popup.on = function ($window, options = {}) {
             this.wEdit({
                 title: this.title,
                 content: '<div class="auth"><a href="/auth/vk" class="auth__button auth__button--vkontakte">Вконтакте</a><a href="/auth/twitch" class="auth__button auth__button--twitch">Twitch</a><a href="/auth/youtube" class="auth__button auth__button--youtube">Youtube</a></div>',
-                help: this.getLanguage(`popup.${$window}.help`),
+                help: getLanguage(`popup.${$window}.help`),
             });
             break;
         case "sell_all":
             this.wEdit({
                 title: this.title,
                 summary: this.summary.replace("{price}", options.inventoryPrice),
-                content: `<div style="display:flex;justify-content:center;"><button class="popup-window__button button2" onclick="features.popup.close();">${this.getLanguage("popup." + $window + ".buttons.no")}</button><button class="popup-window__button button1" onclick="${options.callback2}">${this.getLanguage("popup." + $window + ".buttons.yes")}</button></div>`,
+                content: `<div style="display:flex;justify-content:center;"><button class="popup-window__button button2" onclick="features.popup.close();">${getLanguage("popup." + $window + ".buttons.no")}</button><button class="popup-window__button button1" onclick="${options.callback2}">${getLanguage("popup." + $window + ".buttons.yes")}</button></div>`,
             });
             break;
         case "sell_all_error":
@@ -250,14 +271,14 @@ features.popup.on = function ($window, options = {}) {
             $(".popup-window__top-up--big-input").on('input', function () {
                 var value = $(this).val();
                 if (value == "") {
-                    $(".top_up_text").text(this.getLanguage("popup.top_up.promocode.default"));
+                    $(".top_up_text").text(getLanguage("popup.top_up.promocode.default"));
                     return;
                 }
                 $.get("/api/v1/user/promo?name=" + encodeURIComponent(value), (data) => {
                     if (data.percent) {
-                        $(".top_up_text").text(this.getLanguage("popup.top_up.promocode.percent").replace("{percent}", data.percent));
+                        $(".top_up_text").text(getLanguage("popup.top_up.promocode.percent").replace("{percent}", data.percent));
                     } else {
-                        $(".top_up_text").text(this.getLanguage("popup.top_up.promocode.not_found"));
+                        $(".top_up_text").text(getLanguage("popup.top_up.promocode.not_found"));
                     }
                 });
             });
@@ -277,7 +298,7 @@ features.popup.on = function ($window, options = {}) {
             this.wEdit({
                 title: this.title,
                 summary: this.summary,
-                content: `<div style="display:flex;justify-content:center;"><button class="popup-window__button button2" onclick="${options.callback1}">${this.getLanguage("popup." + $window + ".buttons.yes")}</button><button class="popup-window__button button1" onclick="${options.callback2}">${this.getLanguage("popup." + $window + ".buttons.no")}</button></div>`,
+                content: `<div style="display:flex;justify-content:center;"><button class="popup-window__button button2" onclick="${options.callback1}">${getLanguage("popup." + $window + ".buttons.yes")}</button><button class="popup-window__button button1" onclick="${options.callback2}">${getLanguage("popup." + $window + ".buttons.no")}</button></div>`,
             });
             break;
 
