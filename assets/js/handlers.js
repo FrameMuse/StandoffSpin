@@ -8,12 +8,31 @@ DOM.listen(".live-drops__inner", (type, element) => {
     if (length > 25) page.liveFeed.removeLast();
 });
 
+DOM.listen(page.support.fickle, type => {
+    if (type != "childList") return;
+    // Clear variables
+    button_more = {
+        contracts: 0,
+        inventory: 0,
+        history: 0,
+    }
+    // After page is loaded
+    page.support.onPageLoaded(this.pageLoaded);
+    // Run sciprts from loaded page & Prevent Unexpected Errors
+    prevent_error_function(features_toLoad);
+    page.support.progress = 100;
+    setTimeout(() => {
+        page.support.progress = null;
+    }, 282.5);
+});
+
 // Socket
 
 (function () {
     const socket = io('/', {
         reconnectionDelay: 10
     });
+
     socket.on('standoffspin:App\\Events\\LiveEvent', (data) => {
         var action = data.result.action;
         delete data.result.action;
@@ -28,9 +47,9 @@ DOM.listen(".live-drops__inner", (type, element) => {
                 break;
             
             case "livedrop":
-                for (const item in result.items) {
+                result.items.filter(function (item) {
                     page.liveFeed.add(item);
-                }
+                });
                 break;
         }
     });
@@ -40,7 +59,11 @@ DOM.listen(".live-drops__inner", (type, element) => {
     setInterval(() => {
         api.post("/user/update");
     }, 270000);
-})()
+})();
+
+(function () {
+    page.lang.tap = $(".topbar-language__text").html();
+})();
 
 // Language
 
@@ -48,9 +71,50 @@ page.lang.onclick = function (tap) {
     api.post("/language/set/" + tap, {}, function () {
         window.location.reload();
     });
-}
+};
 
 // Pages
+
+page.support.addPage("/profile", (uri) => {
+    api.get("/user/load/" + uri + "/inventory/0", {}, function (result) {
+        result.filter(function (data) {
+            var item = data.item,
+                skin = sorted_skin_html.clone();
+            $(skin).addClass("sorted-cotracts__unit--" + item.class_name);
+            $(skin).find(".sorted-skins__cost").html(item.price);
+            $(skin).find(".sorted-skins__skin-title--0").html(item.name);
+            $(skin).find(".sorted-skins__skin-title--1").html(item.subname);
+            $(skin).find(".weapon-skins__image").src("/img/" + item.image);
+            $(".js-tab-inventory").append(skin);
+        });
+    });
+
+    api.get("/user/load/" + uri + "/contracts/0", {}, function (result) {
+        result.filter(function (data) {
+            var item = data.item,
+                skin = sorted_skin_html.clone();
+            $(skin).addClass("sorted-cotracts__unit--" + item.class_name);
+            $(skin).find(".sorted-skins__cost").html(item.price);
+            $(skin).find(".sorted-skins__skin-title--0").html(item.name);
+            $(skin).find(".sorted-skins__skin-title--1").html(item.subname);
+            $(skin).find(".weapon-skins__image").src("/img/" + item.image);
+            $(".js-tab-contracts").append(skin);
+        });
+    });
+
+    api.get("/user/load/" + uri + "/history_inventory/0", {}, function (result) {
+        result.filter(function (data) {
+            var item = data.item,
+                skin = sorted_skin_html.clone();
+            $(skin).addClass("sorted-cotracts__unit--" + item.class_name);
+            $(skin).find(".sorted-skins__cost").html(item.price);
+            $(skin).find(".sorted-skins__skin-title--0").html(item.name);
+            $(skin).find(".sorted-skins__skin-title--1").html(item.subname);
+            $(skin).find(".weapon-skins__image").src("/img/" + item.image);
+            $(".js-tab-history").append(skin);
+        });
+    });
+});
 
 page.support.addPage("/contracts", () => {
     page.contract.init();
@@ -71,7 +135,7 @@ page.support.addPage("/bonuses", () => {
 
 page.wheel.reopen.onclick = function () {
     page.support.load(window.location.pathname);
-}
+};
 
 page.wheel.release = function (fast = false) {
     page.wheel.init();
@@ -80,10 +144,6 @@ page.wheel.release = function (fast = false) {
         id: page.support.pageLoaded[2],
         multiplier: page.wheel.data.multiplier
     }, result => {
-        if ("error" in result) {
-            page.support.notify("error", result.error_msg)
-            return;
-        }
         page.wheel.multiple_win(result.itemList, fast);
         // Balance Update
         DOM.update("required-update", {
@@ -92,7 +152,7 @@ page.wheel.release = function (fast = false) {
         // Audio
         if (result.sound != null) new Audio(`/assets/sound/${result.sound}`)
     });
-}
+};
 
 $(document).on("click", ".box__view .fortune-wheel__button--0", () => {
     page.wheel.release(true)
@@ -156,6 +216,33 @@ $(document).on("click", ".tab-swithcer__button", function () {
     $("[class *= 'js-tab-" + tab + "']").removeClass("hidden");
 });
 
+$(document).on("click", ".sorted-skins-more-button", function () {
+    var _sorted_ = $(this).parent().find(".weapon-skins");
+    var classes = _sorted_.attr("class").split(" ");
+    var sorted_specified = classes[2].replace("js-tab-", "");
+    var page = button_more[sorted_specified];
+    var type = {
+        contracts: "contracts",
+        inventory: "inventory",
+        history: "history_inventory",
+    }[sorted_specified];
+
+    api.get("/user/load/" + page.support.pageLoaded[2] + "/" + type + "/" + page, {}, function (result) {
+        result.filter(function (data) {
+            var item = data.item,
+                skin = sorted_skin_html.clone();
+            $(skin).addClass("sorted-cotracts__unit--" + item.class_name);
+            $(skin).find(".sorted-skins__cost").html(item.price);
+            $(skin).find(".sorted-skins__skin-title--0").html(item.name);
+            $(skin).find(".sorted-skins__skin-title--1").html(item.subname);
+            $(skin).find(".weapon-skins__image").src("/img/" + item.image);
+            $(".js-tab-" + sorted_specified).append(skin);
+            
+            button_more[sorted_specified]++;
+        });
+    });
+});
+
 // Skins
 
 $(document).on("click", ".sorted-skins .sorted-skins__unit[pickable]", function () {
@@ -171,7 +258,7 @@ $(document).on("click", ".contract__spot .sorted-skins__unit[pickable]", functio
 // Contract
 
 $(document).on("click", ".contract-window__button", function () {
-    var items;
+    var items = [];
     page.contract.spot.spots.filter(function (spot) {
         items.push(spot.data.weapon_id);
     });
@@ -309,4 +396,4 @@ page.popup.on = function ($window, options = {}) {
     }
     // Additional Events
     //if ($window == "top_up") Mmenu("hide");
-}
+};

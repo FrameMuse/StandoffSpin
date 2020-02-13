@@ -1974,7 +1974,7 @@ input.promocode__input:focus::placeholder {
 
 .contract__column {
     display: grid;
-    column-gap: 0.25em;
+    row-gap: 0.25em;
     font-size: 0.75em;
     text-transform: uppercase;
     text-align: center;
@@ -2142,7 +2142,7 @@ span.contract-window__bill--numeric {
 
 .contract-result__column {
     display: grid;
-    column-gap: 1em;
+    row-gap: 1em;
     align-content: flex-start;
 }
 
@@ -2474,6 +2474,7 @@ span.contract-window__bill--numeric {
 .bonuses {
     display: grid;
     row-gap: 2em;
+    column-gap: 2em;
     grid-template-columns: repeat(2, 1fr);
 }
 
