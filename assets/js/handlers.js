@@ -42,10 +42,6 @@ DOM.listen(".live-drops__inner", (type, element) => {
     }, 270000);
 })()
 
-// Timer
-
-$("[data-time]").timer(false); // True, если нужны дни
-
 // Language
 
 page.lang.onclick = function (tap) {
@@ -67,7 +63,8 @@ page.support.addPage("/referal", () => {
 });
 
 page.support.addPage("/bonuses", () => {
-    // Бонусики
+    // Timer
+    $("[data-time]").timer(false); // True, если нужны дни
 });
 
 // Wheel Opencase
@@ -176,7 +173,7 @@ $(document).on("click", ".contract__spot .sorted-skins__unit[pickable]", functio
 $(document).on("click", ".contract-window__button", function () {
     var items;
     page.contract.spot.spots.filter(function (spot) {
-        items.push(spot.weapon_id);
+        items.push(spot.data.weapon_id);
     });
     // API Connection
     api.post("/contract/create", {
