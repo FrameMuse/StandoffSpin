@@ -217,7 +217,7 @@ $(document).on("click", ".tab-swithcer__button", function () {
 });
 
 $(document).on("click", ".sorted-skins-more-button", function () {
-    var _sorted_ = $(this).parent().find(".weapon-skins");
+    var _sorted_ = $(this).parent();
     var classes = _sorted_.attr("class").split(" ");
     var sorted_specified = classes[2].replace("js-tab-", "");
     var page = button_more[sorted_specified];
@@ -228,7 +228,7 @@ $(document).on("click", ".sorted-skins-more-button", function () {
     }[sorted_specified];
 
     api.get("/user/load/" + page.support.pageLoaded[2] + "/" + type + "/" + page, {}, function (result) {
-        result.filter(function (data) {
+        result.result.filter(function (data) {
             var item = data.item,
                 skin = sorted_skin_html.clone();
             $(skin).addClass("sorted-cotracts__unit--" + item.class_name);
@@ -271,7 +271,7 @@ $(document).on("click", ".contract-window__button", function () {
             1: result.item.price + " Р",
         }
         $(".contract-result__input").each(function (i, e) {
-            $(e).html( gap[i] );
+            $(e).val( gap[i] );
         });
     });
 });
