@@ -77,7 +77,7 @@ page.lang.onclick = function (tap) {
 
 page.support.addPage("/profile", (uri) => {
     api.get("/user/load/" + uri + "/inventory/0", {}, function (result) {
-        result.filter(function (data) {
+        result.result.filter(function (data) {
             var item = data.item,
                 skin = sorted_skin_html.clone();
             $(skin).addClass("sorted-cotracts__unit--" + item.class_name);
@@ -90,7 +90,7 @@ page.support.addPage("/profile", (uri) => {
     });
 
     api.get("/user/load/" + uri + "/contracts/0", {}, function (result) {
-        result.filter(function (data) {
+        result.result.filter(function (data) {
             var item = data.item,
                 skin = sorted_skin_html.clone();
             $(skin).addClass("sorted-cotracts__unit--" + item.class_name);
@@ -103,7 +103,7 @@ page.support.addPage("/profile", (uri) => {
     });
 
     api.get("/user/load/" + uri + "/history_inventory/0", {}, function (result) {
-        result.filter(function (data) {
+        result.result.filter(function (data) {
             var item = data.item,
                 skin = sorted_skin_html.clone();
             $(skin).addClass("sorted-cotracts__unit--" + item.class_name);
