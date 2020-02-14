@@ -63,7 +63,8 @@ DOM.listen(page.support.fickle, type => {
 
 (function () {
     page.lang.tap = $(".topbar-language__text").html();
-})();
+    $(".topbar-language__icon").css({ "background-image": `url(${page.lang.path + page.lang.tap + ".png"})` });
+});
 
 // Language
 
