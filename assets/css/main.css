@@ -547,7 +547,7 @@ a.ghost {
 }
 
 .live-drops .weapon-skins__weapon:hover .weapon-skins__image {
-    transform: rotateY(90deg);
+    transform: rotateY(-90deg);
     transition-delay: 0s;
 }
 
