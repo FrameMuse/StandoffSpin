@@ -34,6 +34,7 @@ body {
     background: #18191b url("../img/bg.png") no-repeat;
     font-size: 16px;
     font-family: 'Exo 2', sans-serif;
+    font-family: 'Proxima Nova';
     line-height: 1;
     color: white;
 }
@@ -520,6 +521,7 @@ a.ghost {
 
 .live-drops .weapon-skins__weapon {
     margin-right: 0;
+    font-size: 0.85em;
 }
 
 .live-drops .weapon-skins__image {
@@ -727,6 +729,7 @@ main {
 
 .page-part__title {
     margin: 0;
+    font-size: 1.1em;
     font-weight: 700;
     font-style: italic;
     text-transform: uppercase;
@@ -759,10 +762,12 @@ article {
     align-items: center;
     justify-items: center;
     text-align: center;
+    margin-bottom: 5em;
 }
 
 .stndfspin-cases__case {
     padding: 1.25em;
+    font-size: 0.85em;
     transition: .125s linear background-color;
 }
 
@@ -2754,12 +2759,13 @@ footer {
 }
 
 .bottombar__logo--logo {
-    width: 10em;
+    width: 6.75em;
     filter: contrast(0.25) opacity(0.75) saturate(0);
 }
 
 .bottombar__description {
     width: 25em;
+    font-size: 0.875em;
 }
 
 .bottombar .social-row {
@@ -2773,6 +2779,7 @@ footer {
 
 .bottombar-menu__link {
     margin-left: 1em;
+    font-size: 0.75em;
     font-weight: 600;
     color: #686c75;
     text-transform: uppercase;
@@ -2792,7 +2799,8 @@ footer {
 }
 
 .copyright {
-    font-style: italic;
+    font-size: 0.875em;
     font-weight: bold;
+    font-style: italic;
     color: #686c75;
 }

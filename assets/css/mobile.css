@@ -1,14 +1,8 @@
 @media screen and (max-width: 1120px) {
     body {
-        font-size: 18px;
+        font-size: 13px;
     }
-    .topbar, .stndfspin-features, .live-drops, main, .bottombar, .lastbar, .temp-event {
-        max-width: unset;
-    }
-}
-
-@media screen and (max-width: 1160px) {
-    body {
-        width: 1160px;
+    .topbar, .stndfspin-features, .live-drops, .temp-event, main, .bottombar, .lastbar {
+        width: 1100px;
     }
 }
