@@ -17,7 +17,7 @@ DOM.listen(page.support.fickle, type => {
         history: 0,
     }
     // After page is loaded
-    page.support.onPageLoaded(this.pageLoaded);
+    page.support.onPageLoaded(page.support.pageLoaded);
     // Run sciprts from loaded page & Prevent Unexpected Errors
     prevent_error_function(features_toLoad);
     page.support.progress = 100;
