@@ -80,7 +80,7 @@ page.support.addPage("/profile", (uri) => {
     api.get("/user/load/" + uri + "/inventory/0", {}, function (result) {
         result.result.filter(function (data) {
             var item = data.item,
-                skin = sorted_skin_html.clone();
+                skin = $(sorted_skin_html).clone();
             $(skin).addClass("sorted-cotracts__unit--" + item.class_name);
             $(skin).find(".sorted-skins__cost").html(item.price);
             $(skin).find(".sorted-skins__skin-title--0").html(item.name);
@@ -93,7 +93,7 @@ page.support.addPage("/profile", (uri) => {
     api.get("/user/load/" + uri + "/contracts/0", {}, function (result) {
         result.result.filter(function (data) {
             var item = data.item,
-                skin = sorted_skin_html.clone();
+                skin = $(sorted_skin_html).clone();
             $(skin).addClass("sorted-cotracts__unit--" + item.class_name);
             $(skin).find(".sorted-skins__cost").html(item.price);
             $(skin).find(".sorted-skins__skin-title--0").html(item.name);
@@ -106,7 +106,7 @@ page.support.addPage("/profile", (uri) => {
     api.get("/user/load/" + uri + "/history_inventory/0", {}, function (result) {
         result.result.filter(function (data) {
             var item = data.item,
-                skin = sorted_skin_html.clone();
+                skin = $(sorted_skin_html).clone();
             $(skin).addClass("sorted-cotracts__unit--" + item.class_name);
             $(skin).find(".sorted-skins__cost").html(item.price);
             $(skin).find(".sorted-skins__skin-title--0").html(item.name);
@@ -217,7 +217,7 @@ $(document).on("click", ".tab-swithcer__button", function () {
     $("[class *= 'js-tab-" + tab + "']").removeClass("hidden");
 });
 
-$(document).on("click", ".sorted-skins-more-button", function () {
+$(document).on("click", ".sorted-skins-more-button", () => {
     var _sorted_ = $(this).parent();
     var classes = _sorted_.attr("class").split(" ");
     var sorted_specified = classes[2].replace("js-tab-", "");
@@ -231,7 +231,7 @@ $(document).on("click", ".sorted-skins-more-button", function () {
     api.get("/user/load/" + page.support.pageLoaded[2] + "/" + type + "/" + page, {}, function (result) {
         result.result.filter(function (data) {
             var item = data.item,
-                skin = sorted_skin_html.clone();
+                skin = $(sorted_skin_html).clone();
             $(skin).addClass("sorted-cotracts__unit--" + item.class_name);
             $(skin).find(".sorted-skins__cost").html(item.price);
             $(skin).find(".sorted-skins__skin-title--0").html(item.name);
