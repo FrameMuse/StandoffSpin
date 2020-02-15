@@ -34,7 +34,6 @@ body {
     background: #18191b url("../img/bg.png") no-repeat;
     font-size: 16px;
     font-family: 'Exo 2', sans-serif;
-    font-family: 'Proxima Nova';
     line-height: 1;
     color: white;
 }
@@ -852,10 +851,14 @@ article {
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
-    margin-bottom: 2em;
+    padding-bottom: 15em;
+    margin-bottom: 5em;
+    min-height: 25em;
 }
 
 .box__view {
+    position: absolute;
+    bottom: 0;
     display: grid;
     row-gap: 2em;
     align-content: center;

@@ -63,7 +63,11 @@ DOM.listen(page.support.fickle, type => {
 
 (function () {
     page.lang.tap = $(".topbar-language__text").html();
-    $(".topbar-language__icon").css({ "background-image": `url(${page.lang.path + page.lang.tap + ".png"})` });
+    postLoader.add(() => {
+        $(".topbar-language__icon").css({
+            "background-image": `url(${page.lang.path + page.lang.tap + ".png"})`,
+        });
+    });
 });
 
 // Language
@@ -75,47 +79,6 @@ page.lang.onclick = function (tap) {
 };
 
 // Pages
-
-page.support.addPage("/profile", (uri) => {
-    api.get("/user/load/" + uri + "/inventory/0", {}, function (result) {
-        result.result.filter(function (data) {
-            var item = data.item,
-                skin = $(sorted_skin_html).clone();
-            $(skin).addClass("sorted-cotracts__unit--" + item.class_name);
-            $(skin).find(".sorted-skins__cost").html(item.price);
-            $(skin).find(".sorted-skins__skin-title--0").html(item.name);
-            $(skin).find(".sorted-skins__skin-title--1").html(item.subname);
-            $(skin).find(".weapon-skins__image").src("/img/" + item.image);
-            $(".js-tab-inventory").append(skin);
-        });
-    });
-
-    api.get("/user/load/" + uri + "/contracts/0", {}, function (result) {
-        result.result.filter(function (data) {
-            var item = data.item,
-                skin = $(sorted_skin_html).clone();
-            $(skin).addClass("sorted-cotracts__unit--" + item.class_name);
-            $(skin).find(".sorted-skins__cost").html(item.price);
-            $(skin).find(".sorted-skins__skin-title--0").html(item.name);
-            $(skin).find(".sorted-skins__skin-title--1").html(item.subname);
-            $(skin).find(".weapon-skins__image").src("/img/" + item.image);
-            $(".js-tab-contracts").append(skin);
-        });
-    });
-
-    api.get("/user/load/" + uri + "/history_inventory/0", {}, function (result) {
-        result.result.filter(function (data) {
-            var item = data.item,
-                skin = $(sorted_skin_html).clone();
-            $(skin).addClass("sorted-cotracts__unit--" + item.class_name);
-            $(skin).find(".sorted-skins__cost").html(item.price);
-            $(skin).find(".sorted-skins__skin-title--0").html(item.name);
-            $(skin).find(".sorted-skins__skin-title--1").html(item.subname);
-            $(skin).find(".weapon-skins__image").src("/img/" + item.image);
-            $(".js-tab-history").append(skin);
-        });
-    });
-});
 
 page.support.addPage("/contracts", () => {
     page.contract.init();
@@ -208,39 +171,62 @@ $(document).on("click", ".faq__summary", function () {
 
 // Profile
 
-$(document).on("click", ".tab-swithcer__button", function () {
+$(document).on("click", ".tab-swithcer__button[tab]", function () {
     // Switching Active Button
     $(".tab-swithcer__button").removeClass("tab-swithcer__button--active");
-    var tab = $(this).addClass("tab-swithcer__button--active").attr("tab");
+    var tab = $(this).length == 1 ? $(this).addClass("tab-swithcer__button--active").attr("tab") : $(this).attr("tab");
     // Switching Tab
-    $("[class *= 'js-tab-']").addClass("hidden");
-    $("[class *= 'js-tab-" + tab + "']").removeClass("hidden");
+    $("[class *= 'js-tab-'], [class *= 'js-tab-" + tab + "']").toggleClass("hidden");
 });
 
-$(document).on("click", ".sorted-skins-more-button", () => {
-    var _sorted_ = $(this).parent();
-    var classes = _sorted_.attr("class").split(" ");
+$(document).on("click", ".sorted-skins-more-button", function () {
+    var sorted = $(this).parent().attr("class");
+    var classes = sorted.split(" ");
     var sorted_specified = classes[2].replace("js-tab-", "");
-    var page = button_more[sorted_specified];
+    var page_id = button_more[sorted_specified];
     var type = {
         contracts: "contracts",
         inventory: "inventory",
         history: "history_inventory",
     }[sorted_specified];
 
-    api.get("/user/load/" + page.support.pageLoaded[2] + "/" + type + "/" + page, {}, function (result) {
-        result.result.filter(function (data) {
-            var item = data.item,
-                skin = $(sorted_skin_html).clone();
-            $(skin).addClass("sorted-cotracts__unit--" + item.class_name);
-            $(skin).find(".sorted-skins__cost").html(item.price);
+    api.get("/user/load/" + page.support.pageLoaded[2] + "/" + type + "/" + page_id, {}, result => {
+        if (result.nextPage == false) {
+            $(this).parent().find(".sorted-skins-more-button").remove();
+        }
+        result.result.filter(function (data) {            
+            if (type == "contracts") {
+                var item = data.win,
+                    skin = $(sorted_contracts_html).clone().prepend(
+                        $(sorted_skin_html).clone()
+                    );
+            } else {
+                var item = data.item,
+                    skin = $(sorted_skin_html).clone();
+            }
+            
+            if (type == "contracts") {
+                $(skin).find(".sorted-skins__unit").addClass("sorted-skins__unit--" + item.class_name);
+                $(skin).find(".sorted-cotracts__text span").html(alter_by_currency(data.price, true, true));
+            } else {
+                $(skin).addClass("sorted-skins__unit--" + item.class_name);
+            }
+            //----------------------------------------------------------------------
+            $(skin).find(".sorted-skins__cost").html(alter_by_currency(item.price, true, true));
             $(skin).find(".sorted-skins__skin-title--0").html(item.name);
             $(skin).find(".sorted-skins__skin-title--1").html(item.subname);
-            $(skin).find(".weapon-skins__image").src("/img/" + item.image);
+            $(skin).find(".weapon-skins__image").attr({ src: "/img/" + item.image });
             $(".js-tab-" + sorted_specified).append(skin);
-            
-            button_more[sorted_specified]++;
+            //----------------------------------------------------------------------
+            if (type == "contracts") {
+                data.item_list.filter(function (weapon) {
+                    var item = weapon.item;
+                    $(skin).find(".sorted-cotracts__skins").append(`<div class="weapon-skins__weapon"><img src="${"/img/" + item.image}" class="weapon-skins__image"><span class="weapon-skins__quality weapon-skins__quality--${item.class_name}"></span></div>`);
+                });
+            }
         });
+        // Button More
+        button_more[sorted_specified]++;
     });
 });
 
@@ -347,7 +333,7 @@ page.popup.on = function ($window, options = {}) {
                                 <span class="promocode__text">Если у вас есть промокод введите выше</span>
                             </div>
                             <div class="top-up__row">
-                                <input type="text" class="top-up__text" value="1 000">
+                                <input type="text" class="top-up__text" value="100">
                                 <input type="submit" class="top-up__button" value="Пополнить">
                             </div>
                         </div>`,
