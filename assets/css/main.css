@@ -567,7 +567,7 @@ a.ghost {
 }
 
 .live-drops::before, .live-drops::after {
-    content: '';
+    /* content: ''; */
     position: absolute;
     top: 0;
     left: 0;
@@ -851,7 +851,7 @@ article {
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
-    padding-bottom: 15em;
+    padding-bottom: 10em;
     margin-bottom: 5em;
     min-height: 25em;
 }
@@ -1779,7 +1779,7 @@ b {
     position: absolute;
     width: 50em;
     padding: 3em;
-    background: linear-gradient(to top, #14161a 0%, #151618 100%);
+    background: url("../img/bg2.png"), linear-gradient(to top, #14161a 0%, #151618 100%);
     border-radius: 0.35em;
     opacity: 0;
     transform: scale(0.5);
@@ -2778,6 +2778,10 @@ footer {
 .bottombar__logo--logo {
     width: 6.75em;
     filter: contrast(0.25) opacity(0.75) saturate(0);
+}
+
+.bottombar__logo:hover .bottombar__logo--logo {
+    filter: contrast(1) opacity(1) saturate(1);
 }
 
 .bottombar__description {

@@ -12,9 +12,9 @@ DOM.listen(page.support.fickle, type => {
     if (type != "childList") return;
     // Clear variables
     button_more = {
-        contracts: 0,
-        inventory: 0,
-        history: 0,
+        contracts: 1,
+        inventory: 1,
+        history: 1,
     }
     // After page is loaded
     page.support.onPageLoaded(page.support.pageLoaded);
@@ -63,12 +63,10 @@ DOM.listen(page.support.fickle, type => {
 
 (function () {
     page.lang.tap = $(".topbar-language__text").html();
-    postLoader.add(() => {
-        $(".topbar-language__icon").css({
-            "background-image": `url(${page.lang.path + page.lang.tap + ".png"})`,
-        });
+    $(".topbar-language__icon").css({
+        "background-image": `url(${page.lang.path + page.lang.tap + ".png"})`,
     });
-});
+})();
 
 // Language
 
@@ -79,6 +77,10 @@ page.lang.onclick = function (tap) {
 };
 
 // Pages
+
+page.support.addPage("/case", () => {
+    page.wheel.count(12);
+});
 
 page.support.addPage("/contracts", () => {
     page.contract.init();
@@ -171,12 +173,18 @@ $(document).on("click", ".faq__summary", function () {
 
 // Profile
 
-$(document).on("click", ".tab-swithcer__button[tab]", function () {
+$(document).on("click", ".tab-swithcer__button[tab]:not(.tab-swithcer__button--only)", function () {
     // Switching Active Button
     $(".tab-swithcer__button").removeClass("tab-swithcer__button--active");
-    var tab = $(this).length == 1 ? $(this).addClass("tab-swithcer__button--active").attr("tab") : $(this).attr("tab");
+    var tab = $(this).addClass("tab-swithcer__button--active").attr("tab");
     // Switching Tab
-    $("[class *= 'js-tab-'], [class *= 'js-tab-" + tab + "']").toggleClass("hidden");
+    $("[class *= 'js-tab-']").addClass("hidden");
+    $("[class *= 'js-tab-" + tab + "']").removeClass("hidden");
+});
+
+$(document).on("click", ".tab-swithcer__button--only[tab]", function () {
+    $(this).toggleClass("tab-swithcer__button--active");
+    $("[class *= 'js-tab-']").toggleClass("hidden");
 });
 
 $(document).on("click", ".sorted-skins-more-button", function () {
@@ -257,9 +265,12 @@ $(document).on("click", ".contract-window__button", function () {
             0: result.item.name + " | " + result.item.subname,
             1: result.item.price + " Р",
         }
+        // Fill the gaps
         $(".contract-result__input").each(function (i, e) {
             $(e).val( gap[i] );
         });
+        // Removing all skins
+        $(".contract__spot .sorted-skins__unit").remove();
     });
 });
 
@@ -307,7 +318,7 @@ page.popup.on = function ($window, options = {}) {
             this.wEdit({
                 title: this.title,
                 summary: this.summary.replace("{price}", options.inventoryPrice),
-                content: `<div style="display:flex;justify-content:center;"><button class="popup-window__button button2" onclick="features.popup.close();">${getLanguage("popup." + $window + ".buttons.no")}</button><button class="popup-window__button button1" onclick="${options.callback2}">${getLanguage("popup." + $window + ".buttons.yes")}</button></div>`,
+                content: `<div style="display:flex;justify-content:center;"><button class="popup-window__button button2" onclick="page.popup.close();">${getLanguage("popup." + $window + ".buttons.no")}</button><button class="popup-window__button button1" onclick="${options.callback2}">${getLanguage("popup." + $window + ".buttons.yes")}</button></div>`,
             });
             break;
         case "sell_all_error":
