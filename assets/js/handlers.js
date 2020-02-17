@@ -100,10 +100,16 @@ page.support.addPage("/bonuses", () => {
 // Wheel Opencase
 
 page.wheel.reopen.onclick = function () {
+    // Not going anymore
+    page.wheel.going = false;
+    // Restart page
     page.support.load(window.location.pathname);
 };
 
 page.wheel.release = function (fast = false) {
+    // If it's going, prevent event
+    if (page.wheel.going) return;
+    // Init
     page.wheel.init();
     // API Connection
     api.post("/case/open", {

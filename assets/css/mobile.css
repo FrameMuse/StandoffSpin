@@ -1,3 +1,31 @@
-.topbar {
-    width: 100%;
+body {
+    width: 100vw;
+}
+
+.topbar, .topbar, .stndfspin-features, .live-drops, .temp-event, main {
+    width: 100vw;
+    max-width: 100vw;
+}
+
+.bottombar {
+    margin-bottom: 2em;
+}
+
+.stndfspin-features__options, .stndfspin-features__stats, .topbar-language {
+    font-size: 0.85em;
+}
+
+.stndfspin-features::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    width: 5em;
+    box-shadow: inset -70px 0 30px -35px #18191b;
+    z-index: 4;
+}
+
+.lastbar, .bottombar__description {
+    font-size: 0.65em;
 }

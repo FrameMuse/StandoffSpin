@@ -3,11 +3,10 @@
 <head>
     <title>Document</title>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="initial-scale=1, width=320, height=device-height, target-densitydpi=410">
     <link href="https://fonts.googleapis.com/css?family=Exo+2:400,400i,500,500i,600,600i,700,700i&display=swap&subset=cyrillic,cyrillic-ext,latin-ext" rel="stylesheet">
-    <link rel="stylesheet" href="assets/css/main.css">
-    <link rel="stylesheet" href="assets/css/mobile.css">
-    <meta http-equiv="refresh" content="1.5">
+    <link rel="stylesheet" href="assets/css/main.css?">
+    <link rel="stylesheet" href="assets/css/main.css?">
 </head>
 <body>
     <header>
@@ -23,12 +22,8 @@
                 <a href="#link" class="topbar-menu__link">Бонусы</a>
                 <a href="#link" class="topbar-menu__link">FAQ</a>
             </nav-->
-            <div class="topbar-language skewed-element js-option-lang">
-                <span class="topbar-language__icon"></span>
-                <span class="topbar-language__text">RUS</span>
-            </div>
             <div class="topbar-profile">
-                <div class="topbar-profile__balance skewed-element">
+                <div class="topbar-profile__balance">
                     <button class="topbar-profile__button" onclick="features.popup.open('top_up')">Пополнить</button>
                     <div class="topbar-profile__column">
                         <b>БАЛАНС</b>
@@ -44,7 +39,7 @@
                 </div>
             </div>
         </div>
-        <div class="stndfspin-features skewed-element">
+        <div class="stndfspin-features">
             <div class="stndfspin-features__options">
                 <div class="stndfspin-features__pattern js-option-volume">
                     <div class="stndfspin-features__icon stndfspin-features__icon--green stndfspin-button stndfspin-button--gray skewed-element">
@@ -55,6 +50,10 @@
                         <span class="darkgray" style="width: 3em;">Вкл.</span>
                     </div>
                 </div>
+            </div>
+            <div class="topbar-language skewed-element js-option-lang">
+                <span class="topbar-language__icon"></span>
+                <span class="topbar-language__text">RUS</span>
             </div>
             <div class="stndfspin-features__stats">
                 <div class="stndfspin-features__pattern">
@@ -94,7 +93,7 @@
                     </div>
                 </div>
             </div>
-            <div class="social-row">
+            <!--div class="social-row">
                 <span class="social-row__title darkgray">Мы в соц. сетях</span>
                 <div class="social-row__icon skewed-element">
                     <span class="social-row__icon--icon icon__vk"></span>
@@ -108,7 +107,7 @@
                     <span class="social-row__icon--icon icon__youtube"></span>
                     <a href="#soc_link" class="ghost"></a>
                 </div>
-            </div>
+            </div-->
         </div>
         <div class="live-drops">
             <div class="live-drops__inner weapon-skins">
@@ -332,17 +331,16 @@
                 <img src="assets/img/logo.svg" class="bottombar__logo--logo">
                 <a href="#!/logo" class="ghost"></a>
             </div>
-            <div class="bottombar__description">
-                На нашем сайте вы можете открыть различные
-                кейсы по игре Standoff 2 и самым выгодным ценам
+            <div class="to-top skewed-element">
+                <span class="to-top__icon"></span>
             </div>
-            <nav class="bottombar-menu">
-                <a href="#link" class="bottombar-menu__link bottombar-menu__link--active">Главная</a>
-                <a href="#link" class="bottombar-menu__link">Контракты</a>
-                <a href="#link" class="bottombar-menu__link">Топ</a>
-                <a href="#link" class="bottombar-menu__link">Бонусы</a>
-                <a href="#link" class="bottombar-menu__link">FAQ</a>
-            </nav>
+        </div>
+        <div class="bottombar__description">
+            На нашем сайте вы можете открыть различные
+            кейсы по игре Standoff 2 и самым выгодным ценам
+        </div>
+        <div class="lastbar">
+            <div class="copyright">2019 - 2019 STANDOFFSPIN.COM</div>
             <div class="social-row">
                 <span class="social-row__title darkgray">Мы в соц. сетях</span>
                 <div class="social-row__icon skewed-element">
@@ -357,12 +355,6 @@
                     <span class="social-row__icon--icon icon__youtube"></span>
                     <a href="#soc_link" class="ghost"></a>
                 </div>
-            </div>
-        </div>
-        <div class="lastbar">
-            <div class="copyright">2019 - 2019 STANDOFFSPIN.COM</div>
-            <div class="to-top skewed-element">
-                <span class="to-top__icon"></span>
             </div>
         </div>
         <!--Scripts-->
