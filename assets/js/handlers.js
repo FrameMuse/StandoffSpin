@@ -155,22 +155,22 @@ $(document).on("click", ".js-bonus-balance-button", function () {
 
 // Referal
 
-$(document).on("click", ".js-referal-active-button", function () {
-    api.post("/referal/active", {
-        code: $(".js-referal-active-gap").val(),
-    }, (result) => {
-        page.support.notify("success", result.success_message)
-    });
+DOM.on("click", "referal", {
+    "active-button": function () {
+        api.post("/referal/active", {
+            code: $(".js-referal-active-gap").val(),
+        }, (result) => {
+            page.support.notify("success", result.success_message)
+        });
+    },
+    "save-button": function () {
+        api.post("/referal/save", {
+            code: $(".js-referal-save-gap").val(),
+        }, (result) => {
+            page.support.notify("success", result.success_message)
+        });
+    },
 });
-
-$(document).on("click", ".js-referal-save-button", function () {
-    api.post("/referal/save", {
-        code: $(".js-referal-save-gap").val(),
-    }, (result) => {
-        page.support.notify("success", result.success_message)
-    });
-});
-
 // FAQ
 
 $(document).on("click", ".faq__summary", function () {
@@ -275,8 +275,9 @@ $(document).on("click", ".contract-window__button", function () {
         $(".contract-result__input").each(function (i, e) {
             $(e).val( gap[i] );
         });
-        // Removing all skins
-        $(".contract__spot .sorted-skins__unit").remove();
+        // Reset contract
+        page.contract.spot.init();
+        page.contract.update_DOM()
     });
 });
 
@@ -324,7 +325,7 @@ page.popup.on = function ($window, options = {}) {
             this.wEdit({
                 title: this.title,
                 summary: this.summary.replace("{price}", options.inventoryPrice),
-                content: `<div style="display:flex;justify-content:center;"><button class="popup-window__button button2" onclick="page.popup.close();">${getLanguage("popup." + $window + ".buttons.no")}</button><button class="popup-window__button button1" onclick="${options.callback2}">${getLanguage("popup." + $window + ".buttons.yes")}</button></div>`,
+                content: `<div style="display:flex;justify-content:center;"><button class="popup-window__button button2" onclick="page.popup.close();">${getLanguage("popup." + $window + ".buttons.no")}</button><button class="popup-window__button button1" onclick="ItemsController.sellAll();">${getLanguage("popup." + $window + ".buttons.yes")}</button></div>`,
             });
             break;
         case "sell_all_error":
