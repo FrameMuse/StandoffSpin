@@ -41,11 +41,11 @@ DOM.listen(page.support.fickle, type => {
             case "online":
                 DOM.update("socket-update", result, true);
                 break;
-            
+
             case "bonus_update":
                 DOM.update("bonus-update--" + result.bonus_id, result, true);
                 break;
-            
+
             case "livedrop":
                 result.items.filter(function (item) {
                     page.liveFeed.add(item);
@@ -77,10 +77,6 @@ page.lang.onclick = function (tap) {
 };
 
 // Pages
-
-page.support.addPage("/profile", () => {
-    $(".profile-confirmation, .profile-info").removeClass("skewed-element");
-});
 
 page.support.addPage("/case", () => {
     page.wheel.count(12);
@@ -149,12 +145,14 @@ $(document).on("click", ".feeder[data-id] .feeder__button:not([disabled])", func
     });
 });
 
-$(document).on("click", ".js-bonus-balance-button", function () {
-    api.post("/promo/prize_promo", {
-        promo: $(".js-bonus-balance-gap").val(),
-    }, (result) => {
-        page.support.notify("success", result.success_message)
-    });
+DOM.on("click", "bonus", {
+    "balance-button": function () {
+        api.post("/promo/prize_promo", {
+            promo: $(".js-bonus-balance-gap").val(),
+        }, (result) => {
+            page.support.notify("success", result.success_message)
+        });
+    },
 });
 
 // Referal
@@ -212,30 +210,34 @@ $(document).on("click", ".sorted-skins-more-button", function () {
         if (result.nextPage == false) {
             $(this).parent().find(".sorted-skins-more-button").remove();
         }
-        result.result.filter(function (data) {            
+        result.result.filter(function (data) {
             if (type == "contracts") {
                 var item = data.win,
-                    skin = $(sorted_contracts_html).clone().prepend(
+                    skin = $(sorted_contract_html).clone().prepend(
                         $(sorted_skin_html).clone()
                     );
             } else {
                 var item = data.item,
                     skin = $(sorted_skin_html).clone();
             }
-            
+
             if (type == "contracts") {
                 $(skin).find(".sorted-skins__unit").addClass("sorted-skins__unit--" + item.class_name);
                 $(skin).find(".sorted-cotracts__text span").html(alter_by_currency(data.price, true, true));
             } else {
                 $(skin).addClass("sorted-skins__unit--" + item.class_name);
             }
-            //----------------------------------------------------------------------
+            
+            ItemsController.CreateItem();
+            ItemsController.ModifyItemByData(item);
+            ItemsController.AppendItemTo(".js-tab-" + sorted_specified);
+            /*
             $(skin).find(".sorted-skins__cost").html(alter_by_currency(item.price, true, true));
             $(skin).find(".sorted-skins__skin-title--0").html(item.name);
             $(skin).find(".sorted-skins__skin-title--1").html(item.subname);
             $(skin).find(".weapon-skins__image").attr({ src: "/img/" + item.image });
             $(".js-tab-" + sorted_specified).append(skin);
-            //----------------------------------------------------------------------
+            */
             if (type == "contracts") {
                 data.item_list.filter(function (weapon) {
                     var item = weapon.item;
@@ -277,7 +279,7 @@ $(document).on("click", ".contract-window__button", function () {
         }
         // Fill the gaps
         $(".contract-result__input").each(function (i, e) {
-            $(e).val( gap[i] );
+            $(e).val(gap[i]);
         });
         // Reset contract
         page.contract.spot.init();
