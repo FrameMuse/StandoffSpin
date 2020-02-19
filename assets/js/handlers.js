@@ -78,6 +78,10 @@ page.lang.onclick = function (tap) {
 
 // Pages
 
+page.support.addPage("/profile", () => {
+    $(".profile-confirmation, .profile-info").removeClass("skewed-element");
+});
+
 page.support.addPage("/case", () => {
     page.wheel.count(12);
 });
