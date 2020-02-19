@@ -78,6 +78,12 @@ page.lang.onclick = function (tap) {
 
 // Pages
 
+page.support.addPage("/profile", () => {
+    if (page.mobile.if) {
+        $(".profile-info, .profile-confirmation").removeClass("skewed-element");
+    }
+});
+
 page.support.addPage("/case", () => {
     page.wheel.count(12);
 });
@@ -206,45 +212,29 @@ $(document).on("click", ".sorted-skins-more-button", function () {
         history: "history_inventory",
     }[sorted_specified];
 
-    api.get("/user/load/" + page.support.pageLoaded[2] + "/" + type + "/" + page_id, {}, result => {
+    api.get("/user/load/" + page.support.pageLoaded[2] + "/" + type + "/" + page_id, { }, result => {
+        console.log(result);
+        
         if (result.nextPage == false) {
             $(this).parent().find(".sorted-skins-more-button").remove();
         }
-        result.result.filter(function (data) {
-            if (type == "contracts") {
-                var item = data.win,
-                    skin = $(sorted_contract_html).clone().prepend(
-                        $(sorted_skin_html).clone()
-                    );
-            } else {
-                var item = data.item,
-                    skin = $(sorted_skin_html).clone();
-            }
-
-            if (type == "contracts") {
-                $(skin).find(".sorted-skins__unit").addClass("sorted-skins__unit--" + item.class_name);
-                $(skin).find(".sorted-cotracts__text span").html(alter_by_currency(data.price, true, true));
-            } else {
-                $(skin).addClass("sorted-skins__unit--" + item.class_name);
-            }
-            
-            ItemsController.CreateItem();
-            ItemsController.ModifyItemByData(item);
-            ItemsController.AppendItemTo(".js-tab-" + sorted_specified);
-            /*
-            $(skin).find(".sorted-skins__cost").html(alter_by_currency(item.price, true, true));
-            $(skin).find(".sorted-skins__skin-title--0").html(item.name);
-            $(skin).find(".sorted-skins__skin-title--1").html(item.subname);
-            $(skin).find(".weapon-skins__image").attr({ src: "/img/" + item.image });
-            $(".js-tab-" + sorted_specified).append(skin);
-            */
-            if (type == "contracts") {
-                data.item_list.filter(function (weapon) {
-                    var item = weapon.item;
-                    $(skin).find(".sorted-cotracts__skins").append(`<div class="weapon-skins__weapon"><img src="${"/img/" + item.image}" class="weapon-skins__image"><span class="weapon-skins__quality weapon-skins__quality--${item.class_name}"></span></div>`);
+        switch (type) {
+            case "contracts":
+                result.result.filter(function (data) {
+                    ItemsController.CreateContract();
+                    ItemsController.ModifyContractByData(data);
+                    ItemsController.AppendContractTo(".js-tab-" + sorted_specified);
                 });
-            }
-        });
+                break;
+        
+            default:
+                result.result.filter(function (data) {
+                    ItemsController.CreateItem();
+                    ItemsController.ModifyItemByData(data.item);
+                    ItemsController.AppendItemTo(".js-tab-" + sorted_specified);
+                });
+                break;
+        }
         // Button More
         button_more[sorted_specified]++;
     });
