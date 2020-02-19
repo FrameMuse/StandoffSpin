@@ -213,8 +213,6 @@ $(document).on("click", ".sorted-skins-more-button", function () {
     }[sorted_specified];
 
     api.get("/user/load/" + page.support.pageLoaded[2] + "/" + type + "/" + page_id, { }, result => {
-        console.log(result);
-        
         if (result.nextPage == false) {
             $(this).parent().find(".sorted-skins-more-button").remove();
         }
@@ -272,8 +270,7 @@ $(document).on("click", ".contract-window__button", function () {
             $(e).val(gap[i]);
         });
         // Reset contract
-        page.contract.spot.init();
-        page.contract.update_DOM()
+        page.support.refresh();
     });
 });
 
