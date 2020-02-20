@@ -699,7 +699,7 @@ main {
 
 .page-part__container {
     display: grid;
-    justify-items: center;
+    justify-items: stretch;
 }
 
 .page-part__article {
@@ -1117,11 +1117,9 @@ article {
     row-gap: 2em;
     column-gap: 2em;
     grid-template-columns: repeat(6, 1fr);
-    align-items: center;
     text-align: center;
     padding-bottom: 5em;
     margin-bottom: 5em;
-    width: 100%;
 }
 
 .sorted-skins__unit {
@@ -1291,6 +1289,7 @@ article {
     grid-template-columns: repeat(2, 1fr);
     text-align: center;
     padding-bottom: 5em;
+    margin-bottom: 5em;
 }
 
 .sorted-cotracts__unit {
