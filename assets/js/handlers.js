@@ -138,6 +138,7 @@ $(document).on("click", ".box__view .fortune-wheel__button--0", () => {
 $(document).on("click", ".box__view .fortune-wheel__button--1", () => {
     page.wheel.release(false)
 });
+
 // Bonuses
 
 $(document).on("click", ".feeder[data-id] .feeder__button:not([disabled])", function () {
