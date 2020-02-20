@@ -2752,6 +2752,140 @@ span.contract-window__bill--numeric {
     font-weight: 500;
 }
 
+/* Battles */
+
+.battles {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    overflow: hidden;
+}
+
+.fortune-wheel--left, .fortune-wheel--right {
+    margin: unset;
+    height: 121em;
+    font-size: 6px;
+    left: -10%;
+}
+
+.fortune-wheel-user {
+    display: flex;
+    align-items: center;
+    top: -1.625em;
+}
+
+.fortune-wheel-user__info {
+    display: grid;
+    row-gap: 0.25em;
+    margin-right: 1em;
+    text-align: right;
+}
+
+.fortune-wheel-user__nickname {
+    font-size: 1.25em;
+    font-weight: 700;
+    font-style: italic;
+    text-transform: uppercase;
+}
+
+.fortune-wheel-user__status {
+    color: #686c75;
+    font-weight: 700;
+}
+
+.fortune-wheel-user__image {
+    width: 5em;
+    height: 5em;
+    object-fit: cover;
+    background: #18191b;
+    border-radius: 100%;
+}
+
+.fortune-wheel__skin {
+    display: grid;
+    row-gap: 2em;
+}
+
+.fortune-wheel__inner--2 {
+    top: 20%;
+    width: 30em;
+    left: calc(50% - 12em);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 2em;
+    z-index: 2;
+}
+
+.fortune-wheel--left::before, .fortune-wheel--right::before {
+    top: 0;
+    left: -11.5%;
+    box-shadow: unset;
+    background: #18191b;
+    box-shadow: 0 4.6875em 1.875em -1.875em #18191b;
+    height: 45%;
+    transform: rotate(-20deg);
+}
+
+.fortune-wheel--left::after, .fortune-wheel--right::after {
+    content: '';
+    position: absolute;
+    top: unset;
+    right: 0;
+    bottom: 0px;
+    left: -11.5%;
+    box-shadow: unset;
+    background: #18191b;
+    box-shadow: 0 -4.6875em 1.875em -1.875em #18191b;
+    width: auto;
+    height: 45%;
+    transform: rotate(20deg);
+    z-index: 1;
+}
+
+.fortune-wheel--right {
+    left: unset;
+    right: -15%;
+}
+
+.fortune-wheel__skin--price {
+    font-size: 1.25em;
+    font-weight: 600;
+    font-style: italic;
+}
+
+.fortune-wheel-user__image--winner {
+    border: 0.35em solid #476227;
+}
+
+.fortune-wheel--right .fortune-wheel__inner--2 {
+    flex-direction: row-reverse;
+    left: unset;
+    right: calc(50% - 12em);
+}
+
+.fortune-wheel--right .fortune-wheel-user {
+    flex-direction: row-reverse;
+}
+
+.fortune-wheel--right .fortune-wheel-user__info {
+    text-align: left;
+    margin-left: 1em;
+    margin-right: unset;
+}
+
+.fortune-wheel--right::before {
+    transform: rotate(20deg);
+    left: 0;
+    right: -11.5%;
+}
+
+.fortune-wheel--right::after {
+    transform: rotate(-20deg);
+    right: -11.5%;
+    left: 0;
+}
+
 /* Footer */
 
 footer {
