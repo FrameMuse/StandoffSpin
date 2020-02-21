@@ -1471,9 +1471,9 @@ article {
 
 .table tr {
     display: block;
-    margin-bottom: 0.5em;
+    margin-bottom: 0.25em;
     background: rgba(255, 255, 255, 0.025);
-    border-radius: 0.5em;
+    border-radius: 0.25em;
     font-size: 1.15em;
     font-weight: 600;
 }
@@ -2693,6 +2693,7 @@ span.contract-window__bill--numeric {
     padding: 1em 1.5em;
     background: rgba(255, 255, 255, 0.1);
     border-radius: 0.12em;
+    z-index: 6;
 }
 
 .notifier__signal {
@@ -2754,7 +2755,7 @@ span.contract-window__bill--numeric {
 
 /* Battles */
 
-.battles {
+.battle {
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -2884,6 +2885,148 @@ span.contract-window__bill--numeric {
     transform: rotate(-20deg);
     right: -11.5%;
     left: 0;
+}
+
+/* Battles Lobby */
+
+.battles {
+    display: flex;
+    margin-top: 2.5em;
+}
+
+.battles__sidebar {
+    display: grid;
+    align-content: flex-start;
+    row-gap: 1em;
+    margin-right: 2em;
+}
+
+.battles__sidebar--box {
+    display: flex;
+    align-items: center;
+    padding: 2em;
+    background: rgba(255, 255, 255, 0.025);
+}
+
+.battles-last-game {
+    display: grid;
+}
+
+.battles-last-game__title {
+    font-weight: 700;
+    font-style: italic;
+    text-transform: uppercase;
+    margin-bottom: 2em;
+}
+
+.battles-last-game__details {
+    display: flex;
+    align-content: flex-start;
+}
+
+.battles-last-game-player {
+    display: grid;
+    align-content: flex-start;
+}
+
+.battles-last-game-player__info {
+    display: grid;
+    row-gap: 1em;
+    justify-items: center;
+    margin-top: -1.5em;
+    z-index: 3;
+}
+
+.battles-last-game-player__image {
+    width: 3.5em;
+    height: 3.5em;
+    background: rebeccapurple;
+    border-radius: 100%;
+}
+
+.battles-last-game-player__price {
+    font-size: 1em;
+    font-weight: 700;
+    font-style: italic;
+}
+
+.battles-last-game__case-image {
+    width: 8em;
+    height: 8em;
+    margin: 0 2em;
+}
+
+.battles-stats {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex: 1;
+}
+
+.battles-stats__column {
+    display: grid;
+    row-gap: 0.25em;
+    font-size: 0.85em;
+}
+
+.battles-stats__number {
+    font-size: 1.25em;
+    font-weight: 700;
+    font-style: italic;
+}
+
+.battles-stats__text {
+    color: #767d8c;
+}
+
+.battles__button {
+    padding: 1.15em 1.75em;
+    border-radius: 0.15em;
+    font-size: 0.75em;
+    font-weight: 600;
+    text-transform: uppercase;
+    cursor: pointer;
+    color: white;
+    margin-left: 2em;
+}
+
+.battles__button::before {
+    background: #88cc31;
+}
+
+.battles__content {
+    flex: 1;
+}
+
+.battles-table {
+    font-size: 0.75em;
+    margin: unset;
+}
+
+.battles-table__image {
+    width: 3.5em;
+}
+
+.battles-table__buttons {
+    display: flex;
+    justify-content: space-around;
+}
+
+.battles-table__button {
+    padding: 1.15em 1.75em;
+    border-radius: 0.15em;
+    font-size: 0.75em;
+    font-weight: 600;
+    text-transform: uppercase;
+    cursor: pointer;
+}
+
+.battles-table__button::before {
+    background: #2b2e33;
+}
+
+.battles-table__button--green::before {
+    background: #88cc31;
 }
 
 /* Footer */
