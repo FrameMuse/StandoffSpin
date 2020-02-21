@@ -2766,7 +2766,7 @@ span.contract-window__bill--numeric {
     margin: unset;
     height: 121em;
     font-size: 6px;
-    left: -10%;
+    left: -14%;
 }
 
 .fortune-wheel-user {
@@ -3027,6 +3027,53 @@ span.contract-window__bill--numeric {
 
 .battles-table__button--green::before {
     background: #88cc31;
+}
+
+.battle__inner {
+    position: absolute;
+    left: 0;
+    right: 0;
+    display: grid;
+    row-gap: 2em;
+    justify-content: center;
+    text-align: center;
+}
+
+.battle__inner .stndfspin-cases__case:hover {
+    background: unset;
+}
+
+.battle__inner .stndfspin-cases__cost {
+    font-size: 1.25em;
+}
+
+.battle__buttons {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 1em;
+}
+
+.battle__button--0, .battle__button--1 {
+    padding: 1.5em 1.75em;
+    border-radius: 0.25em;
+    font-size: 0.75em;
+    font-weight: 600;
+    text-transform: uppercase;
+    cursor: pointer;
+}
+
+.battle__button--0::before {
+    background: #222426;
+}
+
+.battle__button--1 {
+    top: -1em;
+    margin-left: 1em;
+}
+
+.battle__button--1::before {
+    background: #89cc32;
 }
 
 /* Footer */
