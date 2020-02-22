@@ -85,6 +85,7 @@ page.support.addPage("/profile", () => {
 });
 
 page.support.addPage("/case", () => {
+    page.wheel.reject = true;
     page.wheel.count(12);
 });
 
@@ -105,16 +106,37 @@ page.support.addPage("/bonuses", () => {
 
 // Wheel Opencase
 
-page.wheel.reopen.onclick = function () {
-    // Not going anymore
-    page.wheel.going = false;
-    // Restart page
-    page.support.load(window.location.pathname);
-};
+DOM.on("click", "wheel", {
+    reopen: function () {
+        // Restart page
+        page.support.load(window.location.pathname);
+    },
+    "sell-item": function () {
+        ItemsController.sell($(this).attr("weapon-id"), (result) => {
+            // Balance Update
+            DOM.update("required-update", {
+                balance: split_number(result.balance) + " Р"
+            });
+            // Reload Page
+            page.support.refresh();
+            // Notify
+            page.support.notify("success", "Предметы успешно проданы");
+        });
+    },
+    "sell-all-items": function () {
+        page.wheel.data.current.filter(function (item) {
+            ItemsController.sell(item.id, () => { });
+        });
+        page.support.notify("success", "Предметы успешно проданы");
+    },
+});
+
+$(document).on("click", ".box__input", function () {
+    $(".box__input").removeClass("box__input--active");
+    $(this).addClass("box__input--active");
+});
 
 page.wheel.release = function (fast = false) {
-    // If it's going, prevent event
-    if (page.wheel.going) return;
     // Init
     page.wheel.init();
     // API Connection
@@ -132,10 +154,10 @@ page.wheel.release = function (fast = false) {
     });
 };
 
-$(document).on("click", ".box__view .fortune-wheel__button--0", () => {
+$(document).on("click", ".box__view .fortune-wheel__button--0:not([class *= 'js'])", () => {
     page.wheel.release(true)
 });
-$(document).on("click", ".box__view .fortune-wheel__button--1", () => {
+$(document).on("click", ".box__view .fortune-wheel__button--1:not([class *= 'js'])", () => {
     page.wheel.release(false)
 });
 
@@ -214,7 +236,7 @@ $(document).on("click", ".sorted-skins-more-button", function () {
 
     api.get("/user/load/" + page.support.pageLoaded[2] + "/" + type + "/" + page_id, { }, result => {
         if (result.nextPage == false) {
-            $(this).parent().find(".sorted-skins-more-button").remove();
+            $(this).parent().find(".sorted-skins-more-button").addClass("hidden");
         }
         switch (type) {
             case "contracts":
@@ -392,6 +414,4 @@ page.popup.on = function ($window, options = {}) {
             });
             break;
     }
-    // Additional Events
-    //if ($window == "top_up") Mmenu("hide");
 };
