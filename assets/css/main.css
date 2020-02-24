@@ -890,8 +890,9 @@ article {
 }
 
 .box--no-indent {
-    margin-bottom: auto;
-    min-height: auto;
+    padding-bottom: unset;
+    margin-bottom: unset;
+    min-height: unset;
 }
 
 .box__view {
