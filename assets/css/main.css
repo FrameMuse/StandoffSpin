@@ -511,26 +511,32 @@ a.ghost {
 
 .weapon-skins__quality--blue {
     background: #0154c6;
+    --color: #0154c6;
 }
 
 .weapon-skins__quality--skyblue {
     background: #579EFF;
+    --color: #579EFF;
 }
 
 .weapon-skins__quality--red {
     background: #CC4450;
+    --color: #CC4450;
 }
 
 .weapon-skins__quality--pink {
     background: #f140af;
+    --color: #f140af;
 }
 
 .weapon-skins__quality--purple {
     background: #8120ef;
+    --color: #8120ef;
 }
 
 .weapon-skins__quality--gold {
     background: #FFD700;
+    --color: #FFD700;
 }
 
 /* Live Drops */
@@ -617,6 +623,7 @@ a.ghost {
 main {
     max-width: 1320px;
     margin: 0 auto;
+    will-change: contents;
 }
 
 /* Temporal Event */
@@ -951,6 +958,7 @@ article {
     left: calc(50% - ((var(--wheel-item-size) * 1.4) / 2));
     width: calc(var(--wheel-item-size) * 1.4);
     height: var(--wheel-item-size);
+    background: transparent;
 }
 
 .fortune__item::before {
@@ -966,6 +974,7 @@ article {
     z-index: -1;
 }
 
+/*
 .fortune__item::after {
     content: '';
     border-top: 0.625em solid #84c430;
@@ -977,6 +986,17 @@ article {
     bottom: 0;
     width: 64%;
     z-index: -1;
+}
+*/
+
+.fortune__item::after {
+    content: '';
+    position: absolute;
+    bottom: -5%;
+    width: 62%;
+    border-top: 3em solid var(--color);
+    border-radius: 50% 50% 0 0/100% 100% 0 0;
+    box-shadow: 0 0 10px -4px var(--color);
 }
 
 .fortune__item>* {
@@ -1021,12 +1041,13 @@ article {
 
 .fortune-wheel__curve-2 {
     position: absolute;
-    top: 48%;
-    left: 25%;
-    width: 50%;
-    height: 100%;
-    background: url(../img/wheel_curves_2.png) no-repeat center/contain;
+    top: calc(31% + 7.5em);
+    left: calc(50% - (54.5em + 17em) / 2);
+    width: calc(54.5em + 17em);
+    height: calc(54.5em + 17em);
+    background: url(../img/wheel_curves_2.png) no-repeat center/93%, #18191b;
     border-radius: 100%;
+    z-index: 1;
 }
 
 .fortune-wheel::after {
@@ -1173,7 +1194,7 @@ article {
 }
 
 .sorted-skins__unit--red {
-    border-color #CC4450;
+    border-color: #CC4450;
 }
 
 .sorted-skins__unit--pink {
