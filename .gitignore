@@ -4,3 +4,6 @@ assets/js/hangouts_new.js
 debug.log
 .vscode/launch.json
 *.tmp
+configure.bat
+configure.js
+run-tests.php
