@@ -89,6 +89,11 @@ page.support.addPage("/case", () => {
     page.wheel.count(12);
 });
 
+page.support.addPage("/battle", () => {
+    page.wheel.reject = true;
+    page.wheel.count(12);
+});
+
 page.support.addPage("/contracts", () => {
     page.contract.init();
     page.contract.spot.init();

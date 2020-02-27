@@ -576,7 +576,7 @@ class features_popup {
         });
 
         prevent_error_function(() => {
-            this.on[$window](options);
+            this.on[$window].apply(this, options);
         });
 
         // Animation
