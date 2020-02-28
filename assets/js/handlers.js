@@ -18,6 +18,8 @@ DOM.listen(page.support.fickle, type => {
     }
     // After page is loaded
     page.support.onPageLoaded(page.support.pageLoaded);
+    // ...Mobile
+    if (page.mobile.if) page.support.onPageLoaded(page.support.pageLoaded, "mobile");
     // Run sciprts from loaded page & Prevent Unexpected Errors
     prevent_error_function(features_toLoad);
     page.support.progress = 100;
@@ -78,11 +80,9 @@ page.lang.onclick = function (tap) {
 
 // Pages
 
-page.support.addPage("/profile", () => {
-    if (page.mobile.if) {
-        $(".profile-info, .profile-confirmation").removeClass("skewed-element");
-    }
-});
+page.mobile.onMobile = function () {
+    page.support.DeviceType = "mobile";
+}
 
 page.support.addPage("/case", () => {
     page.wheel.reject = true;
@@ -107,6 +107,16 @@ page.support.addPage("/referal", () => {
 page.support.addPage("/bonuses", () => {
     // Timer
     $("[data-time]").timer(false); // True, если нужны дни
+});
+
+// Mobile Pages
+
+page.support.addMobilePage("/profile", () => {
+    $(".profile-info, .profile-confirmation").removeClass("skewed-element");
+});
+
+page.support.addMobilePage("/battle", () => {
+    $("[class *= 'battle__button']").removeClass("skewed-element");
 });
 
 // Wheel Opencase
@@ -299,6 +309,24 @@ $(document).on("click", ".contract-window__button", function () {
         // Reset contract
         page.support.refresh();
     });
+});
+
+// Battles
+
+DOM.on("click", "battle", {
+    join: function () {
+        var lobby_id = $(this).parent().parent().parent().data("id");
+        api.post("/battle/join", { id: lobby_id }, function (result) {
+            page.support.load(result.redirectURL);
+        });
+    },
+
+    create: function () {
+        var lobby_id = $(this).parent().parent().parent().data("id");
+        api.post("/battle/create", { id: lobby_id }, function (result) {
+            page.support.load(result.redirectURL);
+        });
+    },
 });
 
 // Popup
