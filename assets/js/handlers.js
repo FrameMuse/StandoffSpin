@@ -87,6 +87,7 @@ page.mobile.onMobile = function () {
 page.support.addPage("/case", () => {
     page.wheel.reject = true;
     page.wheel.count(12);
+    page.wheel.box_input_change($(".box__input[data-id='0']"));
 });
 
 page.support.addPage("/battle", () => {
@@ -123,32 +124,32 @@ page.support.addMobilePage("/battle", () => {
 
 DOM.on("click", "wheel", {
     reopen: function () {
-        // Restart page
-        page.support.load(window.location.pathname);
+        // Reload Page
+        page.support.refresh();
     },
     "sell-item": function () {
         ItemsController.sell($(this).attr("weapon-id"), (result) => {
             // Balance Update
-            DOM.update("required-update", {
-                balance: split_number(result.balance) + " Р"
-            });
+            FeaturesController.UpdateBalance(result.balance, true);
             // Reload Page
             page.support.refresh();
             // Notify
-            page.support.notify("success", "Предметы успешно проданы");
+            page.support.notify("success", "Предмет успешно продан");
         });
     },
     "sell-all-items": function () {
         page.wheel.data.current.filter(function (item) {
-            ItemsController.sell(item.id, () => { });
+            // Sell An Item
+            ItemsController.sell(item.id, function (result) {
+                // Balance Update
+                FeaturesController.UpdateBalance(result.balance, true);
+            });
         });
+        // Reload Page
+        page.support.refresh();
+        // Notify
         page.support.notify("success", "Предметы успешно проданы");
     },
-});
-
-$(document).on("click", ".box__input", function () {
-    $(".box__input").removeClass("box__input--active");
-    $(this).addClass("box__input--active");
 });
 
 page.wheel.release = function (fast = false) {
@@ -161,17 +162,32 @@ page.wheel.release = function (fast = false) {
     }, result => {
         page.wheel.multiple_win(result.itemList, fast);
         // Balance Update
-        DOM.update("required-update", {
-            balance: split_number(result.balance) + " Р"
-        });
+        FeaturesController.UpdateBalance(result.balance);
         // Audio
         if (result.sound != null) new Audio(`/assets/sound/${result.sound}`)
     });
-};
+}
+
+page.wheel.box_input_change = function (e) {
+    // Set Wheel Multiplier
+    page.wheel.data.multiplier = page.wheel.data.multiplies[e.data("id")]; 
+    var case_price = $(".js-wheel-price").data("price");
+    // Update Wheel \ Case Price
+    DOM.update("wheel", {
+        price: alter_by_currency(page.wheel.data.multiplier * case_price, true),
+    });
+}
+
+$(document).on("click", ".box__input", function () {
+    $(".box__input").removeClass("box__input--active");
+    $(this).addClass("box__input--active");
+    page.wheel.box_input_change($(this));
+});
 
 $(document).on("click", ".box__view .fortune-wheel__button--0:not([class *= 'js'])", () => {
     page.wheel.release(true)
 });
+
 $(document).on("click", ".box__view .fortune-wheel__button--1:not([class *= 'js'])", () => {
     page.wheel.release(false)
 });

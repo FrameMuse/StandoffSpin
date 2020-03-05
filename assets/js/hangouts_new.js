@@ -320,27 +320,32 @@ class features_wheel {
             animation: "16s cubic-bezier(.1, 0, 0, 1) transform",
             duration: 16 * 1000,
             only: true,
+            multiplies: {
+                0: 1,
+                1: 2,
+                2: 3,
+                3: 4,
+                4: 5,
+                5: 10,
+            },
         }
     }
 
     init() {
         page.support.progress = 75;
         page.wheel.reject = false;
-        this.data.multiplier = {
-            0: 1,
-            1: 2,
-            2: 3,
-            3: 4,
-            4: 5,
-            5: 10,
-        }[$(".box__input--active").attr("data-id")];
         this.data.current = {
             items: [],
         };
+        // asdadasd
+        var startPosition = this.getRotationDegrees($(".fortune__circle"));
+        $(".fortune__circle").css({ animation: "unset", transform: `rotate(${startPosition}deg)` });
+        // Multipling
         this.multiple(this.data.multiplier);
         this.count(12);
-        // Add box--no-indent Class
+        // Changing Box models
         $(".box").addClass("box--no-indent");
+        this.box_view(null);
     }
 
     getRotationDegrees(obj) {
@@ -362,23 +367,10 @@ class features_wheel {
     spinTo(id, atWheel = 0) {
         var block = this.find_item(atWheel, id);
         var degrees = (this.data.spins * 360) - this.getRotationDegrees(block);
-        var rotate = "rotate(" + degrees + "deg)";
+        var rotate = `rotate(${degrees}deg)`;
         var circle = block.parent();
-
-        circle.css({ animation: "unset" });
-
-        const wait = new Promise(resolve => {
-            var interval = setInterval(() => {
-                if (circle.css("animation") != "spinning") {
-                    resolve();
-                    clearInterval(interval);
-                }
-            }, 75);
-        });
-
-        wait.then(() => {
-            circle.css({ transform: rotate });
-        });
+        
+        circle.css({ transform: rotate });
 
         page.support.progress = 100;
 
@@ -406,9 +398,15 @@ class features_wheel {
             timeout = fast ? 0 : 3000;
         setTimeout(() => {
             // Skin
-            ItemsController.CreateItem();
+            ItemsController.CreateItem({ icons: false });
             ItemsController.ModifyItemByData(data.item);
             ItemsController.AppendItemAfter(wheel.find(".fortune-wheel__header"));
+            ItemsController.config({
+                item: {
+                    marks: false
+                }
+            });
+            ItemsController.ReplaceWithItemContent(skin);
             // Setting Weapon ID
             wheel.find(".js-wheel-sell-item").attr({ "weapon-id": data.id });
         }, timeout);
@@ -445,8 +443,6 @@ class features_wheel {
                 return;
             }, this.data.duration);
         });
-
-        this.box_view(null);
 
         checkUp.then(() => {
             DOM.update("wheel", {
@@ -576,7 +572,7 @@ class features_popup {
         });
 
         prevent_error_function(() => {
-            this.on[$window].apply(this, options);
+            this.on[$window].apply(this, [options]);
         });
 
         // Animation
@@ -1198,9 +1194,11 @@ class ItemsController extends STNDFItems {
         $("[weapon-id='" + weapon_id + "'], [data-id='" + weapon_id + "']").remove();
     }
 
-    static CreateItem() {
+    static CreateItem(config = {}) {
         var clone = $(sorted_skin_html).clone();
         this.items = [clone];
+        // Configuration
+        this.config({ item: config });
     }
 
     static CreateContract() {
@@ -1245,6 +1243,25 @@ class ItemsController extends STNDFItems {
         $(сontract).appendTo(object);
     }
 
+    static ReplaceWithItemContent(object) {
+        this.items.last($this => {
+            var quality = $this.attr("class").replace("fortune__item", "").split("sorted-skins__unit--")[1];
+            $(object)
+                .attr({ class: "fortune__item" })
+                .addClass("weapon-skins__quality--" + quality)
+                .html($this.html());
+        });
+    }
+
+    static config(config = {}) {
+        if (config.item != "undefined") {
+            this.items.last($this => {
+                if (!config.item.marks) $this.find(".sorted-skins__marks").remove();
+                if (!config.item.icons) $this.find(".sorted-skins__icons").remove();
+            });
+        }
+    }
+
     static CreateWeapon(params = {}) {
         return `<div class="weapon-skins__weapon"><img src="${"/img/" + params.image}" class="weapon-skins__image"><span class="weapon-skins__quality weapon-skins__quality--${params.class_name}"></span></div>`;
     }
@@ -1253,6 +1270,14 @@ class ItemsController extends STNDFItems {
 class FortuneWheelController {
     static setInnerPrice(wheel_id, price) {
         $(".fortune-wheel[data-id='" + wheel_id + "'] .js-wheel-item-price").html(alter_by_currency(price, true))
+    }
+}
+
+class FeaturesController {
+    static UpdateBalance(balance) {
+        DOM.update("required-update", {
+            balance: alter_by_currency(balance)
+        });
     }
 }
 
@@ -1290,11 +1315,11 @@ function split_number(x) {
 }
 
 function alter_by_currency(param, appendCurrency = false, toFixed = false) {
-    var multiplier = getLanguage('settings.multiplier');
-    var number = (param * multiplier);
+    var multiplier = getLanguage('settings.multiplier'),
+        currency = getLanguage('settings.currency'),
+        number = (param.toString().multiReplace([" ", currency], "")) * multiplier;
     if (toFixed) number = number.toFixed(2);
-
-    return appendCurrency ? (number + ' ' + getLanguage('settings.currency')) : number;
+    return appendCurrency ? (number + ' ' + currency) : split_number(number);
 }
 
 function parse_html(html) {
