@@ -55,6 +55,19 @@ DOM.listen(page.support.fickle, type => {
                 break;
         }
     });
+
+    socket.on('standoffspin:App\\Events\\battle_join', (data) => {
+        console.log(data);
+        
+        var action = data.result.action;
+        delete data.result.action;
+        var result = data.result;
+        switch (action) {
+            case "online":
+                DOM.update("socket-update", result, true);
+                break;
+        }
+    });
 })();
 
 (function () {
@@ -130,7 +143,7 @@ DOM.on("click", "wheel", {
     "sell-item": function () {
         ItemsController.sell($(this).attr("weapon-id"), (result) => {
             // Balance Update
-            FeaturesController.UpdateBalance(result.balance, true);
+            FeaturesController.UpdateBalance(result.balance);
             // Reload Page
             page.support.refresh();
             // Notify
@@ -142,7 +155,7 @@ DOM.on("click", "wheel", {
             // Sell An Item
             ItemsController.sell(item.id, function (result) {
                 // Balance Update
-                FeaturesController.UpdateBalance(result.balance, true);
+                FeaturesController.UpdateBalance(result.balance);
             });
         });
         // Reload Page
@@ -238,6 +251,27 @@ $(document).on("click", ".faq__summary", function () {
     $(this).parent().toggleClass("faq__clause--deployed");
 });
 
+// Item Events
+
+DOM.on("click", "item", {
+    sell: function () {
+        var weapon = $(this).parent().parent().parent();
+        var weapon_id = weapon.data("id");
+        ItemsController.sell(weapon_id, function () {
+            weapon.remove();
+            ItemsController.callback();
+        });
+    },
+    withdraw: function () {
+        var weapon = $(this).parent().parent().parent();
+        var weapon_id = weapon.data("id");
+        ItemsController.withdraw(weapon_id, function () {
+            weapon.remove();
+            ItemsController.callback();
+        });
+    },
+});
+
 // Profile
 
 $(document).on("click", ".tab-swithcer__button[tab]:not(.tab-swithcer__button--only)", function () {
@@ -265,7 +299,7 @@ $(document).on("click", ".sorted-skins-more-button", function () {
         history: "history_inventory",
     }[sorted_specified];
 
-    api.get("/user/load/" + page.support.pageLoaded[2] + "/" + type + "/" + page_id, { }, result => {
+    api.get(["/user/load/", page.support.pageLoaded[2], type, page_id], { }, result => {
         if (result.nextPage == false) {
             $(this).parent().find(".sorted-skins-more-button").addClass("hidden");
         }
@@ -281,7 +315,7 @@ $(document).on("click", ".sorted-skins-more-button", function () {
             default:
                 result.result.filter(function (data) {
                     ItemsController.CreateItem();
-                    ItemsController.ModifyItemByData(data.item);
+                    ItemsController.ModifyItemByData(data);
                     ItemsController.AppendItemTo(".js-tab-" + sorted_specified);
                 });
                 break;
@@ -294,11 +328,13 @@ $(document).on("click", ".sorted-skins-more-button", function () {
 // Skins
 
 $(document).on("click", ".sorted-skins .sorted-skins__unit[pickable]", function () {
+    $(this).attr({ pickable: "Убрать" });
     page.contract.spot.takePlace($(this));
     page.contract.update_DOM();
 });
 
 $(document).on("click", ".contract__spot .sorted-skins__unit[pickable]", function () {
+    $(this).attr({ pickable: "Выбрать" });
     page.contract.spot.freeUpPlace($(this));
     page.contract.update_DOM();
 });
@@ -324,6 +360,10 @@ $(document).on("click", ".contract-window__button", function () {
         });
         // Reset contract
         page.support.refresh();
+        // Close popup in 5 seconds
+        setTimeout(() => {
+            page.popup.close();
+        }, 500);
     });
 });
 

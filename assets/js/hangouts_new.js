@@ -6,7 +6,7 @@ var features_toLoad,
         inventory: 1,
         history: 1,
     },
-    sorted_skin_html = `<div class="sorted-skins__unit"><div class="sorted-skins__marks"><span class="sorted-skins__cost skewed-element"></span><div class="sorted-skins__icons"><div class="sorted-skins__icon sorted-skins__icon--green skewed-element"><span class="sorted-skins__icon--arrow"></span></div><div class="sorted-skins__icon sorted-skins__icon--orange skewed-element"><span class="sorted-skins__icon--dollar"></span></div></div></div><div class="weapon-skins__weapon"><img src="" class="weapon-skins__image"></div><div class="sorted-skins__skin-title"><span class="sorted-skins__skin-title--0"></span><span class="sorted-skins__skin-title--1"></span></div></div>`,
+    sorted_skin_html = `<div class="sorted-skins__unit"><div class="sorted-skins__marks"><span class="sorted-skins__cost skewed-element"></span><div class="sorted-skins__icons"><div class="sorted-skins__icon sorted-skins__icon--green skewed-element js-item-withdraw"><span class="sorted-skins__icon--arrow"></span></div><div class="sorted-skins__icon sorted-skins__icon--orange skewed-element js-item-sell"><span class="sorted-skins__icon--dollar"></span></div></div></div><div class="weapon-skins__weapon"><img src="" class="weapon-skins__image"></div><div class="sorted-skins__skin-title"><span class="sorted-skins__skin-title--0"></span><span class="sorted-skins__skin-title--1"></span></div></div>`,
     sorted_contract_html = `<div class="sorted-cotracts__unit"><div class="sorted-cotracts__extend"><div class="sorted-cotracts__skins"></div><div class="sorted-cotracts__text gray">Стоимость контракта <span class="white skewed-text"></span></div></div></div>`;
 
 // Extending Functions
@@ -112,6 +112,7 @@ const api = new class {
         this.version = "v1";
         this.host = "https://standoffspin.ru";
         this.path = this.host + "/api/" + this.version;
+        this.token = $('meta[name="csrf-token"]').attr('content');
     }
 
     request(method, url, params = {}, success) {
@@ -120,7 +121,7 @@ const api = new class {
             url: this.url(url),
             method: method,
             headers: {
-                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                'X-CSRF-TOKEN': this.token,
             },
             dataType: 'json',
             data: $.param(params),
@@ -156,7 +157,7 @@ const api = new class {
     }
 
     url(path) {
-        return this.path + path;
+        return this.path + path.toString().multiReplace([",", "//"], "/");
     }
 }
 
@@ -331,15 +332,17 @@ class features_wheel {
         }
     }
 
-    init() {
+    __init() {
         page.support.progress = 75;
         page.wheel.reject = false;
         this.data.current = {
             items: [],
-        };
-        // asdadasd
-        var startPosition = this.getRotationDegrees($(".fortune__circle"));
-        $(".fortune__circle").css({ animation: "unset", transform: `rotate(${startPosition}deg)` });
+        }
+    }
+
+    init() {
+        this.__init();
+        this.stop_wheel();
         // Multipling
         this.multiple(this.data.multiplier);
         this.count(12);
@@ -362,6 +365,15 @@ class features_wheel {
 
         } else { var angle = 0; }
         return (angle < 0) ? angle + 360 : angle;
+    }
+
+    stop_wheel() {
+        var startPosition = this.getRotationDegrees($(".fortune__circle"));
+        DOM.listen(".fortune__circle", () => {
+            this.getRotationDegrees($(".fortune__circle"));
+            $(".fortune__circle").css("animation");
+        });
+        $(".fortune__circle").css({ animation: "unset", transform: `rotate(${startPosition}deg)` });
     }
 
     spinTo(id, atWheel = 0) {
@@ -393,13 +405,16 @@ class features_wheel {
     }
 
     win(data = {}, atWheel = 0, fast = false) {
+        // Fix a wheel position
+        //this.stop_wheel();
+        // Variables
         var skin = this.spinTo(8, atWheel),
             wheel = skin.parent().parent(),
             timeout = fast ? 0 : 3000;
         setTimeout(() => {
             // Skin
             ItemsController.CreateItem({ icons: false });
-            ItemsController.ModifyItemByData(data.item);
+            ItemsController.ModifyItemByData(data);
             ItemsController.AppendItemAfter(wheel.find(".fortune-wheel__header"));
             ItemsController.config({
                 item: {
@@ -423,7 +438,7 @@ class features_wheel {
             this.win(item, id, fast);
             this.sum += item.item.price;
 
-            FortuneWheelController.setInnerPrice(id, item.item.price);
+            FortuneWheelController.SetInnerPrice(id, item.item.price);
         });
         var checkUp = new Promise((resolve, reject) => {
             if (fast) {
@@ -506,8 +521,8 @@ class features_wheel {
             $(".box").css("--wheel-font-size", "3.5px");
             return;
         }
-        if (x == 2) $(".box").css("--wheel-font-size", "5.25px");
-        if (x >= 3) $(".box").css("--wheel-font-size", "3.5px");
+        if (x >= 2) $(".box").css("--wheel-font-size", "5.25px");
+        //if (x >= 3) $(".box").css("--wheel-font-size", "3.5px");
     }
 
     tideUp() {
@@ -666,6 +681,7 @@ class features_contract {
             }
             init() {
                 this.spots = [];
+                this.caution();
                 $(".contract__spot").each((i, e) => {
                     this.spots.push({
                         status: "unoccupied",
@@ -760,9 +776,11 @@ class features_contract {
             caution() {
                 var avail = this.whichAvail("occupied");
                 if (avail.length >= 3) {
+                    $(".contract__button").removeAttr("disabled");
                     $(".contract__caution").hide();
                     this.saf = false;
                 } else {
+                    $(".contract__button").attr({ disabled: "" });
                     $(".contract__caution").show();
                     this.saf = true;
                 }
@@ -1187,7 +1205,7 @@ class ItemsController extends STNDFItems {
     }
 
     static callback(result) {
-        page.support.notify("success", getLanguage(result.success_message));
+        page.support.notify("success", "Операция Выполнена");
     }
 
     static RemoveItem(weapon_id) {
@@ -1207,8 +1225,10 @@ class ItemsController extends STNDFItems {
         this.contracts = [clone];
     }
 
-    static ModifyItemByData(params = {}) {
+    static ModifyItemByData(data = {}) {
+        const params = this.parseData(data, { item_id: data.id });
         this.items.last(function ($this) {
+            $this.attr({ "data-id": params.item_id });
             $this.find(".sorted-skins__cost").html(alter_by_currency(params.price, true));
             $this.find(".sorted-skins__skin-title--0").html(params.name);
             $this.find(".sorted-skins__skin-title--1").html(params.subname);
@@ -1256,10 +1276,19 @@ class ItemsController extends STNDFItems {
     static config(config = {}) {
         if (config.item != "undefined") {
             this.items.last($this => {
-                if (!config.item.marks) $this.find(".sorted-skins__marks").remove();
-                if (!config.item.icons) $this.find(".sorted-skins__icons").remove();
+                if (config.item.marks == false) $this.find(".sorted-skins__marks").remove();
+                if (config.item.icons == false) $this.find(".sorted-skins__icons").remove();
             });
         }
+    }
+
+    static parseData(data, modifications = {}) {
+        var data = data.item;
+        for (const key in modifications) {
+            data[key] = modifications[key];
+        }
+
+        return data;
     }
 
     static CreateWeapon(params = {}) {
@@ -1268,15 +1297,27 @@ class ItemsController extends STNDFItems {
 }
 
 class FortuneWheelController {
-    static setInnerPrice(wheel_id, price) {
+    static SetInnerPrice(wheel_id, price) {
         $(".fortune-wheel[data-id='" + wheel_id + "'] .js-wheel-item-price").html(alter_by_currency(price, true))
+    }
+
+    BattleInit() {
+        page.wheel.__init();
+        page.wheel.stop_wheel();
+    }
+
+    BattleCry(data = {}) {
+        page.wheel.multiple_win(data).then(function () {
+            console.log("aohdasdkjashd");
+            
+        });
     }
 }
 
 class FeaturesController {
     static UpdateBalance(balance) {
         DOM.update("required-update", {
-            balance: alter_by_currency(balance)
+            balance: alter_by_currency(balance, true)
         });
     }
 }
@@ -1314,12 +1355,12 @@ function split_number(x) {
     return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ");
 }
 
-function alter_by_currency(param, appendCurrency = false, toFixed = false) {
+function alter_by_currency(param, appendCurrency = false) {
     var multiplier = getLanguage('settings.multiplier'),
         currency = getLanguage('settings.currency'),
         number = (param.toString().multiReplace([" ", currency], "")) * multiplier;
-    if (toFixed) number = number.toFixed(2);
-    return appendCurrency ? (number + ' ' + currency) : split_number(number);
+    if (isFloat(number)) number = number.toFixed(2);
+    return appendCurrency ? (number + ' ' + currency) : number;
 }
 
 function parse_html(html) {
@@ -1334,4 +1375,8 @@ function color_html(html, parsed_html) {
         html = html.replace(value, '<span class="dev-log__color">' + value + '</span>');
     });
     return html;
+}
+
+function isFloat(n) {
+    return Number(n) === n && n % 1 !== 0;
 }
