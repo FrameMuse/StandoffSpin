@@ -53,18 +53,21 @@ DOM.listen(page.support.fickle, type => {
                     page.liveFeed.add(item);
                 });
                 break;
-        }
-    });
-
-    socket.on('standoffspin:App\\Events\\battle_join', (data) => {
-        console.log(data);
-        
-        var action = data.result.action;
-        delete data.result.action;
-        var result = data.result;
-        switch (action) {
-            case "online":
-                DOM.update("socket-update", result, true);
+            case "battle_join":
+                console.log(data);
+                FortuneWheelController.BattleInit();
+                FortuneWheelController.BattleCry([
+                    {
+                        item: {
+                            price: 123,
+                        }
+                    },
+                    {
+                        item: {
+                            price: 1233
+                        }
+                    }
+                ]);
                 break;
         }
     });
@@ -141,7 +144,7 @@ DOM.on("click", "wheel", {
         page.support.refresh();
     },
     "sell-item": function () {
-        ItemsController.sell($(this).attr("weapon-id"), (result) => {
+        ItemsController.Sell($(this).attr("weapon-id"), (result) => {
             // Balance Update
             FeaturesController.UpdateBalance(result.balance);
             // Reload Page
@@ -153,7 +156,7 @@ DOM.on("click", "wheel", {
     "sell-all-items": function () {
         page.wheel.data.current.filter(function (item) {
             // Sell An Item
-            ItemsController.sell(item.id, function (result) {
+            ItemsController.Sell(item.id, function (result) {
                 // Balance Update
                 FeaturesController.UpdateBalance(result.balance);
             });
@@ -183,7 +186,7 @@ page.wheel.release = function (fast = false) {
 
 page.wheel.box_input_change = function (e) {
     // Set Wheel Multiplier
-    page.wheel.data.multiplier = page.wheel.data.multiplies[e.data("id")]; 
+    page.wheel.data.multiplier = page.wheel.data.multiplies[e.data("id")];
     var case_price = $(".js-wheel-price").data("price");
     // Update Wheel \ Case Price
     DOM.update("wheel", {
@@ -257,17 +260,36 @@ DOM.on("click", "item", {
     sell: function () {
         var weapon = $(this).parent().parent().parent();
         var weapon_id = weapon.data("id");
-        ItemsController.sell(weapon_id, function () {
+        ItemsController.Sell(weapon_id, function () {
             weapon.remove();
-            ItemsController.callback();
+            ItemsController.Callback();
         });
     },
     withdraw: function () {
         var weapon = $(this).parent().parent().parent();
         var weapon_id = weapon.data("id");
-        ItemsController.withdraw(weapon_id, function () {
+        page.popup.open("withdraw", {
+            item: {
+                id: weapon_id,
+                random_number: RandomByte(),
+            },
+        });
+    },
+    "withdraw-submit": function () {
+        var item = page.popup.TempOptions.item;
+        console.log({
+            item: item.id,
+            price: item.random_number,
+            name: DOM.$("item", "withdraw-input").val(),
+        });
+
+        ItemsController.CreateWithdrawal({
+            item: item.id,
+            price: item.random_number,
+            name: DOM.$("item", "withdraw-input").val(),
+        }, function () {
             weapon.remove();
-            ItemsController.callback();
+            ItemsController.Callback();
         });
     },
 });
@@ -299,7 +321,7 @@ $(document).on("click", ".sorted-skins-more-button", function () {
         history: "history_inventory",
     }[sorted_specified];
 
-    api.get(["/user/load/", page.support.pageLoaded[2], type, page_id], { }, result => {
+    api.get(["/user/load/", page.support.pageLoaded[2], type, page_id], {}, result => {
         if (result.nextPage == false) {
             $(this).parent().find(".sorted-skins-more-button").addClass("hidden");
         }
@@ -311,7 +333,7 @@ $(document).on("click", ".sorted-skins-more-button", function () {
                     ItemsController.AppendContractTo(".js-tab-" + sorted_specified);
                 });
                 break;
-        
+
             default:
                 result.result.filter(function (data) {
                     ItemsController.CreateItem();
@@ -388,11 +410,11 @@ DOM.on("click", "battle", {
 // Popup
 
 page.popup.on["withdraw"] = function (options) {
-    var itemPrice = convert(parseFloat(options.item.price) + parseFloat(options.rnd));
-    var item = options.item;
+    var itemPrice = options.item.price + options.rnd;
+    this.TempOptions = options;
     this.wEdit({
         summary: this.summary.replace('{itemPrice}', itemPrice),
-        content: `<div style="display:flex;justify-content:center;flex-direction:column;align-items:center;"><input class="popup-window__button button1" withdraw-skin placeholder="${this.wText("other.placeholder")}"><button class="popup-window__button button2" onclick="withdrawConfirm(${item.id}, ${options.rnd})">${this.wText("other.button")}</button></div>`,
+        content: `<div style="display:flex;justify-content:center;flex-direction:column;align-items:center;"><span>${options.item.random_number}</span><input class="popup-window__button button1 js-item-withdraw-input" withdraw-skin placeholder="${this.wText("other.placeholder")}"><button class="popup-window__button button2 js-item-withdraw-submit">${this.wText("other.button")}</button></div>`,
     });
 };
 

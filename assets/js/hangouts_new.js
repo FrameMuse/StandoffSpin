@@ -35,6 +35,10 @@ String.prototype.multiReplace = function (array, replacement) {
     return string;
 };
 
+String.prototype.ias = function (config = { prefix: "[prefix]" }) {
+    return interpret.JSDOM(this, config.prefix);
+};
+
 Array.prototype.last = function (argument1) {
     if (this == null) return;
     switch (typeof argument1) {
@@ -106,6 +110,21 @@ $.fn.extend({
 });
 
 // Const Classes
+
+class interpret {
+    static JSDOM(string, prefix) {
+        var brackets = [string.indexOf('{'), string.indexOf('}')];
+        function createSpan(name) {
+            return `<span class="js-${prefix}-${name}"></span>`;
+        }
+        while (brackets[0] != -1 && brackets[1] != -1) {
+            var brackets = [string.indexOf('{'), string.indexOf('}')];
+            var replacy = string.slice(brackets[0] + 1, brackets[1]);
+            var string = string.multiReplace(['{' + replacy + '}'], createSpan(replacy)).multiReplace(['_'], '-');
+        }
+        return string;
+    }
+}
 
 const api = new class {
     constructor() {
@@ -213,6 +232,10 @@ const DOM = new class {
         for (const key in handlers) {
             $(document).on(event, origin + key, handlers[key]);
         }
+    }
+
+    $(prefix, name) {
+        return $(".js-" + prefix + "-" + name);
     }
 }
 
@@ -376,13 +399,16 @@ class features_wheel {
         $(".fortune__circle").css({ animation: "unset", transform: `rotate(${startPosition}deg)` });
     }
 
-    spinTo(id, atWheel = 0) {
+    spinTo(id, atWheel = 0, reverse = false) {
         var block = this.find_item(atWheel, id);
         var degrees = (this.data.spins * 360) - this.getRotationDegrees(block);
-        var rotate = `rotate(${degrees}deg)`;
         var circle = block.parent();
         
-        circle.css({ transform: rotate });
+        if (reverse) {
+            circle.css({ transform: `rotate(-${degrees + 60}deg)` });
+        } else {
+            circle.css({ transform: `rotate(${degrees}deg)` });
+        }
 
         page.support.progress = 100;
 
@@ -431,7 +457,7 @@ class features_wheel {
         }, 250);
     }
 
-    multiple_win(data = { }, fast = false) {
+    multiple_win(data = { }, fast = false, overideThen = false) {
         this.sum = 0;
         this.data.current = data;
         data.filter(async (item, id) => {
@@ -459,12 +485,12 @@ class features_wheel {
             }, this.data.duration);
         });
 
-        checkUp.then(() => {
+        if (!overideThen) checkUp.then(() => {
             DOM.update("wheel", {
                 "all-prices": alter_by_currency(this.sum, true)
             });
             $(".fortune__circle, .fortune-wheel__inner, .fortune-wheel__curve-1, .fortune-wheel__curve-2").toggleClass("hidden");
-            $(".fortune-wheel").addClass("fortune-wheel--without-after");
+            $(".fortune-wheel").addClass("fortune-wheel--final");
             if (!this.data.only) this.box_view(1);
             // Remove box--no-indent Class
             $(".box").removeClass("box--no-indent");
@@ -504,7 +530,7 @@ class features_wheel {
         var fortune = $(".fortune-wheel"),
             box = fortune.parent();
 
-        for (var i = 0; i < x; i++) {
+        for (var i = 1; i < x; i++) {
             box.append(fortune.clone().attr("data-id", i))
         }
 
@@ -678,6 +704,10 @@ class features_contract {
             constructor() {
                 this.error = function () { };
                 this.saf = true;
+                this.cautionMap = {
+                    insufficient: "Добавьте минимум 3 предмета",
+                    ranged: "Может выпасть от {price_min} до {price_max}"
+                };
             }
             init() {
                 this.spots = [];
@@ -777,7 +807,7 @@ class features_contract {
                 var avail = this.whichAvail("occupied");
                 if (avail.length >= 3) {
                     $(".contract__button").removeAttr("disabled");
-                    $(".contract__caution").hide();
+                    $(".contract__caution").html(this.cautionMap["ranged"].ias({ prefix: "contract" }));
                     this.saf = false;
                 } else {
                     $(".contract__button").attr({ disabled: "" });
@@ -831,9 +861,12 @@ class features_contract {
     }
 
     update_DOM() {
+        const sum = this.count_sum();
         DOM.update("contract", {
             items: this.spot.whichAvail("occupied").length,
-            sum: this.count_sum(),
+            sum: sum,
+            "price-min": alter_by_currency(sum / 4, true),
+            "price-max": alter_by_currency(sum * 4, true),
         });
     }
 }
@@ -1185,7 +1218,7 @@ class STNDFItems {
 // Controllers
 
 class ItemsController extends STNDFItems {
-    static sell(weapon_id, callback) {
+    static Sell(weapon_id, callback) {
         api.post("/item/sell", { id: weapon_id }, callback);
     }
 
@@ -1200,11 +1233,11 @@ class ItemsController extends STNDFItems {
         });
     }
 
-    static createWithdrawal(params) {
-        api.post("/item/sell", params, this.callback);
+    static CreateWithdrawal(params) {
+        api.post("/withdraw/create", params, this.Callback);
     }
 
-    static callback(result) {
+    static Callback(result) {
         page.support.notify("success", "Операция Выполнена");
     }
 
@@ -1238,7 +1271,7 @@ class ItemsController extends STNDFItems {
     }
 
     static ModifyContractByData(params = {}) {
-        this.ModifyItemByData(params.win);
+        this.ModifyItemByData(params);
         this.contracts.last(($this) => {
             params.item_list.filter((weapon) => {
                 $this.find(".sorted-cotracts__skins").append(this.CreateWeapon(weapon.item));
@@ -1251,6 +1284,11 @@ class ItemsController extends STNDFItems {
     static AppendItemTo(object) {
         var item = this.items.last();
         $(item).appendTo(object);
+    }
+
+    static PrependItemTo(object) {
+        var item = this.items.last();
+        $(item).prependTo(object);
     }
 
     static AppendItemAfter(object) {
@@ -1283,11 +1321,10 @@ class ItemsController extends STNDFItems {
     }
 
     static parseData(data, modifications = {}) {
-        var data = data.item;
+        var data = "item" in data ? data.item : data.win ;
         for (const key in modifications) {
             data[key] = modifications[key];
         }
-
         return data;
     }
 
@@ -1301,15 +1338,48 @@ class FortuneWheelController {
         $(".fortune-wheel[data-id='" + wheel_id + "'] .js-wheel-item-price").html(alter_by_currency(price, true))
     }
 
-    BattleInit() {
+    static BattleInit() {
         page.wheel.__init();
         page.wheel.stop_wheel();
     }
 
-    BattleCry(data = {}) {
-        page.wheel.multiple_win(data).then(function () {
-            console.log("aohdasdkjashd");
-            
+    static BattleCry(data = {}) {
+        page.wheel.data.spins = 4.25;
+        data.filter((itemData, id) => {
+            // Variables
+            var skin = page.wheel.spinTo(8, id, id == 0 ? false : true),
+                wheel = skin.parent().parent(),
+                timeout = 3000;
+            setTimeout(() => {
+                this.SetInnerPrice(id, itemData.item.price);
+                // Skin
+                ItemsController.CreateItem({ marks: false });
+                ItemsController.ModifyItemByData(itemData);
+                ItemsController.PrependItemTo(wheel.find(".fortune-wheel__skin"));
+                ItemsController.ReplaceWithItemContent(skin);
+            }, timeout);
+            // Extra
+            setTimeout(() => {
+                page.support.progress = null;
+            }, 250);
+        });
+
+        var checkUp = new Promise((resolve, reject) => {
+            var interval = setInterval(() => {
+                if (page.wheel.reject) {
+                    reject();
+                    clearInterval(interval);
+                    return;
+                }
+            }, 250);
+            setTimeout(() => {
+                resolve();
+                return;
+            }, page.wheel.data.duration);
+        });
+
+        checkUp.then(function () {
+            $(".fortune-wheel__skin").removeClass("hidden");
         });
     }
 }
@@ -1379,4 +1449,8 @@ function color_html(html, parsed_html) {
 
 function isFloat(n) {
     return Number(n) === n && n % 1 !== 0;
+}
+
+function RandomByte() {
+    return Math.floor(Math.random() * Math.floor(2));
 }
