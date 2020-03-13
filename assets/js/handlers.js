@@ -18,6 +18,7 @@ DOM.listen(page.support.fickle, type => {
     }
     // After page is loaded
     page.support.onPageLoaded(page.support.pageLoaded);
+    page.support.pageLoading.resolve();
     // ...Mobile
     if (page.mobile.if) page.support.onPageLoaded(page.support.pageLoaded, "mobile");
     // Run sciprts from loaded page & Prevent Unexpected Errors
@@ -35,7 +36,7 @@ DOM.listen(page.support.fickle, type => {
         reconnectionDelay: 10
     });
 
-    socket.on('standoffspin:App\\Events\\LiveEvent', (data) => {
+    socket.on('standoffspin:App\\Events\\LiveEvent', async (data) => {
         var action = data.result.action;
         delete data.result.action;
         var result = data.result;
@@ -53,21 +54,23 @@ DOM.listen(page.support.fickle, type => {
                     page.liveFeed.add(item);
                 });
                 break;
+
             case "battle_join":
-                console.log(data);
-                FortuneWheelController.BattleInit();
-                FortuneWheelController.BattleCry([
-                    {
-                        item: {
-                            price: 123,
-                        }
-                    },
-                    {
-                        item: {
-                            price: 1233
-                        }
-                    }
-                ]);
+                await page.support.pageLoading.promise; // Wait for page loaded
+
+                console.log(data, ServiceController.userId, result.itemList, result);
+                console.log(result.rival_id == ServiceController.userId)
+                console.log(result.owner_id == ServiceController.userId)
+                if ((result.owner_id == ServiceController.userId || result.rival_id == ServiceController.userId) && result.battle_id == ServiceController.battle_id || true) {
+                    FortuneWheelController.BattleInit();
+                    FortuneWheelController.BattleCry(result.itemList);
+                    $(".fortune-wheel--right .fortune-wheel-user__image").attr({ src: result.user.photo });
+                    $(".fortune-wheel--right .fortune-wheel-user__nickname").html(result.user.first_name + " " + result.user.last_name);
+                }
+                break;
+
+            case "battle_create":
+                $(`tr[data-id="${result.case_id}"] .battles-table__buttons`).prepend(`<button class="battles-table__button battles-table__button--green skewed-element js-battle-join">Войти</button>`);
                 break;
         }
     });
@@ -84,6 +87,11 @@ DOM.listen(page.support.fickle, type => {
     $(".topbar-language__icon").css({
         "background-image": `url(${page.lang.path + page.lang.tap + ".png"})`,
     });
+    if (!page.mobile.if) {
+        $($("link")[2]).attr({
+            href: "/assets/css/main.css?v=" + page.mobile.time
+        });
+    }
 })();
 
 // Language
@@ -98,9 +106,23 @@ page.lang.onclick = function (tap) {
 
 page.mobile.onMobile = function () {
     page.support.DeviceType = "mobile";
+    // Layout
+    $("#adaptive-style").remove();
+    $(".timer-v2__text").remove();
+    $($(".social-row")[0]).remove();
+    $(".topbar-profile__balance, .stndfspin-features, .profile-confirmation, .profile-info").removeClass("skewed-element");
+    $(".topbar-menu, .social-row__title").remove();
+    $(".bottombar").after($(".bottombar__description"));
+    $(".lastbar").after($(".bottombar-menu"));
+    $(".stndfspin-features__options").after($(".topbar-language"));
+    $(".live-drops").after($(".stndfspin-features__stats"));
 }
 
 page.support.addPage("/case", () => {
+    ServiceController.SetCurrentService = {
+        Name: $(".fortune-wheel__image").html(),
+        Price: DOM.$("wheel", "price").data("price"),
+    };
     page.wheel.reject = true;
     page.wheel.count(12);
     page.wheel.box_input_change($(".box__input[data-id='0']"));
@@ -109,6 +131,10 @@ page.support.addPage("/case", () => {
 page.support.addPage("/battle", () => {
     page.wheel.reject = true;
     page.wheel.count(12);
+    if ($(".battle").data("status") == "END") {
+        $(".fortune-wheel__skin").removeClass("hidden");
+        $(".battle__buttons").removeClass("hidden");
+    }
 });
 
 page.support.addPage("/contracts", () => {
@@ -136,6 +162,20 @@ page.support.addMobilePage("/battle", () => {
     $("[class *= 'battle__button']").removeClass("skewed-element");
 });
 
+// Probable actions when the page is loaded
+
+page.support.actionOnLoaded["open_tab_battle"] = function () {
+    $(".tab-swithcer__button[tab='battles']").click()
+    $([document.documentElement, document.body]).animate({
+        scrollTop: $(".tab-swithcer__button[tab='battles']").offset().top
+    }, 600);
+};
+
+page.support.actionOnLoaded["battle_hide_all"] = function () {
+    $(".fortune-wheel__skin").addClass("hidden");
+    $(".battle__buttons").addClass("hidden");
+};
+
 // Wheel Opencase
 
 DOM.on("click", "wheel", {
@@ -146,7 +186,7 @@ DOM.on("click", "wheel", {
     "sell-item": function () {
         ItemsController.Sell($(this).attr("weapon-id"), (result) => {
             // Balance Update
-            FeaturesController.UpdateBalance(result.balance);
+            BalanceController.UpdateBalance(result.balance);
             // Reload Page
             page.support.refresh();
             // Notify
@@ -158,7 +198,7 @@ DOM.on("click", "wheel", {
             // Sell An Item
             ItemsController.Sell(item.id, function (result) {
                 // Balance Update
-                FeaturesController.UpdateBalance(result.balance);
+                BalanceController.UpdateBalance(result.balance);
             });
         });
         // Reload Page
@@ -178,7 +218,7 @@ page.wheel.release = function (fast = false) {
     }, result => {
         page.wheel.multiple_win(result.itemList, fast);
         // Balance Update
-        FeaturesController.UpdateBalance(result.balance);
+        BalanceController.UpdateBalance(result.balance);
         // Audio
         if (result.sound != null) new Audio(`/assets/sound/${result.sound}`)
     });
@@ -188,10 +228,22 @@ page.wheel.box_input_change = function (e) {
     // Set Wheel Multiplier
     page.wheel.data.multiplier = page.wheel.data.multiplies[e.data("id")];
     var case_price = $(".js-wheel-price").data("price");
-    // Update Wheel \ Case Price
+    var price = page.wheel.data.multiplier * case_price;
+    // Update Case Price & Funds Lack
     DOM.update("wheel", {
-        price: alter_by_currency(page.wheel.data.multiplier * case_price, true),
+        price: alter_by_currency(price, true),
+        funds_lack: alter_by_currency(BalanceController.FundsLackAmount(price) * -1, true),
     });
+    // Check for sufficient funds
+    if (BalanceController.HasSufficientFunds(price)) {
+        $(".fortune-wheel__lack-of-funds").addClass("hidden");
+        $(".fortune-wheel__buttons").removeAttr("hidden");
+    } else {
+        $(".fortune-wheel__lack-of-funds").removeClass("hidden");
+        $(".fortune-wheel__buttons").attr({ hidden: "" });
+    }
+    // Check for minimal price threshold
+    if (!BalanceController.HasSufficientFunds()) $(".box__multiply").attr({ hidden: "" });
 }
 
 $(document).on("click", ".box__input", function () {
@@ -201,11 +253,11 @@ $(document).on("click", ".box__input", function () {
 });
 
 $(document).on("click", ".box__view .fortune-wheel__button--0:not([class *= 'js'])", () => {
-    page.wheel.release(true)
+    page.wheel.release(false)
 });
 
 $(document).on("click", ".box__view .fortune-wheel__button--1:not([class *= 'js'])", () => {
-    page.wheel.release(false)
+    page.wheel.release(true)
 });
 
 // Bonuses
@@ -271,7 +323,7 @@ DOM.on("click", "item", {
         page.popup.open("withdraw", {
             item: {
                 id: weapon_id,
-                random_number: RandomByte(),
+                random_number: get_random_int(),
             },
         });
     },
@@ -395,8 +447,10 @@ DOM.on("click", "battle", {
     join: function () {
         var lobby_id = $(this).parent().parent().parent().data("id");
         api.post("/battle/join", { id: lobby_id }, function (result) {
-            page.support.load(result.redirectURL);
+            // Load the page
+            page.support.load(result.redirectURL, "battle_hide_all");
         });
+        page.support.pageLoading = $.Postpone();
     },
 
     create: function () {
@@ -407,6 +461,29 @@ DOM.on("click", "battle", {
     },
 });
 
+// Top Up
+
+$(document).on("click", ".top-up__button", function () {
+    api.post("/payment/create", {
+        sum: $(".top-up__text").val(),
+        promo: $(".promocode__input").val(),
+    }, function (result) {
+        window.location.href = result.redirectURL;
+    });
+});
+
+$(document).on("keyup", ".promocode__input", function () {
+    api.post("/promo/promo", {
+        promo: $(".promocode__input").val(),
+    }, function (result) {
+        if ("error_msg" in result) {
+            $(".promocode__text").html(getLanguage(result.error_msg));
+        } else {
+            $(".promocode__text").html("Бонус к пополнению " + result.percent + "%");
+        }
+    });
+});
+
 // Popup
 
 page.popup.on["withdraw"] = function (options) {
@@ -414,7 +491,7 @@ page.popup.on["withdraw"] = function (options) {
     this.TempOptions = options;
     this.wEdit({
         summary: this.summary.replace('{itemPrice}', itemPrice),
-        content: `<div style="display:flex;justify-content:center;flex-direction:column;align-items:center;"><span>${options.item.random_number}</span><input class="popup-window__button button1 js-item-withdraw-input" withdraw-skin placeholder="${this.wText("other.placeholder")}"><button class="popup-window__button button2 js-item-withdraw-submit">${this.wText("other.button")}</button></div>`,
+        content: `<div style="display:flex;justify-content:center;flex-direction:column;align-items:center;"><span class="withdraw__price">${options.item.random_number}</span><input class="popup-window__button button1 js-item-withdraw-input" withdraw-skin placeholder="${this.wText("other.placeholder")}"><button class="popup-window__button button2 js-item-withdraw-submit">${this.wText("other.button")}</button></div>`,
     });
 };
 

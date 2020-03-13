@@ -73,6 +73,20 @@ window.getLanguage = (param) => {
 
 // Jquery
 
+$.Postpone = function () {
+    var $resolve, $reject;
+    var $promise = new Promise((resolve, reject) => {
+        $resolve = resolve;
+        $reject = reject;
+    });
+
+    return {
+        promise: $promise,
+        resolve: $resolve,
+        reject: $reject,
+    };
+};
+
 $.fn.extend({
     toggleText: function (a, b = null) {
         return this.html(this.html() == b ? a : b);
@@ -391,19 +405,22 @@ class features_wheel {
     }
 
     stop_wheel() {
-        var startPosition = this.getRotationDegrees($(".fortune__circle"));
-        DOM.listen(".fortune__circle", () => {
-            this.getRotationDegrees($(".fortune__circle"));
-            $(".fortune__circle").css("animation");
+        $(".fortune__circle").each((i, e) => {
+            var startPosition = this.getRotationDegrees($(e));
+            DOM.listen(e, () => {
+                this.getRotationDegrees($(e));
+                $(e).css("animation");
+            });
+            $(e).css({ animation: "unset", transform: `rotate(${startPosition}deg)` });
         });
-        $(".fortune__circle").css({ animation: "unset", transform: `rotate(${startPosition}deg)` });
     }
 
     spinTo(id, atWheel = 0, reverse = false) {
         var block = this.find_item(atWheel, id);
-        var degrees = (this.data.spins * 360) - this.getRotationDegrees(block);
+        var random = get_random_int(-this.data.degrees_per_block / 2, this.data.degrees_per_block / 2);
+        var degrees = (this.data.spins * 360) - this.getRotationDegrees(block) + random;
         var circle = block.parent();
-        
+
         if (reverse) {
             circle.css({ transform: `rotate(-${degrees + 60}deg)` });
         } else {
@@ -457,7 +474,7 @@ class features_wheel {
         }, 250);
     }
 
-    multiple_win(data = { }, fast = false, overideThen = false) {
+    multiple_win(data = {}, fast = false, overideThen = false) {
         this.sum = 0;
         this.data.current = data;
         data.filter(async (item, id) => {
@@ -501,6 +518,7 @@ class features_wheel {
 
     count(n) {
         this.number = n;
+        this.data.degrees_per_block = 360 / n;
         var height = +$(".fortune__item").css("height").replace("px", "");
 
         //console.log("You have " + n + " block in it");
@@ -521,6 +539,7 @@ class features_wheel {
 
     find_item(wheel_id, block_id) {
         var item = $(".fortune-wheel[data-id='" + wheel_id + "'] .fortune__item:nth-child(" + block_id + ")");
+        console.log("Asshole: ", wheel_id, block_id, item);
         if (item.length > 0) return item; else throw "There is no such an item";
     }
 
@@ -566,7 +585,7 @@ class features_wheel {
 
 class features_popup {
     constructor() {
-        this.on = { };
+        this.on = {};
     }
 
     tend(option) {
@@ -972,6 +991,8 @@ class features_paging {
         this.fickle = ".ajax-fickle";
         this.progress = 15;
         this.DeviceType = "desktop";
+        this.actionOnLoaded = [];
+        this.pageLoading = $.Postpone();
 
         postLoader.add(() => {
             this.default();
@@ -981,7 +1002,7 @@ class features_paging {
         $("body").append(`<div class="notifier"><div class="notifier__message"></div><span class="notifier__signal"></span></div>`);
         $(document).on("click", "a.ajax-link", (e) => {
             e.preventDefault();
-
+            this.pageLoading = $.Postpone();
             var href = $(e.currentTarget).attr("href");
             if (href != null) {
                 this.load(href);
@@ -993,21 +1014,18 @@ class features_paging {
         this.refresh();
         // Extending History API
         window.onpopstate = (event) => {
-            if (this.isFirstInHistory()) {
-                window.location.href = event.state.href;
-                return;
-            }
-            $(this.fickle).html(event.state.data);
+            window.location.href = event.state.href;
         }
     }
 
-    load(url, saveHistory = true) {
+    load(url, hashAction = false) {
+        var url = hashAction ? url + "#!" + hashAction : url;
         this.progress = 25;
         this.dynamic_request(url, (result) => {
             // Histoty Push
             if (history.state == null) {
                 history.replaceState({ href: url, first: true, data: result }, "", url);
-            } else if (saveHistory) {
+            } else {
                 history.pushState({ href: url, data: result }, "", url);
             }
             this.final(result, url);
@@ -1024,9 +1042,11 @@ class features_paging {
             headers: {
                 "DYNAMIC-REQUEST": true,
             },
-            dataType: 'html',
+            dataType: 'text',
+            cache: false,
             success: $success,
             error: (error) => {
+                this.pageLoading.reject();
                 this.progress = null;
                 console.warn("Page Loading Error:", error);
                 if (typeof error.responseJSON == "undefined") error.responseJSON = { message: "Undefined error" };
@@ -1061,7 +1081,19 @@ class features_paging {
 
     onPageLoaded(url, DeviceType = false) {
         url[1] += DeviceType ? "__" + DeviceType : "";
-        if (url[1] in this.pages) this.pages[url[1]](url[2]);
+        if (url[1] in this.pages) try {
+            this.pages[url[1]](url[2]);
+            this.pageLoaded.last($this => {
+                var action = $this.split("#!")[1];
+                this.actionOnLoaded[action]();
+                this.clear_hash();
+            });
+            api.post("/user/update");
+        } catch (error) {
+            console.log(error);
+
+            //this.refresh();
+        }
     }
 
     isFirstInHistory() {
@@ -1089,6 +1121,10 @@ class features_paging {
             .css({ opacity: opacity })
             .find(".load-indicator__fill")
             .css({ width: percent });
+    }
+
+    clear_hash() {
+        window.history.replaceState("", "", window.location.href.split('#')[0]);
     }
 
     notify(signal, message) {
@@ -1153,29 +1189,18 @@ class features_liveFeed {
 class features_mobile {
     constructor() {
         this.time = new Date().getTime();
-        this.file = this.isDeviceMobile() ? "mobile.css" : "main.css";
         this.onMobile = function () { };
-
-        $($("link")[1]).attr({
-            href: "/assets/css/" + this.file + "?v=" + this.time
-        });
 
         if (this.isDeviceMobile()) {
             this.if = true;
-            this.onMobile();
-            $("#adaptive-style").remove();
-            $(".timer-v2__text").remove();
-            $($(".social-row")[0]).remove();
-            $(".topbar-profile__balance, .stndfspin-features, .profile-confirmation, .profile-info").removeClass("skewed-element");
-            $(".topbar-menu, .social-row__title").remove();
-            $(".bottombar").after($(".bottombar__description"));
-            $(".lastbar").after($(".bottombar-menu"));
-            $(".stndfspin-features__options").after($(".topbar-language"));
+            postLoader.add(() => {
+                this.onMobile.apply(this);
+            });
         } else this.if = false;
     }
 
     isDeviceMobile() {
-        return /(android|bb\d+|meego).+mobile|avantgo|bada\/|blackberry|blazer|compal|elaine|fennec|hiptop|iemobile|ip(hone|od)|ipad|iris|kindle|Android|Silk|lge |maemo|midp|mmp|netfront|opera m(ob|in)i|palm( os)?|phone|p(ixi|re)\/|plucker|pocket|psp|series(4|6)0|symbian|treo|up\.(browser|link)|vodafone|wap|windows (ce|phone)|xda|xiino/i.test(navigator.userAgent) || /1207|6310|6590|3gso|4thp|50[1-6]i|770s|802s|a wa|abac|ac(er|oo|s\-)|ai(ko|rn)|al(av|ca|co)|amoi|an(ex|ny|yw)|aptu|ar(ch|go)|as(te|us)|attw|au(di|\-m|r |s )|avan|be(ck|ll|nq)|bi(lb|rd)|bl(ac|az)|br(e|v)w|bumb|bw\-(n|u)|c55\/|capi|ccwa|cdm\-|cell|chtm|cldc|cmd\-|co(mp|nd)|craw|da(it|ll|ng)|dbte|dc\-s|devi|dica|dmob|do(c|p)o|ds(12|\-d)|el(49|ai)|em(l2|ul)|er(ic|k0)|esl8|ez([4-7]0|os|wa|ze)|fetc|fly(\-|_)|g1 u|g560|gene|gf\-5|g\-mo|go(\.w|od)|gr(ad|un)|haie|hcit|hd\-(m|p|t)|hei\-|hi(pt|ta)|hp( i|ip)|hs\-c|ht(c(\-| |_|a|g|p|s|t)|tp)|hu(aw|tc)|i\-(20|go|ma)|i230|iac( |\-|\/)|ibro|idea|ig01|ikom|im1k|inno|ipaq|iris|ja(t|v)a|jbro|jemu|jigs|kddi|keji|kgt( |\/)|klon|kpt |kwc\-|kyo(c|k)|le(no|xi)|lg( g|\/(k|l|u)|50|54|\-[a-w])|libw|lynx|m1\-w|m3ga|m50\/|ma(te|ui|xo)|mc(01|21|ca)|m\-cr|me(rc|ri)|mi(o8|oa|ts)|mmef|mo(01|02|bi|de|do|t(\-| |o|v)|zz)|mt(50|p1|v )|mwbp|mywa|n10[0-2]|n20[2-3]|n30(0|2)|n50(0|2|5)|n7(0(0|1)|10)|ne((c|m)\-|on|tf|wf|wg|wt)|nok(6|i)|nzph|o2im|op(ti|wv)|oran|owg1|p800|pan(a|d|t)|pdxg|pg(13|\-([1-8]|c))|phil|pire|pl(ay|uc)|pn\-2|po(ck|rt|se)|prox|psio|pt\-g|qa\-a|qc(07|12|21|32|60|\-[2-7]|i\-)|qtek|r380|r600|raks|rim9|ro(ve|zo)|s55\/|sa(ge|ma|mm|ms|ny|va)|sc(01|h\-|oo|p\-)|sdk\/|se(c(\-|0|1)|47|mc|nd|ri)|sgh\-|shar|sie(\-|m)|sk\-0|sl(45|id)|sm(al|ar|b3|it|t5)|so(ft|ny)|sp(01|h\-|v\-|v )|sy(01|mb)|t2(18|50)|t6(00|10|18)|ta(gt|lk)|tcl\-|tdg\-|tel(i|m)|tim\-|t\-mo|to(pl|sh)|ts(70|m\-|m3|m5)|tx\-9|up(\.b|g1|si)|utst|v400|v750|veri|vi(rg|te)|vk(40|5[0-3]|\-v)|vm40|voda|vulc|vx(52|53|60|61|70|80|81|83|85|98)|w3c(\-| )|webc|whit|wi(g |nc|nw)|wmlb|wonu|x700|yas\-|your|zeto|zte\-/i.test(navigator.userAgent.substr(0, 4));
+        return (/(android|bb\d+|meego).+mobile|avantgo|bada\/|blackberry|blazer|compal|elaine|fennec|hiptop|iemobile|ip(hone|od)|ipad|iris|kindle|Android|Silk|lge |maemo|midp|mmp|netfront|opera m(ob|in)i|palm( os)?|phone|p(ixi|re)\/|plucker|pocket|psp|series(4|6)0|symbian|treo|up\.(browser|link)|vodafone|wap|windows (ce|phone)|xda|xiino/i.test(navigator.userAgent)) || (/1207|6310|6590|3gso|4thp|50[1-6]i|770s|802s|a wa|abac|ac(er|oo|s\-)|ai(ko|rn)|al(av|ca|co)|amoi|an(ex|ny|yw)|aptu|ar(ch|go)|as(te|us)|attw|au(di|\-m|r |s )|avan|be(ck|ll|nq)|bi(lb|rd)|bl(ac|az)|br(e|v)w|bumb|bw\-(n|u)|c55\/|capi|ccwa|cdm\-|cell|chtm|cldc|cmd\-|co(mp|nd)|craw|da(it|ll|ng)|dbte|dc\-s|devi|dica|dmob|do(c|p)o|ds(12|\-d)|el(49|ai)|em(l2|ul)|er(ic|k0)|esl8|ez([4-7]0|os|wa|ze)|fetc|fly(\-|_)|g1 u|g560|gene|gf\-5|g\-mo|go(\.w|od)|gr(ad|un)|haie|hcit|hd\-(m|p|t)|hei\-|hi(pt|ta)|hp( i|ip)|hs\-c|ht(c(\-| |_|a|g|p|s|t)|tp)|hu(aw|tc)|i\-(20|go|ma)|i230|iac( |\-|\/)|ibro|idea|ig01|ikom|im1k|inno|ipaq|iris|ja(t|v)a|jbro|jemu|jigs|kddi|keji|kgt( |\/)|klon|kpt |kwc\-|kyo(c|k)|le(no|xi)|lg( g|\/(k|l|u)|50|54|\-[a-w])|libw|lynx|m1\-w|m3ga|m50\/|ma(te|ui|xo)|mc(01|21|ca)|m\-cr|me(rc|ri)|mi(o8|oa|ts)|mmef|mo(01|02|bi|de|do|t(\-| |o|v)|zz)|mt(50|p1|v )|mwbp|mywa|n10[0-2]|n20[2-3]|n30(0|2)|n50(0|2|5)|n7(0(0|1)|10)|ne((c|m)\-|on|tf|wf|wg|wt)|nok(6|i)|nzph|o2im|op(ti|wv)|oran|owg1|p800|pan(a|d|t)|pdxg|pg(13|\-([1-8]|c))|phil|pire|pl(ay|uc)|pn\-2|po(ck|rt|se)|prox|psio|pt\-g|qa\-a|qc(07|12|21|32|60|\-[2-7]|i\-)|qtek|r380|r600|raks|rim9|ro(ve|zo)|s55\/|sa(ge|ma|mm|ms|ny|va)|sc(01|h\-|oo|p\-)|sdk\/|se(c(\-|0|1)|47|mc|nd|ri)|sgh\-|shar|sie(\-|m)|sk\-0|sl(45|id)|sm(al|ar|b3|it|t5)|so(ft|ny)|sp(01|h\-|v\-|v )|sy(01|mb)|t2(18|50)|t6(00|10|18)|ta(gt|lk)|tcl\-|tdg\-|tel(i|m)|tim\-|t\-mo|to(pl|sh)|ts(70|m\-|m3|m5)|tx\-9|up(\.b|g1|si)|utst|v400|v750|veri|vi(rg|te)|vk(40|5[0-3]|\-v)|vm40|voda|vulc|vx(52|53|60|61|70|80|81|83|85|98)|w3c(\-| )|webc|whit|wi(g |nc|nw)|wmlb|wonu|x700|yas\-|your|zeto|zte\-/i.test(navigator.userAgent.substr(0, 4)));
     }
 }
 
@@ -1204,26 +1229,12 @@ const page = new class {
 }
 
 class STNDFItems {
-    static gather(parent) {
-        var ItemsArray = [];
-        $(parent).find(".sorted-skins__unit").each(function () {
-            ItemsArray.push({
-                weapon_id: $(this).attr("data-id"),
-            });
-        });
-        return ItemsArray;
-    }
-}
-
-// Controllers
-
-class ItemsController extends STNDFItems {
     static Sell(weapon_id, callback) {
         api.post("/item/sell", { id: weapon_id }, callback);
     }
 
     static sellAll() {
-        api.post("/item/sellall", { }, (result) => {
+        api.post("/item/sellall", {}, (result) => {
             page.popup.close();
             page.support.refresh();
             DOM.update("required-update", {
@@ -1240,7 +1251,11 @@ class ItemsController extends STNDFItems {
     static Callback(result) {
         page.support.notify("success", "Операция Выполнена");
     }
+}
 
+// Controllers
+
+class ItemsController extends STNDFItems {
     static RemoveItem(weapon_id) {
         $("[weapon-id='" + weapon_id + "'], [data-id='" + weapon_id + "']").remove();
     }
@@ -1321,7 +1336,7 @@ class ItemsController extends STNDFItems {
     }
 
     static parseData(data, modifications = {}) {
-        var data = "item" in data ? data.item : data.win ;
+        var data = "item" in data ? data.item : "win" in data ? data.win : data;
         for (const key in modifications) {
             data[key] = modifications[key];
         }
@@ -1351,7 +1366,7 @@ class FortuneWheelController {
                 wheel = skin.parent().parent(),
                 timeout = 3000;
             setTimeout(() => {
-                this.SetInnerPrice(id, itemData.item.price);
+                this.SetInnerPrice(id, itemData.price);
                 // Skin
                 ItemsController.CreateItem({ marks: false });
                 ItemsController.ModifyItemByData(itemData);
@@ -1380,16 +1395,58 @@ class FortuneWheelController {
 
         checkUp.then(function () {
             $(".fortune-wheel__skin").removeClass("hidden");
+            $(".battle__buttons").removeClass("hidden");
         });
     }
 }
 
-class FeaturesController {
+class BalanceController {
     static UpdateBalance(balance) {
         DOM.update("required-update", {
             balance: alter_by_currency(balance, true)
         });
     }
+
+    static GetUserBalance() {
+        var balance = alter_by_currency(DOM.$("required-update", "balance").html(), false);
+        if (this.CurrentBalance == balance) {
+            return balance;
+        }// else window.location.reload();
+    }
+
+    static HasSufficientFunds(CustomPrice = false) {
+        return this.GetUserBalance() >= (CustomPrice ? CustomPrice : ServiceController.CurrentService["Price"]);
+    }
+
+    static FundsLackAmount(CustomPrice = false) {
+        return this.GetUserBalance() - (CustomPrice ? CustomPrice : ServiceController.CurrentService["Price"]);
+    }
+}
+
+class ServiceController {
+    static ServiceMap() {
+        return {
+            Name: "{Name}",
+            Price: "{Price}",
+        };
+    }
+
+    static set SetCurrentService(service) {
+        if (this.MatchServiceMap(service)) {
+            this.CurrentService = service;
+        } else throw "Provided service map cannot be listed";
+    }
+
+    static MatchServiceMap(service) {
+        for (const key in this.ServiceMap()) {
+            if (!(key in service)) return false;
+        }
+        return true;
+    }
+}
+
+class asd {
+    
 }
 
 // Functions
@@ -1451,6 +1508,16 @@ function isFloat(n) {
     return Number(n) === n && n % 1 !== 0;
 }
 
-function RandomByte() {
-    return Math.floor(Math.random() * Math.floor(2));
+function get_random_int(min = 0, max = 1) {
+    min = Math.ceil(min);
+    max = Math.floor(max);
+    return Math.floor(Math.random() * (max - min)) + min; //The maximum is exclusive and the minimum is inclusive
+}
+
+function img_error(element) {
+    element.src = '/assets/img/guest.png';
+}
+
+function IsDefined($this) {
+    return $this != "undefined" && $this != undefined && typeof $this != "undefined";
 }
