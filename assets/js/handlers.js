@@ -95,6 +95,7 @@ DOM.listen(page.support.fickle, type => {
             href: "/assets/css/main.css?v=" + page.mobile.time
         });
     }
+    ServiceController.MinWithdrawalPrice = 25;
 })();
 
 // Language
@@ -321,8 +322,20 @@ DOM.on("click", "item", {
         });
     },
     withdraw: function () {
+        // Vars
         var weapon = $(this).parent().parent().parent();
         var weapon_id = weapon.data("id");
+        var weapon_price = alter_by_currency(weapon.find(".sorted-skins__cost").html(), false);
+        // Conditions
+        if (page.popup.tmp.NeedsToSetAvatar) {
+            page.popup.open("withdraw__avatar");
+            return;
+        }
+        if (weapon_price < ServiceController.MinWithdrawalPrice) {
+            page.popup.open("withdraw__error");
+            return;
+        }
+        // Final Action
         page.popup.open("withdraw", {
             item: {
                 id: weapon_id,
@@ -332,7 +345,7 @@ DOM.on("click", "item", {
         });
     },
     "withdraw-submit": function () {
-        var item = page.popup.TempOptions.item;
+        var item = page.popup.tmp.item;
         ItemsController.CreateWithdrawal({
             item: item.id,
             price: item.random_number,
@@ -356,7 +369,7 @@ DOM.on("click", "item", {
         });
     },
     sell_submit: function () {
-        var item = page.popup.TempOptions.item;
+        var item = page.popup.tmp.item;
         ItemsController.Sell(item.id, function () {
             item.object.remove();
             ItemsController.Callback();
@@ -382,6 +395,7 @@ $(document).on("click", ".tab-swithcer__button--only[tab]", function () {
 });
 
 $(document).on("click", ".sorted-skins-more-button", function () {
+    var config = {};
     var sorted = $(this).parent().attr("class");
     var classes = sorted.split(" ");
     var sorted_specified = classes[2].replace("js-tab-", "");
@@ -399,15 +413,15 @@ $(document).on("click", ".sorted-skins-more-button", function () {
         switch (type) {
             case "contracts":
                 result.result.filter(function (data) {
-                    ItemsController.CreateContract();
+                    ItemsController.CreateContract(config);
                     ItemsController.ModifyContractByData(data);
                     ItemsController.AppendContractTo(".js-tab-" + sorted_specified);
                 });
                 break;
-
             default:
+                if (sorted_specified == "history") config = { events: false };
                 result.result.filter(function (data) {
-                    ItemsController.CreateItem();
+                    ItemsController.CreateItem(config);
                     ItemsController.ModifyItemByData(data);
                     ItemsController.AppendItemTo(".js-tab-" + sorted_specified);
                 });
@@ -507,20 +521,20 @@ $(document).on("keyup", ".promocode__input", function () {
 
 page.popup.on["withdraw"] = function (options) {
     var itemPrice = options.item.price + options.rnd;
-    this.TempOptions = options;
+    this.tmp = options;
     this.wEdit({
         summary: this.summary.replace('{itemPrice}', itemPrice),
         content: `<div style="display:flex;justify-content:center;flex-direction:column;align-items:center;"><span class="withdraw__price skewed-element">${options.item.random_number}</span><input class="popup-window__button button1 js-item-withdraw-input" withdraw-skin placeholder="${this.wText("other.placeholder")}"><button class="popup-window__button button1 js-item-withdraw-submit">${this.wText("other.button")}</button></div>`,
     });
 };
 
-page.popup.on["withdraw_error"] = function () {
+page.popup.on["withdraw__error"] = function () {
     // Automataticly Filled
 };
 
-page.popup.on["withdraw_avatar"] = function () {
+page.popup.on["withdraw__avatar"] = function () {
     this.wEdit({
-        content: "<form class='avatar-change' method='POST' enctype='multipart/form-data' action='/api/v1/user/avatar'><div class='avatar-change__title'>" + getLanguage("popup.withdraw_avatar.avatar_change__title") + "</div><img src='/img/guest.png' class='avatar-change__avatar'><label><a class='avatar-change__input button1'>" + getLanguage("popup.withdraw_avatar.avatar_change__input") + "</a><input accept='.jpg, .png, .jpeg, .gif, .bmp, .tif, .tiff|image/*' type='file' onchange='this.form.submit();' name='file' style='display: none; position: absolute;' ></label></form>",
+        content: "<form class='avatar-change' method='POST' enctype='multipart/form-data' action='/api/v1/user/avatar'><div class='avatar-change__title'>" + this.wText("avatar_change__title") + "</div><img src='/img/guest.png' class='avatar-change__avatar'><label class='avatar-change__input skewed-element' for='avatar_image'>" + this.wText("avatar_change__input") + "</label><input id='avatar_image' accept='.jpg, .png, .jpeg, .gif, .bmp, .tif, .tiff|image/*' type='file' onchange='this.form.submit();' name='file' style='display: none; position: absolute;'></form>",
     });
 };
 
@@ -532,7 +546,7 @@ page.popup.on["auth"] = function () {
 };
 
 page.popup.on["sell"] = function (options) {
-    this.TempOptions = options;
+    this.tmp = options;
     this.wEdit({
         summary: this.summary.ias("price", options.item.price),
         content: `<div style="display:flex;justify-content:center;"><button class="popup-window__button button1 js-item-sell_submit">${this.wText("buttons.yes")}</button><button class="popup-window__button button2" onclick="page.popup.close();">${this.wText("buttons.no")}</button></div>`,

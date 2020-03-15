@@ -55,10 +55,6 @@ Array.prototype.last = function (argument1) {
     }
 };
 
-Object.prototype.context = function($function) {
-    $function.apply(this);
-};
-
 // Additional Functions
 
 window.getLanguage = (param) => {
@@ -545,7 +541,6 @@ class features_wheel {
 
     find_item(wheel_id, block_id) {
         var item = $(".fortune-wheel[data-id='" + wheel_id + "'] .fortune__item:nth-child(" + block_id + ")");
-        console.log("Asshole: ", wheel_id, block_id, item);
         if (item.length > 0) return item; else throw "There is no such an item";
     }
 
@@ -592,6 +587,7 @@ class features_wheel {
 class features_popup {
     constructor() {
         this.on = {};
+        this.tmp = {};
     }
 
     tend(option) {
@@ -731,7 +727,7 @@ class features_contract {
                 this.saf = true;
                 this.cautionMap = {
                     insufficient: "Добавьте минимум 3 предмета",
-                    ranged: "Может выпасть от {price_min} до {price_max}"
+                    ranged: "Может выпасть от {contract=>price->min} до {contract=>price->max}"
                 };
             }
             init() {
@@ -832,7 +828,7 @@ class features_contract {
                 var avail = this.whichAvail("occupied");
                 if (avail.length >= 3) {
                     $(".contract__button").removeAttr("disabled");
-                    $(".contract__caution").html(this.cautionMap["ranged"].ias({ prefix: "contract" }));
+                    $(".contract__caution").html(this.cautionMap["ranged"].ias());
                     this.saf = false;
                 } else {
                     $(".contract__button").attr({ disabled: "" });
@@ -890,8 +886,8 @@ class features_contract {
         DOM.update("contract", {
             items: this.spot.whichAvail("occupied").length,
             sum: sum,
-            "price-min": alter_by_currency(sum / 4, true),
-            "price-max": alter_by_currency(sum * 4, true),
+            price_min: alter_by_currency(sum / 4, true),
+            price_max: alter_by_currency(sum * 4, true),
         });
     }
 }
@@ -1164,6 +1160,10 @@ class features_paging {
             content: colored_html,
         })
     }
+
+    context(object) {
+        object.apply(this);
+    }
 }
 
 class features_liveFeed {
@@ -1238,6 +1238,8 @@ const page = new class {
 
 class STNDFItems {
     static Sell(weapon_id, callback) {
+        console.log(weapon_id);
+        
         api.post("/item/sell", { id: weapon_id }, callback);
     }
 
@@ -1339,6 +1341,7 @@ class ItemsController extends STNDFItems {
             this.items.last($this => {
                 if (config.item.marks == false) $this.find(".sorted-skins__marks").remove();
                 if (config.item.icons == false) $this.find(".sorted-skins__icons").remove();
+                if (config.item.events == false) $this.find(".sorted-skins__icon").removeClass("js-item-withdraw js-item-sell");
             });
         }
     }
@@ -1522,10 +1525,11 @@ function get_random_int(min = 0, max = 2) {
     return Math.floor(Math.random() * (max - min)) + min; //The maximum is exclusive and the minimum is inclusive
 }
 
-function img_error(element) {
-    element.src = '/assets/img/guest.png';
-}
-
 function IsDefined($this) {
     return $this != "undefined" && $this != undefined && typeof $this != "undefined";
+}
+
+function img_error(element) {
+    element.src = '/assets/img/guest.png';
+    page.popup.tmp.NeedsToSetAvatar = true;
 }
