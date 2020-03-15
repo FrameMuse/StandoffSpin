@@ -35,8 +35,9 @@ String.prototype.multiReplace = function (array, replacement) {
     return string;
 };
 
-String.prototype.ias = function (config = { prefix: "[prefix]" }) {
-    return interpret.JSDOM(this, config.prefix);
+String.prototype.ias = function (argument1 = "", argument2 = "") {
+    if (argument1 == "" && argument2 == "") return interpret.JSDOM(this);
+    return this.multiReplace([`{${argument1}}`], argument2);
 };
 
 Array.prototype.last = function (argument1) {
@@ -52,6 +53,10 @@ Array.prototype.last = function (argument1) {
             return this.slice(Math.max(this.length - argument1, 0));
             break;
     }
+};
+
+Function.prototype.context = function($function) {
+    $function.apply(this);
 };
 
 // Additional Functions
@@ -123,18 +128,19 @@ $.fn.extend({
     },
 });
 
-// Const Classes
+// Const Classes  item__sell-> === item-
 
 class interpret {
-    static JSDOM(string, prefix) {
+    static JSDOM(string) {
+        if (string == null) return string;
         var brackets = [string.indexOf('{'), string.indexOf('}')];
-        function createSpan(name) {
-            return `<span class="js-${prefix}-${name}"></span>`;
+        function createSpan(spot) {
+            return `<span class="js-${spot}"></span>`.multiReplace(['=>'], '-').multiReplace(['->'], '_');
         }
         while (brackets[0] != -1 && brackets[1] != -1) {
             var brackets = [string.indexOf('{'), string.indexOf('}')];
-            var replacy = string.slice(brackets[0] + 1, brackets[1]);
-            var string = string.multiReplace(['{' + replacy + '}'], createSpan(replacy)).multiReplace(['_'], '-');
+            var $var = string.slice(brackets[0] + 1, brackets[1]);
+            var string = string.multiReplace(['{' + $var + '}'], createSpan($var));
         }
         return string;
     }
@@ -595,7 +601,7 @@ class features_popup {
 
     wEdit(options = {}) {
         for (var option in options) {
-            this.tend(option).html(options[option]);
+            this.tend(option).html(interpret.JSDOM(options[option]));
         }
     }
 
@@ -1083,17 +1089,19 @@ class features_paging {
         url[1] += DeviceType ? "__" + DeviceType : "";
         if (url[1] in this.pages) try {
             this.pages[url[1]](url[2]);
-            this.pageLoaded.last($this => {
-                var action = $this.split("#!")[1];
-                this.actionOnLoaded[action]();
-                this.clear_hash();
-            });
             api.post("/user/update");
         } catch (error) {
             console.log(error);
 
             //this.refresh();
         }
+    }
+
+    startActionOnLoaded(url) {
+        if (window.location.hash == "") return;
+        var action = url.last().split("#!")[1];
+        this.actionOnLoaded[action]();
+        this.clear_hash();
     }
 
     isFirstInHistory() {
@@ -1446,7 +1454,7 @@ class ServiceController {
 }
 
 class asd {
-    
+
 }
 
 // Functions
@@ -1508,7 +1516,7 @@ function isFloat(n) {
     return Number(n) === n && n % 1 !== 0;
 }
 
-function get_random_int(min = 0, max = 1) {
+function get_random_int(min = 0, max = 2) {
     min = Math.ceil(min);
     max = Math.floor(max);
     return Math.floor(Math.random() * (max - min)) + min; //The maximum is exclusive and the minimum is inclusive

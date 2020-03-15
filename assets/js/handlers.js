@@ -16,11 +16,14 @@ DOM.listen(page.support.fickle, type => {
         inventory: 1,
         history: 1,
     }
-    // After page is loaded
-    page.support.onPageLoaded(page.support.pageLoaded);
-    page.support.pageLoading.resolve();
-    // ...Mobile
-    if (page.mobile.if) page.support.onPageLoaded(page.support.pageLoaded, "mobile");
+    page.support.context(function () {
+        // After page is loaded
+        this.onPageLoaded(this.pageLoaded);
+        this.startActionOnLoaded(this.pageLoaded);
+        this.pageLoading.resolve();
+        // ...Mobile
+        if (page.mobile.if) this.onPageLoaded(this.pageLoaded, "mobile");
+    });
     // Run sciprts from loaded page & Prevent Unexpected Errors
     prevent_error_function(features_toLoad);
     page.support.progress = 100;
@@ -110,12 +113,12 @@ page.mobile.onMobile = function () {
     $("#adaptive-style").remove();
     $(".timer-v2__text").remove();
     $($(".social-row")[0]).remove();
-    $(".topbar-profile__balance, .stndfspin-features, .profile-confirmation, .profile-info").removeClass("skewed-element");
     $(".topbar-menu, .social-row__title").remove();
     $(".bottombar").after($(".bottombar__description"));
     $(".lastbar").after($(".bottombar-menu"));
     $(".stndfspin-features__options").after($(".topbar-language"));
     $(".live-drops").after($(".stndfspin-features__stats"));
+    $(".mobile-menu").removeClass("hidden");
 }
 
 page.support.addPage("/case", () => {
@@ -323,25 +326,41 @@ DOM.on("click", "item", {
         page.popup.open("withdraw", {
             item: {
                 id: weapon_id,
+                object: weapon,
                 random_number: get_random_int(),
             },
         });
     },
     "withdraw-submit": function () {
         var item = page.popup.TempOptions.item;
-        console.log({
-            item: item.id,
-            price: item.random_number,
-            name: DOM.$("item", "withdraw-input").val(),
-        });
-
         ItemsController.CreateWithdrawal({
             item: item.id,
             price: item.random_number,
             name: DOM.$("item", "withdraw-input").val(),
         }, function () {
-            weapon.remove();
+            item.object.remove();
             ItemsController.Callback();
+            page.popup.close();
+        });
+    },
+    sell: function() {
+        var weapon = $(this).parent().parent().parent();
+        var weapon_id = weapon.data("id");
+        var weapon_price = alter_by_currency(weapon.find(".sorted-skins__cost").html(), false);
+        page.popup.open("sell", {
+            item: {
+                id: weapon_id,
+                object: weapon,
+                price: weapon_price,
+            },
+        });
+    },
+    sell_submit: function () {
+        var item = page.popup.TempOptions.item;
+        ItemsController.Sell(item.id, function () {
+            item.object.remove();
+            ItemsController.Callback();
+            page.popup.close();
         });
     },
 });
@@ -491,7 +510,7 @@ page.popup.on["withdraw"] = function (options) {
     this.TempOptions = options;
     this.wEdit({
         summary: this.summary.replace('{itemPrice}', itemPrice),
-        content: `<div style="display:flex;justify-content:center;flex-direction:column;align-items:center;"><span class="withdraw__price">${options.item.random_number}</span><input class="popup-window__button button1 js-item-withdraw-input" withdraw-skin placeholder="${this.wText("other.placeholder")}"><button class="popup-window__button button2 js-item-withdraw-submit">${this.wText("other.button")}</button></div>`,
+        content: `<div style="display:flex;justify-content:center;flex-direction:column;align-items:center;"><span class="withdraw__price skewed-element">${options.item.random_number}</span><input class="popup-window__button button1 js-item-withdraw-input" withdraw-skin placeholder="${this.wText("other.placeholder")}"><button class="popup-window__button button1 js-item-withdraw-submit">${this.wText("other.button")}</button></div>`,
     });
 };
 
@@ -512,6 +531,14 @@ page.popup.on["auth"] = function () {
     });
 };
 
+page.popup.on["sell"] = function (options) {
+    this.TempOptions = options;
+    this.wEdit({
+        summary: this.summary.ias("price", options.item.price),
+        content: `<div style="display:flex;justify-content:center;"><button class="popup-window__button button1 js-item-sell_submit">${this.wText("buttons.yes")}</button><button class="popup-window__button button2" onclick="page.popup.close();">${this.wText("buttons.no")}</button></div>`,
+    });
+};
+
 page.popup.on["sell_all"] = function (options) {
     this.wEdit({
         summary: this.summary.replace("{price}", options.inventoryPrice),
@@ -521,12 +548,6 @@ page.popup.on["sell_all"] = function (options) {
 
 page.popup.on["sell_all_error"] = function () {
     // Automataticly Filled
-};
-
-page.popup.on["0ge"] = function (options) {
-    this.wEdit({
-        summary: this.summary.replace("{skin}", options.skin),
-    });
 };
 
 page.popup.on["top_up"] = function (options) {
@@ -569,12 +590,6 @@ page.popup.on["vk-accept"] = function (options) {
     // VK Widgets
     VK.Widgets.AllowMessagesFromCommunity("vk_allow_messages_from_community", { height: 30 }, 187346506);
     VK.Widgets.Group("vk_groups", { mode: 1, no_cover: 1 }, 187346506);
-};
-
-page.popup.on["pay_confirm"] = function (options) {
-    this.wEdit({
-        content: `<div style="display:flex;justify-content:center;"><button class="popup-window__button button2" onclick="${options.callback1}">${this.wText("buttons.yes")}</button><button class="popup-window__button button1" onclick="${options.callback2}">${this.wText("buttons.no")}</button></div>`,
-    });
 };
 
 $(document).on("click", ".popup-window__close, .popup__cover", () => {
