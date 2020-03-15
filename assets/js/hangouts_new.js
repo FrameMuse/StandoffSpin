@@ -55,7 +55,7 @@ Array.prototype.last = function (argument1) {
     }
 };
 
-Function.prototype.context = function($function) {
+Object.prototype.context = function($function) {
     $function.apply(this);
 };
 
