@@ -5,10 +5,11 @@ var features_toLoad,
         contracts: 1,
         inventory: 1,
         history: 1,
+        battles: 1,
     },
     sorted_skin_html = `<div class="sorted-skins__unit"><div class="sorted-skins__marks"><span class="sorted-skins__cost skewed-element"></span><div class="sorted-skins__icons"><div class="sorted-skins__icon sorted-skins__icon--green skewed-element js-item-withdraw"><span class="sorted-skins__icon--arrow"></span></div><div class="sorted-skins__icon sorted-skins__icon--orange skewed-element js-item-sell"><span class="sorted-skins__icon--dollar"></span></div></div></div><div class="weapon-skins__weapon"><img src="" class="weapon-skins__image"></div><div class="sorted-skins__skin-title"><span class="sorted-skins__skin-title--0"></span><span class="sorted-skins__skin-title--1"></span></div></div>`,
-    sorted_contract_html = `<div class="sorted-cotracts__unit"><div class="sorted-cotracts__extend"><div class="sorted-cotracts__skins"></div><div class="sorted-cotracts__text gray">Стоимость контракта <span class="white skewed-text"></span></div></div></div>`;
-
+    sorted_contract_html = `<div class="sorted-cotracts__unit"><div class="sorted-cotracts__extend"><div class="sorted-cotracts__skins"></div><div class="sorted-cotracts__text gray">Стоимость контракта <span class="white skewed-text"></span></div></div></div>`,
+    sorted_battle_html = `<div class="sorted-battles__battle"><div class="sorted-battles-player"><div class="weapon-skins__weapon"><img src="" class="weapon-skins__image"><span class="weapon-skins__quality weapon-skins__quality--skyblue"></span></div><div class="sorted-battles-player__info"><img src="" alt="" class="sorted-battles-player__image"><span class="sorted-battles-player__price"></span></div></div><img src="" alt="" class="sorted-battles__case-image"><div class="sorted-battles-player"><div class="weapon-skins__weapon"><img src="" class="weapon-skins__image"><span class="weapon-skins__quality weapon-skins__quality--pink"></span></div><div class="sorted-battles-player__info"><img src="" alt="" class="sorted-battles-player__image"><span class="sorted-battles-player__price"></span></div></div></div>`;
 // Extending Functions
 
 String.prototype.intConvert = function () {
@@ -1283,6 +1284,11 @@ class ItemsController extends STNDFItems {
         this.contracts = [clone];
     }
 
+    static CreateBattle() {
+        var clone = $(sorted_battle_html).clone();
+        this.battles = [clone];
+    }
+
     static ModifyItemByData(data = {}) {
         const params = this.parseData(data, { item_id: data.id });
         this.items.last(function ($this) {
@@ -1306,9 +1312,39 @@ class ItemsController extends STNDFItems {
         });
     }
 
+    static ModifyBattleByData(data = {}) {
+        const params = this.parseData(data, {
+            case_id: data.case_id,
+            user_0: data.owner,
+            user_1: data.rival,
+            user_0_item: data.owner_item,
+            user_1_item: data.rival_item,
+        });
+        this.battles.last(function ($this) {
+            $this.attr({ "data-id": params.case_id });
+            $this.find(".sorted-battles__case-image").attr({ src: "/img/" + params.image });
+            // ---------------------------------------------------------------
+            $this.find(".sorted-battles-player").each(function (i, e) {
+                var user = params["user_" + i];
+                var item = params["user_" + i + "_item"];
+                // ---------------------------------------------------------------
+                $(e).find(".sorted-battles-player__image").attr({ src: user["photo"] });
+                $(e).find(".sorted-battles-player__price").html(alter_by_currency(item["price"], true));
+                // ---------------------------------------------------------------
+                $(e).find(".weapon-skins__image").attr({ src: "/img/" + item["image"] });
+                $(e).addClass("sorted-skins__unit--" + item["class_name"]);
+            });
+        });
+    }
+
     static AppendItemTo(object) {
         var item = this.items.last();
         $(item).appendTo(object);
+    }
+
+    static AppendBattleTo(object) {
+        var battle = this.battles.last();
+        $(battle).appendTo(object);
     }
 
     static PrependItemTo(object) {
@@ -1347,7 +1383,7 @@ class ItemsController extends STNDFItems {
     }
 
     static parseData(data, modifications = {}) {
-        var data = "item" in data ? data.item : "win" in data ? data.win : data;
+        var data = "item" in data ? data.item : "win" in data ? data.win : "_case" in data ? data._case : data;
         for (const key in modifications) {
             data[key] = modifications[key];
         }
@@ -1369,7 +1405,7 @@ class FortuneWheelController {
         page.wheel.stop_wheel();
     }
 
-    static BattleCry(data = {}) {
+    static BattleCry(data = {}, wheelWinnerId = 0) {
         page.wheel.data.spins = 4.25;
         data.filter((itemData, id) => {
             // Variables
@@ -1377,7 +1413,7 @@ class FortuneWheelController {
                 wheel = skin.parent().parent(),
                 timeout = 3000;
             setTimeout(() => {
-                this.SetInnerPrice(id, itemData.price);
+                wheel.find(".fortune-wheel__skin").prepend(`<span class="fortune-wheel__skin--price">${alter_by_currency(itemData.price, true)}</span>`);
                 // Skin
                 ItemsController.CreateItem({ marks: false });
                 ItemsController.ModifyItemByData(itemData);
@@ -1405,6 +1441,7 @@ class FortuneWheelController {
         });
 
         checkUp.then(function () {
+            $(".battle").addClass("battle__over--" + wheelWinnerId);
             $(".fortune-wheel__skin").removeClass("hidden");
             $(".battle__buttons").removeClass("hidden");
         });
@@ -1453,6 +1490,10 @@ class ServiceController {
             if (!(key in service)) return false;
         }
         return true;
+    }
+
+    static LevelProgress(procent = 0) {
+        $(".user-level__progress-line--indicator").css({ width: procent + "%" });
     }
 }
 

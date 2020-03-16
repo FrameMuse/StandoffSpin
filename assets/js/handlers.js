@@ -15,6 +15,7 @@ DOM.listen(page.support.fickle, type => {
         contracts: 1,
         inventory: 1,
         history: 1,
+        battles: 1,
     }
     page.support.context(function () {
         // After page is loaded
@@ -66,7 +67,7 @@ DOM.listen(page.support.fickle, type => {
                 console.log(result.owner_id == ServiceController.userId)
                 if ((result.owner_id == ServiceController.userId || result.rival_id == ServiceController.userId) && result.battle_id == ServiceController.battle_id || true) {
                     FortuneWheelController.BattleInit();
-                    FortuneWheelController.BattleCry(result.itemList);
+                    FortuneWheelController.BattleCry(result.itemList, result.wheelWinnerId);
                     $(".fortune-wheel--right .fortune-wheel-user__image").attr({ src: result.user.photo });
                     $(".fortune-wheel--right .fortune-wheel-user__nickname").html(result.user.first_name + " " + result.user.last_name);
                 }
@@ -154,6 +155,13 @@ page.support.addPage("/referal", () => {
 page.support.addPage("/bonuses", () => {
     // Timer
     $("[data-time]").timer(false); // True, если нужны дни
+});
+
+page.support.addPage("/profile", () => {
+    var a = +$($(".user-level-block__description > b")[0]).html();
+    var b = +$($(".user-level-block__description > b")[1]).html();
+    var levelPercent = (a / b) * 100;
+    ServiceController.LevelProgress(levelPercent);
 });
 
 // Mobile Pages
@@ -404,6 +412,7 @@ $(document).on("click", ".sorted-skins-more-button", function () {
         contracts: "contracts",
         inventory: "inventory",
         history: "history_inventory",
+        battles: "battles",
     }[sorted_specified];
 
     api.get(["/user/load/", page.support.pageLoaded[2], type, page_id], {}, result => {
@@ -416,6 +425,13 @@ $(document).on("click", ".sorted-skins-more-button", function () {
                     ItemsController.CreateContract(config);
                     ItemsController.ModifyContractByData(data);
                     ItemsController.AppendContractTo(".js-tab-" + sorted_specified);
+                });
+                break;
+            case "battles":
+                result.result.filter(function (data) {
+                    ItemsController.CreateBattle(config);
+                    ItemsController.ModifyBattleByData(data);
+                    ItemsController.AppendBattleTo(".js-tab-" + sorted_specified);
                 });
                 break;
             default:
@@ -488,6 +504,8 @@ DOM.on("click", "battle", {
 
     create: function () {
         var lobby_id = $(this).parent().parent().parent().data("id");
+        console.log(lobby_id);
+        
         api.post("/battle/create", { id: lobby_id }, function (result) {
             page.support.load(result.redirectURL);
         });

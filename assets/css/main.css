@@ -87,6 +87,22 @@ body {
     font-family: 'Exo 2', sans-serif;
     line-height: 1;
     color: white;
+    overflow-x: hidden;
+}
+
+body::-webkit-scrollbar {
+    width: 0.25em;
+}
+
+body::-webkit-scrollbar-track {
+    background: #26282d;
+    border-radius: 10em;
+}
+
+body::-webkit-scrollbar-thumb {
+    background: #696c72;
+    border: 0.1em solid rgba(0, 0, 0, 0.25);
+    border-radius: 10px;
 }
 
 header {
@@ -196,7 +212,7 @@ a.ghost {
     transition: .125s linear border-color;
 }
 
-.stndfspin-button--unfilled:hover::before {
+.stndfspin-features__pattern:hover .stndfspin-button--unfilled::before {
     border-color: #4d5158;
 }
 
@@ -639,6 +655,7 @@ a.ghost {
     max-width: 1320px;
     max-width: 100%;
     margin: 2em auto 0;
+    font-size: 1.25em;
     overflow: hidden;
 }
 
@@ -1332,7 +1349,7 @@ article {
 
 /* Sorted Skins */
 
-.sorted-skins {
+.sorted-skins, .sorted-contracts, .sorted-battles {
     display: grid;
     row-gap: 2em;
     column-gap: 2em;
@@ -1517,30 +1534,24 @@ article {
 
 /* Sorted Contracts */
 
-.sorted-cotracts {
-    display: grid;
-    row-gap: 2em;
-    column-gap: 2em;
+.sorted-contracts {
     grid-template-columns: repeat(2, 1fr);
-    text-align: center;
-    padding-bottom: 5em;
-    margin-bottom: 5em;
 }
 
-.sorted-cotracts__unit {
+.sorted-contracts__unit {
     display: flex;
     align-content: stretch;
     justify-items: center;
 }
 
-.sorted-cotracts__extend {
+.sorted-contracts__extend {
     display: grid;
     align-content: space-between;
     padding: 1.5em 2em;
     background: rgba(33, 35, 38, 0.5);
 }
 
-.sorted-cotracts__skins {
+.sorted-contracts__skins {
     display: grid;
     row-gap: 1.5em;
     column-gap: 1.25em;
@@ -1548,7 +1559,7 @@ article {
     font-size: 0.625em;
 }
 
-.sorted-cotracts__text {
+.sorted-contracts__text {
     font-size: 0.9em;
     font-weight: 600;
     text-align: right;
@@ -1570,9 +1581,6 @@ article {
 /* Sorted Battles */
 
 .sorted-battles {
-    display: grid;
-    row-gap: 2em;
-    column-gap: 2em;
     grid-template-columns: repeat(4, 1fr);
 }
 
@@ -3140,8 +3148,50 @@ span.contract-window__bill--numeric {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    overflow: hidden;
     padding-bottom: 5em;
+}
+
+.battle::before, .battle::after {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 5em;
+    height: 100%;
+    border-radius: 100%;
+    box-shadow: 0 0 7.5em 5em #88cc31;
+}
+
+.battle__over--0::before {
+    content: "";
+    left: calc((-100vw + 1320px - 20em) / 2);
+}
+
+.battle__over--0::after {
+    content: "";
+    right: calc((-100vw + 1320px - 20em) / 2);
+    box-shadow: 0 0 7.5em 5em #ff3648;
+}
+
+.battle__over--1::before {
+    content: "";
+    right: calc((-100vw + 1320px - 20em) / 2);
+}
+
+.battle__over--1::after {
+    content: "";
+    left: calc((-100vw + 1320px - 20em) / 2);
+    box-shadow: 0 0 7.5em 5em #ff3648;
+}
+
+.battle__over--2::before, .battle__over--2::after {
+    content: "";
+    left: calc((-100vw + 1320px - 20em) / 2);
+    box-shadow: 0 0 7.5em 5em #fcff3f;
+}
+
+.battle__over--2::after {
+    left: unset;
+    right: calc((-100vw + 1320px - 20em) / 2);
 }
 
 .fortune-wheel--left, .fortune-wheel--right {
@@ -3443,6 +3493,7 @@ span.contract-window__bill--numeric {
     row-gap: 2em;
     justify-content: center;
     text-align: center;
+    z-index: 3;
 }
 
 .battle__inner .stndfspin-cases__case:hover {
@@ -3519,7 +3570,6 @@ span.contract-window__bill--numeric {
     /*-----------:-----------*/
     width: 7em;
     height: 7em;
-    background: #18191b;
     border: 0.2em solid #88cc31;
     border-radius: 100%;
 }
@@ -3534,7 +3584,7 @@ span.contract-window__bill--numeric {
 }
 
 .user-level-block__circle--action::before {
-    content: "Забрать приз";
+    content: "ÃƒÂÃ¢â‚¬â€ÃƒÂÃ‚Â°ÃƒÂÃ‚Â±Ãƒâ€˜Ã¢â€šÂ¬ÃƒÂÃ‚Â°Ãƒâ€˜Ã¢â‚¬Å¡Ãƒâ€˜Ã…â€™ ÃƒÂÃ‚Â¿Ãƒâ€˜Ã¢â€šÂ¬ÃƒÂÃ‚Â¸ÃƒÂÃ‚Â·";
     position: absolute;
     font-size: 1em;
     font-weight: 800;
@@ -3559,6 +3609,7 @@ span.contract-window__bill--numeric {
 .user-level-block__circle--image {
     width: 3.5em;
     height: 3.5em;
+    z-index: -1;
 }
 
 .user-level-block__description {
@@ -3598,6 +3649,7 @@ span.contract-window__bill--numeric {
     border-radius: 10em;
     width: 80%;
     height: 100%;
+    transition: 0.5s linear width;
 }
 
 .user-level__advice {
