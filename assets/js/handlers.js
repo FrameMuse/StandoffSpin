@@ -148,6 +148,7 @@ page.support.addPage("/", () => {
 });
 
 page.support.context(function () {
+    // Desktop Pages
     this.__addPage({
         page: "/case",
         action: function () {
@@ -166,25 +167,21 @@ page.support.context(function () {
             }
         },
     });
-});
-
-page.support.__addPage({
-    page: "/case",
-    action: function () {
-        ServiceController.SetCurrentService = {
-            Name: $(".fortune-wheel__image").html(),
-            Price: DOM.$("wheel", "price").data("price"),
-        };
-        page.wheel.__init();
-        page.wheel.box_input_change($(".box__input[data-id='0']"));
-        $(".fortune-wheel").scrollTo(null);
-        $(".box__column--1[data-time]").timer();
-    },
-    errors: {
-        403: function () {
-            page.popup.open("vk_participation");
-        }
-    },
+    // Mobile Pages
+    this.__addPage({
+        page: "/profile",
+        device: "mobile",
+        action: function () {
+            $(".profile-info, .profile-confirmation").removeClass("skewed-element");
+        },
+    });
+    this.__addPage({
+        page: "/battle",
+        device: "mobile",
+        action: function () {
+            $("[class *= 'battle__button']").removeClass("skewed-element");
+        },
+    });
 });
 
 page.support.addPage("/battle", () => {
@@ -215,16 +212,6 @@ page.support.addPage("/profile", () => {
     var b = +$($(".user-level-block__description > b")[1]).html();
     var levelPercent = (a / b) * 100;
     ServiceController.LevelProgress(levelPercent);
-});
-
-// Mobile Pages
-
-page.support.addMobilePage("/profile", () => {
-    $(".profile-info, .profile-confirmation").removeClass("skewed-element");
-});
-
-page.support.addMobilePage("/battle", () => {
-    $("[class *= 'battle__button']").removeClass("skewed-element");
 });
 
 // Probable actions when the page is loaded

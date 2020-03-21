@@ -1103,13 +1103,8 @@ class features_paging {
 
     __addPage(settings) {
         settings.page = settings.page.replace("/", "");
-        this.pages[settings.page] = settings.action;
+        this.pages[settings.page] = settings.action + (settings.device != undefined ? "__mobile" : "");
         this.errors[settings.page] = settings.errors;
-    }
-
-    addMobilePage(page_name, run) {
-        page_name = page_name.replace("/", "") + "__mobile";
-        this.pages[page_name] = run;
     }
 
     EventPageLoaded(url, DeviceType = false) {

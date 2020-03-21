@@ -1646,6 +1646,18 @@ article {
     font-size: 0.7em;
 }
 
+.sorted-battles__battle--0 {
+    box-shadow: inset 6em 0 4em -7em #88cc31, inset -6em 0 4em -7em #ff5858;
+}
+
+.sorted-battles__battle--1 {
+    box-shadow: inset -6em 0 4em -7em #88cc31, inset 6em 0 4em -7em #ff5858;
+}
+
+.sorted-battles__battle--2 {
+    box-shadow: inset 6em 0 4em -7em #ccb831, inset -6em 0 4em -7em #ccb831;
+}
+
 .sorted-battles-player {
     display: grid;
     align-content: flex-start;

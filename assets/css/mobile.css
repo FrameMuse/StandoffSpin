@@ -7,12 +7,78 @@
     }
 }
 
+@keyframes spinning-reverse {
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(-360deg);
+    }
+}
+
 @keyframes weapon-fade-in {
     0% {
         opacity: 0;
     }
     100% {
         opacity: 1;
+    }
+}
+
+@keyframes scale-pulse {
+    0% {
+        transform: scale(0.9);
+    }
+    50% {
+        transform: scale(1);
+    }
+    100% {
+        transform: scale(0.9);
+    }
+}
+
+@keyframes move-around-to-right {
+    0% {
+        transform: translate(0%);
+    }
+    25% {
+        transform: translate(400%);
+    }
+    50% {
+        transform: translate(400%, 200%);
+    }
+    75% {
+        transform: translate(0%, 200%);
+    }
+}
+
+@keyframes move-around-to-bottom {
+    0% {
+        transform: translate(0%);
+    }
+    25% {
+        transform: translate(0%, 200%);
+    }
+    50% {
+        transform: translate(-400%, 200%);
+    }
+    75% {
+        transform: translate(-400%, 0%);
+    }
+}
+
+@keyframes emphasize {
+    0% {
+        background: transparent;
+    }
+    25% {
+        background: rgba(55, 55, 60, 0.5);
+    }
+    35% {
+        background: rgba(55, 55, 60, 0.75);
+    }
+    100% {
+        background: transparent;
     }
 }
 
@@ -659,19 +725,21 @@ main {
     max-width: 1320px;
     margin: 0 auto;
     will-change: contents;
+    overflow: hidden;
 }
 
 /* Temporal Event */
 
 .temp-event {
-    display: flex;
+    display: grid;
+    row-gap: 2em;
     align-items: center;
+    justify-content: center;
     padding: 1.5em 3em;
     margin: 4em auto;
-    max-width: 1320px;
+    left: 5em;
     font-size: 0.45em;
-    width: calc(100vw - 0.25em) !important;
-    max-width: unset !important;
+    width: calc(60vw - 0.25em) !important;
 }
 
 .temp-event::before {
@@ -693,6 +761,9 @@ main {
 }
 
 .temp-event__image {
+    position: absolute;
+    top: 4.9em;
+    left: -10em;
     background-image: url("../img/event_1.png");
     width: 14em;
     height: 11em;
@@ -702,8 +773,9 @@ main {
 
 .temp-event__summary {
     margin: 0;
-    font-size: 1.5em;
+    font-size: 1.75em;
     font-style: italic;
+    text-align: center;
 }
 
 .temp-event__summary--marked {
@@ -732,7 +804,7 @@ main {
 .timer-v2__count {
     display: flex;
     align-items: center;
-    font-size: 1em;
+    font-size: 1.1em;
     font-weight: 700;
 }
 
@@ -763,7 +835,9 @@ main {
 
 /* Page Part */
 
-.page-part {}
+.page-part {
+    padding: 0 1em;
+}
 
 .page-part__container {
     display: grid;
@@ -1069,7 +1143,7 @@ article {
 
 .fortune-wheel__curve-1 {
     position: absolute;
-    top: 0%;
+    top: -6%;
     left: 0%;
     width: 100%;
     height: 200%;
@@ -1121,12 +1195,12 @@ article {
 }
 
 .fortune-wheel__inner--0 {
-    font-size: 2.5em;
+    font-size: 3.5em;
     top: 15%;
 }
 
 .fortune-wheel__inner--1 {
-    font-size: 2em;
+    font-size: 2.5em;
     top: 15%;
 }
 
@@ -1378,7 +1452,7 @@ article {
 
 /* Sorted Contracts */
 
-.sorted-cotracts {
+.sorted-contracts {
     display: grid;
     row-gap: 2em;
     column-gap: 2em;
@@ -1388,13 +1462,13 @@ article {
     padding-bottom: 5em;
 }
 
-.sorted-cotracts__unit {
+.sorted-contracts__unit {
     display: flex;
     align-content: stretch;
     justify-items: center;
 }
 
-.sorted-cotracts__extend {
+.sorted-contracts__extend {
     display: grid;
     align-content: space-between;
     padding: 1.5em 2em;
@@ -1402,7 +1476,7 @@ article {
     font-size: 0.7em;
 }
 
-.sorted-cotracts__skins {
+.sorted-contracts__skins {
     display: grid;
     row-gap: 1.5em;
     column-gap: 1.25em;
@@ -1410,7 +1484,7 @@ article {
     font-size: 0.625em;
 }
 
-.sorted-cotracts__text {
+.sorted-contracts__text {
     font-size: 0.9em;
     font-weight: 600;
     text-align: right;
@@ -1444,6 +1518,18 @@ article {
     padding: 2em;
     background: rgba(255, 255, 255, 0.025);
     font-size: 0.7em;
+}
+
+.sorted-battles__battle--0 {
+    box-shadow: inset 6em 0 4em -7em #88cc31, inset -6em 0 4em -7em #ff5858;
+}
+
+.sorted-battles__battle--1 {
+    box-shadow: inset -6em 0 4em -7em #88cc31, inset 6em 0 4em -7em #ff5858;
+}
+
+.sorted-battles__battle--2 {
+    box-shadow: inset 6em 0 4em -7em #ccb831, inset -6em 0 4em -7em #ccb831;
 }
 
 .sorted-battles-player {
@@ -1613,20 +1699,24 @@ article {
 /* Table */
 
 .table {
-    padding: 0 2em;
     margin-top: 3em;
     width: 100%;
     border-spacing: unset;
-    font-size: 0.35em;
+    font-size: 0.5em;
 }
 
 .table tr {
-    display: block;
+    /* display: block; */
     margin-bottom: 0.5em;
     background: rgba(255, 255, 255, 0.025);
     border-radius: 0.5em;
     font-size: 1.15em;
     font-weight: 600;
+}
+
+tr.table__disables {
+    background: transparent;
+    color: #686c75;
 }
 
 .table tr.table__preview {
@@ -1640,6 +1730,7 @@ article {
     font-weight: 700;
     font-style: italic;
     text-transform: uppercase;
+    white-space: nowrap;
 }
 
 .table td:nth-child(1) {
@@ -1652,7 +1743,6 @@ article {
     text-align: left;
     overflow: hidden;
     text-overflow: ellipsis;
-    white-space: nowrap;
 }
 
 .table td:nth-child(3) {
@@ -1667,6 +1757,13 @@ article {
     display: flex;
     align-items: center;
     cursor: pointer;
+}
+
+.table-user>span {
+    width: 9em;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .table-user__image {
@@ -1684,7 +1781,6 @@ article {
     row-gap: 2em;
     justify-items: center;
     width: 100%;
-    padding: 0 2em;
     margin: 1em 0 5em;
     font-size: 0.95em;
 }
@@ -1785,6 +1881,7 @@ b {
 .profile-stats {
     display: flex;
     align-items: center;
+    margin-top: 2em;
 }
 
 .profile-stats__title {
@@ -1948,7 +2045,6 @@ b {
     display: flex;
     align-items: center;
     justify-content: center;
-    overflow: auto;
 }
 
 .popup__cover {
@@ -1970,6 +2066,7 @@ b {
 .popup-window__article {
     display: grid;
     text-align: center;
+    font-size: 1.75em;
 }
 
 .popup-window__title {
@@ -1990,7 +2087,8 @@ b {
 .popup-window__content {
     /* display: grid; */
     justify-content: center;
-    margin: 1.75em 0;
+    margin: 2.5em 0;
+    font-size: 1.75em;
 }
 
 .popup-window__content:empty {
@@ -1999,6 +2097,7 @@ b {
 
 .popup-window__help {
     text-align: center;
+    font-size: 1.5em;
 }
 
 .popup-window__button {
@@ -2021,8 +2120,46 @@ b {
     background: #88cc31;
 }
 
-.popup-window__button.button2 {
+input.popup-window__button.button1 {
+    padding: 0.85em;
+    background: rgba(255, 255, 255, 0.1);
+    width: calc(50% - 0.6em);
+    border-bottom: 0.1em solid rgba(255, 255, 255, 0.5);
+    cursor: text;
+    transition: 0.125s linear border-color;
+}
+
+button.popup-window__button.button1[disabled] {
+    background: transparent;
+    border: 0.125em solid #88cc31;
+    cursor: not-allowed;
+}
+
+input.popup-window__button.button1:hover, input.popup-window__button.button1:focus {
+    border-color: rgba(255, 255, 255, 0.75);
+}
+
+.withdraw__price {
+    padding: 0.65em 1.75em;
+    margin-bottom: 1em;
+    border-radius: 0.175em;
+    text-align: center;
+    cursor: text;
+}
+
+.withdraw__price::before {
+    background: repeating-linear-gradient(45deg, rgba(255, 255, 255, 0.1) 60%, rgba(136, 204, 49, 0.35) 68%);
+    border: 0.1em solid #88cc31;
+}
+
+button.popup-window__button.button2 {
     background: rgba(255, 255, 255, 0.05);
+}
+
+.popup-window__button.button2[disabled] {
+    background: transparent;
+    border: 0.125em solid rgba(255, 255, 255, 0.25);
+    cursor: not-allowed;
 }
 
 .popup-window__marked {
@@ -2036,9 +2173,9 @@ b {
 
 .popup-window__close {
     position: absolute;
-    top: 1.25em;
+    top: 0.5em;
     right: 1.25em;
-    font-size: 1.5em;
+    font-size: 2.5em;
     color: #6f6f6f;
     cursor: pointer;
 }
@@ -2047,7 +2184,7 @@ b {
 
 .top-up {
     display: grid;
-    width: 50%;
+    width: 90%;
     margin: 0 auto;
 }
 
@@ -2086,7 +2223,7 @@ input.promocode__input:focus::placeholder {
 .top-up__row {
     display: flex;
     align-items: center;
-    justify-content: space-between;
+    justify-content: space-around;
     margin-top: 2.5em;
 }
 
@@ -2393,6 +2530,7 @@ span.contract-window__bill--numeric {
     transform: scale(1);
     opacity: 1;
     transition: .175s linear transform, .125s linear opacity;
+    z-index: 26;
 }
 
 /* Pay systems */
@@ -2956,6 +3094,7 @@ span.contract-window__bill--numeric {
     display: flex;
     justify-content: space-between;
     overflow: hidden;
+    margin-bottom: -9em;
 }
 
 .fortune-wheel--left, .fortune-wheel--right {
@@ -2968,9 +3107,10 @@ span.contract-window__bill--numeric {
 
 .fortune-wheel-user {
     display: flex;
+    align-self: flex-start;
     flex-direction: row-reverse;
     align-items: center;
-    top: -1.625em;
+    top: 2em;
 }
 
 .fortune-wheel-user__info {
@@ -3012,8 +3152,6 @@ span.contract-window__bill--numeric {
     height: 37.5%;
     left: calc(50% + 22em);
     display: flex;
-    flex-direction: column-reverse;
-    align-items: center;
     justify-content: space-between;
     font-size: 1.5em;
     z-index: 2;
@@ -3103,6 +3241,7 @@ span.contract-window__bill--numeric {
 .battles__sidebar-box {
     display: flex;
     align-items: center;
+    justify-content: center;
     padding: 2em;
     background: rgba(255, 255, 255, 0.025);
 }
@@ -3161,38 +3300,80 @@ span.contract-window__bill--numeric {
     align-items: center;
     justify-content: space-between;
     flex: 1;
-    font-size: 0.9em;
 }
 
 .battles-stats__column {
     display: grid;
-    row-gap: 0.25em;
+    row-gap: 0.35em;
+    margin-left: 1em;
     font-size: 0.85em;
+    text-transform: uppercase;
+}
+
+.battles-stats__column:first-child {
+    margin: 0;
 }
 
 .battles-stats__number {
     font-size: 1.25em;
     font-weight: 700;
     font-style: italic;
+    text-align: center;
+}
+
+.battles-stats__number--big {
+    font-size: 1.75em
 }
 
 .battles-stats__text {
     color: #767d8c;
+    font-size: 0.9em;
+    font-weight: 600;
 }
 
 .battles__button {
     padding: 1.15em 1.75em;
     border-radius: 0.15em;
-    font-size: 0.5em;
+    font-size: 0.6em;
     font-weight: 600;
     text-transform: uppercase;
     cursor: pointer;
     color: white;
-    margin-left: 2em;
+    margin-left: 2.5em;
 }
 
 .battles__button::before {
     background: #88cc31;
+}
+
+.battles-system {
+    display: grid;
+    row-gap: 1em;
+}
+
+.battles-system__point {
+    display: flex;
+    align-items: center;
+}
+
+.battles-system__point--number {
+    padding: 0.65em 0.9em;
+    margin-right: 1em;
+    border-radius: 0.125em;
+    font-size: 1em;
+    font-weight: bold;
+    font-style: italic;
+}
+
+.battles-system__point--number::before {
+    background: #88cc31;
+}
+
+.battles-system__point--explanation {
+    font-size: 0.65em;
+    font-weight: 500;
+    text-transform: uppercase;
+    line-height: 1.25;
 }
 
 .battles__content {
@@ -3201,7 +3382,7 @@ span.contract-window__bill--numeric {
 }
 
 .battles-table {
-    font-size: 0.5em;
+    font-size: 0.45em;
     margin: unset;
     padding: unset;
 }
@@ -3213,15 +3394,21 @@ span.contract-window__bill--numeric {
 .battles-table__buttons {
     display: flex;
     justify-content: space-around;
+    width: 12em;
 }
 
 .battles-table__button {
     padding: 1.15em 1.75em;
+    margin-left: 1em;
     border-radius: 0.15em;
     font-size: 0.75em;
-    font-weight: 600;
+    font-style: normal;
     text-transform: uppercase;
     cursor: pointer;
+}
+
+.battles-table__button:first-child {
+    margin: 0;
 }
 
 .battles-table__button::before {
@@ -3238,7 +3425,9 @@ span.contract-window__bill--numeric {
     right: 0;
     display: grid;
     row-gap: 2em;
+    align-items: center;
     justify-content: center;
+    min-height: 20em;
     text-align: center;
 }
 
@@ -3502,7 +3691,7 @@ body {
     width: 100vw;
 }
 
-.topbar, .topbar, .stndfspin-features, .live-drops, .temp-event, main {
+.topbar, .topbar, .stndfspin-features, .live-drops, main {
     width: 100vw;
     max-width: 100vw;
 }
