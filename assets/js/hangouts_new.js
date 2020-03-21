@@ -1103,7 +1103,7 @@ class features_paging {
 
     __addPage(settings) {
         settings.page = settings.page.replace("/", "");
-        this.pages[settings.page] = settings.action + (settings.device != undefined ? "__mobile" : "");
+        this.pages[settings.page + (settings.device != undefined ? "__mobile" : "")] = settings.action;
         this.errors[settings.page] = settings.errors;
     }
 

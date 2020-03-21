@@ -2650,7 +2650,10 @@ span.contract-window__bill--numeric {
 
 .goals {
     display: flex;
-    margin-top: 5em;
+    flex-wrap: nowrap;
+    margin: 5em 10em 0;
+    width: 100%;
+    overflow: auto;
 }
 
 .goals__inner {
@@ -2661,7 +2664,8 @@ span.contract-window__bill--numeric {
     width: 13em;
     margin-left: 5em;
     text-align: center;
-    z-index: 20;
+    flex-shrink: 0;
+    z-index: 4;
 }
 
 .goal__goal {
@@ -2735,7 +2739,7 @@ span.contract-window__bill--numeric {
     width: calc(100% - 18em);
     height: 2px;
     background: rgba(255, 255, 255, .1);
-    z-index: 10;
+    z-index: 3;
 }
 
 .goal__line--line-progress {
@@ -2774,7 +2778,7 @@ span.contract-window__bill--numeric {
 /* Skewed Row */
 
 .skewed-row {
-    display: flex;
+    display: grid;
     align-items: stretch;
     justify-content: space-between;
     font-size: 0.9em;
@@ -2783,6 +2787,7 @@ span.contract-window__bill--numeric {
 .skewed-row__row {
     display: flex;
     align-items: center;
+    justify-content: center;
     padding: 2em;
 }
 
@@ -2821,7 +2826,8 @@ span.contract-window__bill--numeric {
 /* Invites Row & Feeder & Bonuses */
 
 .invites-row {
-    display: flex;
+    display: grid;
+    row-gap: 2.5em;
     margin-top: 5em;
 }
 

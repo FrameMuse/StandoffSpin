@@ -182,6 +182,13 @@ page.support.context(function () {
             $("[class *= 'battle__button']").removeClass("skewed-element");
         },
     });
+    this.__addPage({
+        page: "/refral",
+        device: "mobile",
+        action: function () {
+            $(".skewed-row__row").removeClass("skewed-element");
+        },
+    });
 });
 
 page.support.addPage("/battle", () => {
