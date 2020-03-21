@@ -1,6 +1,6 @@
 // Vars
 
-var features_toLoad,
+var config = {},
     button_more = {
         contracts: 1,
         inventory: 1,
@@ -8,7 +8,7 @@ var features_toLoad,
         battles: 1,
     },
     sorted_skin_html = `<div class="sorted-skins__unit"><div class="sorted-skins__marks"><span class="sorted-skins__cost skewed-element"></span><div class="sorted-skins__icons"><div class="sorted-skins__icon sorted-skins__icon--green skewed-element js-item-withdraw"><span class="sorted-skins__icon--arrow"></span></div><div class="sorted-skins__icon sorted-skins__icon--orange skewed-element js-item-sell"><span class="sorted-skins__icon--dollar"></span></div></div></div><div class="weapon-skins__weapon"><img src="" class="weapon-skins__image"></div><div class="sorted-skins__skin-title"><span class="sorted-skins__skin-title--0"></span><span class="sorted-skins__skin-title--1"></span></div></div>`,
-    sorted_contract_html = `<div class="sorted-cotracts__unit"><div class="sorted-cotracts__extend"><div class="sorted-cotracts__skins"></div><div class="sorted-cotracts__text gray">Стоимость контракта <span class="white skewed-text"></span></div></div></div>`,
+    sorted_contract_html = `<div class="sorted-contracts__unit"><div class="sorted-contracts__extend"><div class="sorted-contracts__skins"></div><div class="sorted-contracts__text gray">Стоимость контракта <span class="white skewed-text"></span></div></div></div>`,
     sorted_battle_html = `<div class="sorted-battles__battle"><div class="sorted-battles-player"><div class="weapon-skins__weapon"><img src="" class="weapon-skins__image"><span class="weapon-skins__quality weapon-skins__quality--skyblue"></span></div><div class="sorted-battles-player__info"><img src="" alt="" class="sorted-battles-player__image"><span class="sorted-battles-player__price"></span></div></div><img src="" alt="" class="sorted-battles__case-image"><div class="sorted-battles-player"><div class="weapon-skins__weapon"><img src="" class="weapon-skins__image"><span class="weapon-skins__quality weapon-skins__quality--pink"></span></div><div class="sorted-battles-player__info"><img src="" alt="" class="sorted-battles-player__image"><span class="sorted-battles-player__price"></span></div></div></div>`;
 // Extending Functions
 
@@ -39,6 +39,10 @@ String.prototype.multiReplace = function (array, replacement) {
 String.prototype.ias = function (argument1 = "", argument2 = "") {
     if (argument1 == "" && argument2 == "") return interpret.JSDOM(this);
     return this.multiReplace([`{${argument1}}`], argument2);
+};
+
+Number.prototype.toPx = function () {
+    return this * $("html").css("font-size").replace("px", "");
 };
 
 Array.prototype.last = function (argument1) {
@@ -77,15 +81,18 @@ window.getLanguage = (param) => {
 
 $.Postpone = function () {
     var $resolve, $reject;
-    var $promise = new Promise((resolve, reject) => {
+    this.promise = new Promise((resolve, reject) => {
         $resolve = resolve;
         $reject = reject;
     });
 
     return {
-        promise: $promise,
+        promise: this.promise,
         resolve: $resolve,
         reject: $reject,
+        then: ($then) => {
+            this.promise.then($then);
+        },
     };
 };
 
@@ -104,28 +111,44 @@ $.fn.extend({
 
         return output;
     },
+    scrollTo: function (offset = false, duration = 400) {
+        $("html").animate({ scrollTop: $(this).offset().top + (offset != false ? offset : config["AutoScrollOffset"].toPx()) }, duration);
+    },
     timer: async function (days_on = false) {
-        this.each(function () {
+        typeof config.intervals != "object" ? config.intervals = [] : (function () {
+            config.intervals.filter(function (interval) {
+                clearInterval(interval);
+            });
+            config.intervals = [];
+        })();
+        this.each(function (i) {
             var data_time = $(this).attr("data-time");
-            var current = new Date(data_time);
-            var interval = setInterval(() => {
-                var timestamp = current - Date.now();
-                var days = Math.floor(timestamp / (1000 * 60 * 60 * 24));
-                var hours = Math.floor((timestamp % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-                var minutes = Math.floor((timestamp % (1000 * 60 * 60)) / (1000 * 60));
-                var seconds = Math.floor((timestamp % (1000 * 60)) / 1000);
-                var html = (days_on ? (days + ":") : "") + hours + ":" + minutes + ":" + seconds;
+
+            config.intervals.push(setInterval(() => {
+                if (+data_time) {
+                    var timestamp = new Date(+data_time);
+                } else {
+                    var timestamp = new Date(new Date(data_time).getTime() - Date.now());
+                }
+
+                if (days_on) {
+                    var time = timestamp.toISOString().substr(8, 10).replace("T", ":");
+                } else {
+                    var time = timestamp.toISOString().substr(11, 8);
+                }
+                                
 
                 if (timestamp < 0) {
-                    clearInterval(interval);
+                    clearInterval(config.intervals[i]);
                     $(this).html("EXPIRED");
-                } else $(this).html(html);
-            }, 1000);
+                } else $(this).html(time);
+                if (+data_time) data_time = (data_time - 1000);
+            }, 1000));
         });
     },
 });
 
-// Const Classes  item__sell-> === item-
+// Const Classes
 
 class interpret {
     static JSDOM(string) {
@@ -353,6 +376,7 @@ class features_timer {
 
 class features_wheel {
     constructor() {
+        this.promise = $.Postpone();
         this.reopen = {
             onclick: function () { },
         }
@@ -374,10 +398,11 @@ class features_wheel {
 
     __init() {
         page.support.progress = 75;
-        page.wheel.reject = false;
+        this.promise = $.Postpone();
         this.data.current = {
             items: [],
-        }
+        };
+        this.count(12);
     }
 
     init() {
@@ -418,9 +443,9 @@ class features_wheel {
         });
     }
 
-    spinTo(id, atWheel = 0, reverse = false) {
+    spinTo(id, atWheel = 0, reverse = false, random = false) {
         var block = this.find_item(atWheel, id);
-        var random = get_random_int(-this.data.degrees_per_block / 2, this.data.degrees_per_block / 2);
+        var random = random ? get_random_int(-this.data.degrees_per_block / 2, this.data.degrees_per_block / 2) : 0;
         var degrees = (this.data.spins * 360) - this.getRotationDegrees(block) + random;
         var circle = block.parent();
 
@@ -436,7 +461,6 @@ class features_wheel {
     }
 
     __checkUp(obj, id) {
-        console.log(id);
         return new Promise(resolve => {
             setTimeout(() => {
                 var interval = setInterval(() => {
@@ -456,7 +480,8 @@ class features_wheel {
         // Variables
         var skin = this.spinTo(8, atWheel),
             wheel = skin.parent().parent(),
-            timeout = fast ? 0 : 3000;
+            timeout = fast ? 0 : 3000,
+            type = fast ? "fast" : "slow";
         setTimeout(() => {
             // Skin
             ItemsController.CreateItem({ icons: false });
@@ -478,45 +503,37 @@ class features_wheel {
     }
 
     multiple_win(data = {}, fast = false, overideThen = false) {
+        // Vars
         this.sum = 0;
         this.data.current = data;
         data.filter(async (item, id) => {
             this.win(item, id, fast);
             this.sum += item.item.price;
-
+            // Setting Inner Price
             FortuneWheelController.SetInnerPrice(id, item.item.price);
         });
-        var checkUp = new Promise((resolve, reject) => {
-            if (fast) {
-                page.support.progress = null;
-                resolve();
-                return;
-            }
-            var interval = setInterval(() => {
-                if (this.reject) {
-                    reject();
-                    clearInterval(interval);
-                    return;
-                }
-            }, 250);
-            setTimeout(() => {
-                resolve();
-                return;
-            }, this.data.duration);
-        });
-
-        if (!overideThen) checkUp.then(() => {
+        // Wheel Promise
+        if (fast) this.promise.resolve();
+        var timeout = setTimeout(() => this.promise.resolve(), this.data.duration);
+        // Aftermaths
+        if (!overideThen) this.promise.then(() => {
+            clearTimeout(timeout);
             DOM.update("wheel", {
                 "all-prices": alter_by_currency(this.sum, true)
             });
             $(".fortune__circle, .fortune-wheel__inner, .fortune-wheel__curve-1, .fortune-wheel__curve-2").toggleClass("hidden");
             $(".fortune-wheel").addClass("fortune-wheel--final");
-            if (!this.data.only) this.box_view(1);
+            if (this.data.only) {
+                $(".fortune-wheel__buttons").parent().not(".hidden").scrollTo();
+            } else {
+                this.box_view(1);
+                $(".fortune-wheel__buttons1").scrollTo();
+            }
             // Remove box--no-indent Class
             $(".box").removeClass("box--no-indent");
         });
-
-        return this.promise = checkUp;
+        // Return
+        return this.promise;
     }
 
     count(n) {
@@ -565,7 +582,7 @@ class features_wheel {
             this.data.only = true;
         }
         if (page.mobile.if) {
-            $(".box").css("--wheel-font-size", "3.5px");
+            //$(".box").css("--wheel-font-size", "3.5px");
             return;
         }
         if (x >= 2) $(".box").css("--wheel-font-size", "5.25px");
@@ -589,6 +606,7 @@ class features_popup {
     constructor() {
         this.on = {};
         this.tmp = {};
+        this.closed = $.Postpone();
     }
 
     tend(option) {
@@ -631,7 +649,7 @@ class features_popup {
             title: this.title,
             summary: this.summary,
             content: null,
-            help: getLanguage('popup.help.html')
+            help: getLanguage('popup.help')
         });
 
         prevent_error_function(() => {
@@ -640,11 +658,14 @@ class features_popup {
 
         // Animation
         this.fadeIn($(".popup-window"));
+        // Return Promise
+        return this.closed = $.Postpone();
     }
 
     close(force = false) {
         if (force) this.fadeOut();
-        $(".popup-window__close, .popup__cover").click();
+        this.fadeOut();
+        setTimeout(this.closed.resolve, 500);
     }
 }
 
@@ -833,7 +854,7 @@ class features_contract {
                     this.saf = false;
                 } else {
                     $(".contract__button").attr({ disabled: "" });
-                    $(".contract__caution").show();
+                    $(".contract__caution").html(this.cautionMap["insufficient"]).show();
                     this.saf = true;
                 }
             }
@@ -991,11 +1012,13 @@ class features_paging {
     constructor() {
         // Begin
         this.pages = {};
+        this.errors = {};
         this.fickle = ".ajax-fickle";
         this.progress = 15;
         this.DeviceType = "desktop";
         this.actionOnLoaded = [];
         this.pageLoading = $.Postpone();
+        this.onPageLoaded = () => { };
 
         postLoader.add(() => {
             this.default();
@@ -1033,6 +1056,7 @@ class features_paging {
             }
             this.final(result, url);
         });
+        return this.pageLoading;
     }
 
     refresh() {
@@ -1052,10 +1076,10 @@ class features_paging {
                 this.pageLoading.reject();
                 this.progress = null;
                 console.warn("Page Loading Error:", error);
-                if (typeof error.responseJSON == "undefined") error.responseJSON = { message: "Undefined error" };
-                page.support.notify(error.statusText, `Page Loading Error: "` + error.responseJSON.message + `"`)
             },
+            statusCode: this.errors[url.split("/")[1]],
         });
+        
     }
 
     request(url, $success) {
@@ -1077,28 +1101,32 @@ class features_paging {
         this.pages[page_name] = run;
     }
 
+    __addPage(settings) {
+        settings.page = settings.page.replace("/", "");
+        this.pages[settings.page] = settings.action;
+        this.errors[settings.page] = settings.errors;
+    }
+
     addMobilePage(page_name, run) {
         page_name = page_name.replace("/", "") + "__mobile";
         this.pages[page_name] = run;
     }
 
-    onPageLoaded(url, DeviceType = false) {
+    EventPageLoaded(url, DeviceType = false) {
         url[1] += DeviceType ? "__" + DeviceType : "";
         if (url[1] in this.pages) try {
-            this.pages[url[1]](url[2]);
-            api.post("/user/update");
+            this.pages[url[1]].apply(this, [url[2]]);
         } catch (error) {
-            console.log(error);
-
-            //this.refresh();
+            console.error(error);
+            this.load("/");
         }
     }
 
-    startActionOnLoaded(url) {
-        if (window.location.hash == "") return;
-        var action = url.last().split("#!")[1];
-        this.actionOnLoaded[action]();
+    startActionOnLoaded() {
+        var hash = window.location.hash.split("!");
         this.clear_hash();
+        if (hash[0] == "" || hash[1] == undefined) return false;
+        this.actionOnLoaded[hash[1]]();
     }
 
     isFirstInHistory() {
@@ -1126,6 +1154,13 @@ class features_paging {
             .css({ opacity: opacity })
             .find(".load-indicator__fill")
             .css({ width: percent });
+    }
+
+    end_progress() {
+        this.progress = 100;
+        setTimeout(() => {
+            this.progress = null;
+        }, 350);
     }
 
     clear_hash() {
@@ -1173,19 +1208,19 @@ class features_liveFeed {
         this.parsedItem = $.parseHTML(this.singleItem);
     }
 
-    add(data) {
-        var singleItem = $(this.parsedItem).clone();
-        $(singleItem).find(".weapon-skins__image").attr({ src: "/img/" + data.item_src });
-        $(singleItem).find(".weapon-skins__quality")
+    CreateByData(data) {
+        this.item = $(this.parsedItem).clone();
+        $(this.item).find(".weapon-skins__image").attr({ src: "/img/" + data.item_src });
+        $(this.item).find(".weapon-skins__quality")
             .attr({ class: "weapon-skins__quality" })
             .addClass("weapon-skins__quality--" + data.class_name);
-        $(singleItem).find(".weapon-skins-owner__case-image").attr({ src: "/img/" + data.case_image });
-        $(singleItem).find(".weapon-skins-owner__name").html(data.name);
-        $(singleItem).find("a.ghost").attr({ href: data.user_id });
+        $(this.item).find(".weapon-skins-owner__case-image").attr({ src: "/img/" + data.case_image });
+        $(this.item).find(".weapon-skins-owner__name").html(data.name);
+        $(this.item).find("a.ghost").attr({ href: data.user_id });
+    }
 
-        setTimeout(() => {
-            $(singleItem).prependTo(".live-drops__inner");
-        }, data.now == false ? 0 : data.now);
+    AddToFeed() {
+        $(this.item).prependTo(".live-drops__inner");
     }
 
     removeLast() {
@@ -1235,12 +1270,14 @@ const page = new class {
     set on($function) {
         $function();
     }
+
+    setup(objectArray) {
+        config = objectArray;
+    }
 }
 
 class STNDFItems {
     static Sell(weapon_id, callback) {
-        console.log(weapon_id);
-        
         api.post("/item/sell", { id: weapon_id }, callback);
     }
 
@@ -1255,8 +1292,8 @@ class STNDFItems {
         });
     }
 
-    static CreateWithdrawal(params) {
-        api.post("/withdraw/create", params, this.Callback);
+    static CreateWithdrawal(params = {}, success = () => {}) {
+        api.post("/withdraw/create", params, success);
     }
 
     static Callback(result) {
@@ -1278,8 +1315,8 @@ class ItemsController extends STNDFItems {
         this.config({ item: config });
     }
 
-    static CreateContract() {
-        this.CreateItem();
+    static CreateContract(config = {}) {
+        this.CreateItem(config);
         var clone = $(sorted_contract_html).clone().prepend(this.items.last());
         this.contracts = [clone];
     }
@@ -1305,9 +1342,9 @@ class ItemsController extends STNDFItems {
         this.ModifyItemByData(params);
         this.contracts.last(($this) => {
             params.item_list.filter((weapon) => {
-                $this.find(".sorted-cotracts__skins").append(this.CreateWeapon(weapon.item));
+                $this.find(".sorted-contracts__skins").append(this.CreateWeapon(weapon.item));
             });
-            $this.find(".sorted-cotracts__text span").html(alter_by_currency(params.price, true, true));
+            $this.find(".sorted-contracts__text span").html(alter_by_currency(params.price, true, true));
             $this.find(".sorted-skins__unit").replaceWith(this.items.last());
         });
     }
@@ -1423,24 +1460,11 @@ class FortuneWheelController {
             // Extra
             setTimeout(() => {
                 page.support.progress = null;
-            }, 250);
+            }, 500);
         });
-
-        var checkUp = new Promise((resolve, reject) => {
-            var interval = setInterval(() => {
-                if (page.wheel.reject) {
-                    reject();
-                    clearInterval(interval);
-                    return;
-                }
-            }, 250);
-            setTimeout(() => {
-                resolve();
-                return;
-            }, page.wheel.data.duration);
-        });
-
-        checkUp.then(function () {
+        var timeout = setTimeout(page.wheel.promise.resolve, page.wheel.data.duration);
+        page.wheel.promise.then(function () {
+            clearTimeout(timeout);
             $(".battle").addClass("battle__over--" + wheelWinnerId);
             $(".fortune-wheel__skin").removeClass("hidden");
             $(".battle__buttons").removeClass("hidden");
@@ -1457,8 +1481,8 @@ class BalanceController {
 
     static GetUserBalance() {
         var balance = alter_by_currency(DOM.$("required-update", "balance").html(), false);
-        if (this.CurrentBalance == balance) {
-            return balance;
+        if (this.CurrentBalance) {
+            return this.CurrentBalance;
         }// else window.location.reload();
     }
 
@@ -1492,8 +1516,8 @@ class ServiceController {
         return true;
     }
 
-    static LevelProgress(procent = 0) {
-        $(".user-level__progress-line--indicator").css({ width: procent + "%" });
+    static LevelProgress(percent = 0) {
+        $(".user-level__progress-line--indicator").css({ width: (percent > 100 ? 100 : percent) + "%" });
     }
 }
 
@@ -1570,7 +1594,7 @@ function IsDefined($this) {
     return $this != "undefined" && $this != undefined && typeof $this != "undefined";
 }
 
-function img_error(element) {
+function img_error(element, isAvatar = false) {
     element.src = '/assets/img/guest.png';
-    page.popup.tmp.NeedsToSetAvatar = true;
+    page.popup.tmp.NeedsToSetAvatar = !isAvatar;
 }

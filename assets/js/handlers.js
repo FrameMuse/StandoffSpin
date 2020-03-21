@@ -1,5 +1,9 @@
 // Handlers
 
+page.setup({
+    AutoScrollOffset: -2.5, // 2.5em
+});
+
 // DOM Listening for LiveFeed Change
 
 DOM.listen(".live-drops__inner", (type, element) => {
@@ -16,17 +20,16 @@ DOM.listen(page.support.fickle, type => {
         inventory: 1,
         history: 1,
         battles: 1,
-    }
+    };
     page.support.context(function () {
         // After page is loaded
-        this.onPageLoaded(this.pageLoaded);
+        this.onPageLoaded(this.pageLoaded[1]);
+        this.EventPageLoaded(this.pageLoaded);
         this.startActionOnLoaded(this.pageLoaded);
         this.pageLoading.resolve();
         // ...Mobile
-        if (page.mobile.if) this.onPageLoaded(this.pageLoaded, "mobile");
+        if (page.mobile.if) this.EventPageLoaded(this.pageLoaded, "mobile");
     });
-    // Run sciprts from loaded page & Prevent Unexpected Errors
-    prevent_error_function(features_toLoad);
     page.support.progress = 100;
     setTimeout(() => {
         page.support.progress = null;
@@ -54,17 +57,18 @@ DOM.listen(page.support.fickle, type => {
                 break;
 
             case "livedrop":
+                var sample = result.items[0];
+                if ("case_id" in sample ? sample["case_id"] : $(".battle").data("id") == page.support.pageLoaded[2]) {
+                    await page.wheel.promise.promise;
+                }
                 result.items.filter(function (item) {
-                    page.liveFeed.add(item);
+                    page.liveFeed.CreateByData(item);
+                    page.liveFeed.AddToFeed();
                 });
                 break;
 
             case "battle_join":
-                await page.support.pageLoading.promise; // Wait for page loaded
-
-                console.log(data, ServiceController.userId, result.itemList, result);
-                console.log(result.rival_id == ServiceController.userId)
-                console.log(result.owner_id == ServiceController.userId)
+                await page.support.pageLoading.promise; // Wait for page is loaded
                 if ((result.owner_id == ServiceController.userId || result.rival_id == ServiceController.userId) && result.battle_id == ServiceController.battle_id || true) {
                     FortuneWheelController.BattleInit();
                     FortuneWheelController.BattleCry(result.itemList, result.wheelWinnerId);
@@ -109,6 +113,22 @@ page.lang.onclick = function (tap) {
 
 // Pages
 
+// When any pages are loaded 
+page.support.onPageLoaded = function (url) {
+    api.post("/user/update");
+    api.get("/user/notifications", {}, async (result) => {
+        for (var i = 0; i < result.length; i++) {
+            await page.popup.closed.promise;
+            var notify = result[i];
+            var notify_data = JSON.parse(notify.data);
+            page.popup.open(notify_data.popup, notify_data.data);
+        }
+    });
+    if (typeof page.wheel.promise == "object" && (url != "case" && url != "battle")) {
+        page.wheel.promise.resolve();
+    }
+};
+
 page.mobile.onMobile = function () {
     page.support.DeviceType = "mobile";
     // Layout
@@ -123,19 +143,52 @@ page.mobile.onMobile = function () {
     $(".mobile-menu").removeClass("hidden");
 }
 
-page.support.addPage("/case", () => {
-    ServiceController.SetCurrentService = {
-        Name: $(".fortune-wheel__image").html(),
-        Price: DOM.$("wheel", "price").data("price"),
-    };
-    page.wheel.reject = true;
-    page.wheel.count(12);
-    page.wheel.box_input_change($(".box__input[data-id='0']"));
+page.support.addPage("/", () => {
+    $(".stndfspin-cases__cost[data-time]").timer();
+});
+
+page.support.context(function () {
+    this.__addPage({
+        page: "/case",
+        action: function () {
+            ServiceController.SetCurrentService = {
+                Name: $(".fortune-wheel__image").html(),
+                Price: DOM.$("wheel", "price").data("price"),
+            };
+            page.wheel.__init();
+            page.wheel.box_input_change($(".box__input[data-id='0']"));
+            $(".fortune-wheel").scrollTo(null);
+            $(".box__column--1[data-time]").timer();
+        },
+        errors: {
+            403: function () {
+                page.popup.open("vk_participation");
+            }
+        },
+    });
+});
+
+page.support.__addPage({
+    page: "/case",
+    action: function () {
+        ServiceController.SetCurrentService = {
+            Name: $(".fortune-wheel__image").html(),
+            Price: DOM.$("wheel", "price").data("price"),
+        };
+        page.wheel.__init();
+        page.wheel.box_input_change($(".box__input[data-id='0']"));
+        $(".fortune-wheel").scrollTo(null);
+        $(".box__column--1[data-time]").timer();
+    },
+    errors: {
+        403: function () {
+            page.popup.open("vk_participation");
+        }
+    },
 });
 
 page.support.addPage("/battle", () => {
-    page.wheel.reject = true;
-    page.wheel.count(12);
+    page.wheel.__init();
     if ($(".battle").data("status") == "END") {
         $(".fortune-wheel__skin").removeClass("hidden");
         $(".battle__buttons").removeClass("hidden");
@@ -177,10 +230,14 @@ page.support.addMobilePage("/battle", () => {
 // Probable actions when the page is loaded
 
 page.support.actionOnLoaded["open_tab_battle"] = function () {
-    $(".tab-swithcer__button[tab='battles']").click()
-    $([document.documentElement, document.body]).animate({
-        scrollTop: $(".tab-swithcer__button[tab='battles']").offset().top
-    }, 600);
+    $(".tab-swithcer__button[tab='battles']")
+        .click()
+        .scrollTo()
+};
+
+page.support.actionOnLoaded["go_home"] = async function () {
+    await page.support.load("/");
+    $("main").scrollTo();
 };
 
 page.support.actionOnLoaded["battle_hide_all"] = function () {
@@ -243,7 +300,7 @@ page.wheel.box_input_change = function (e) {
     var price = page.wheel.data.multiplier * case_price;
     // Update Case Price & Funds Lack
     DOM.update("wheel", {
-        price: alter_by_currency(price, true),
+        price: price ? alter_by_currency(price, true) : getLanguage("case.buttons.free"),
         funds_lack: alter_by_currency(BalanceController.FundsLackAmount(price) * -1, true),
     });
     // Check for sufficient funds
@@ -321,14 +378,6 @@ $(document).on("click", ".faq__summary", function () {
 // Item Events
 
 DOM.on("click", "item", {
-    sell: function () {
-        var weapon = $(this).parent().parent().parent();
-        var weapon_id = weapon.data("id");
-        ItemsController.Sell(weapon_id, function () {
-            weapon.remove();
-            ItemsController.Callback();
-        });
-    },
     withdraw: function () {
         // Vars
         var weapon = $(this).parent().parent().parent();
@@ -348,20 +397,24 @@ DOM.on("click", "item", {
             item: {
                 id: weapon_id,
                 object: weapon,
-                random_number: get_random_int(),
+                price: (+Math.random() + weapon_price).toFixed(3),
+                initial_price: weapon_price,
             },
         });
     },
     "withdraw-submit": function () {
-        var item = page.popup.tmp.item;
+        var item = page.popup.tmp.options.item;
+        $(".popup-window__button").attr({ disabled: "" });
+        page.support.progress = 75;
         ItemsController.CreateWithdrawal({
             item: item.id,
-            price: item.random_number,
+            price: item.price - item.initial_price,
             name: DOM.$("item", "withdraw-input").val(),
         }, function () {
             item.object.remove();
             ItemsController.Callback();
             page.popup.close();
+            page.support.end_progress();
         });
     },
     sell: function() {
@@ -377,11 +430,14 @@ DOM.on("click", "item", {
         });
     },
     sell_submit: function () {
-        var item = page.popup.tmp.item;
+        var item = page.popup.tmp.options.item;
+        $(".popup-window__button").attr({ disabled: "" });
+        page.support.progress = 75;
         ItemsController.Sell(item.id, function () {
             item.object.remove();
             ItemsController.Callback();
             page.popup.close();
+            page.support.end_progress();
         });
     },
 });
@@ -422,7 +478,7 @@ $(document).on("click", ".sorted-skins-more-button", function () {
         switch (type) {
             case "contracts":
                 result.result.filter(function (data) {
-                    ItemsController.CreateContract(config);
+                    ItemsController.CreateContract({ icons: false });
                     ItemsController.ModifyContractByData(data);
                     ItemsController.AppendContractTo(".js-tab-" + sorted_specified);
                 });
@@ -469,6 +525,7 @@ $(document).on("click", ".contract-window__button", function () {
     page.contract.spot.spots.filter(function (spot) {
         items.push(spot.data.weapon_id);
     });
+    page.support.progress = 25;
     // API Connection
     api.post("/contract/create", {
         items: items
@@ -481,12 +538,19 @@ $(document).on("click", ".contract-window__button", function () {
         $(".contract-result__input").each(function (i, e) {
             $(e).val(gap[i]);
         });
-        // Reset contract
-        page.support.refresh();
-        // Close popup in 5 seconds
+        // Close popup
         setTimeout(() => {
+            // Hidding Contract Disposal
+            $(".contract__disposal, .contract__flex, .contract__caution").addClass("hidden");
+            // Closing Popup Window
             page.popup.close();
-        }, 500);
+            // Creating Item
+            ItemsController.CreateItem();
+            ItemsController.ModifyItemByData(result);
+            ItemsController.AppendItemTo($(".contract"));
+        }, 750);
+        // Progress
+        page.support.end_progress();
     });
 });
 
@@ -504,8 +568,6 @@ DOM.on("click", "battle", {
 
     create: function () {
         var lobby_id = $(this).parent().parent().parent().data("id");
-        console.log(lobby_id);
-        
         api.post("/battle/create", { id: lobby_id }, function (result) {
             page.support.load(result.redirectURL);
         });
@@ -535,14 +597,44 @@ $(document).on("keyup", ".promocode__input", function () {
     });
 });
 
+// Level
+
+DOM.on("click", "level", {
+    upgrade: function () {
+        api.post("/user/upgradeLevel", {}, function (result) {
+            if (result.nextLevel) {
+                ServiceController.LevelProgress(0);
+                $(".page-part__title").html(result.lvl + " Уровень");
+                $(".user-level-block__circle--number, .topbar-profile__avatar--lvl > span").html(result.lvl);
+                $(".user-level-block").each(function (i) {
+                    switch (i) {
+                        case 0:
+                            $(this).find(".user-level-block__description > b").html(0);
+                            break;
+                        case 1:
+                            $(this).find(".user-level-block__description > b").html(result.nextLevel.exp);
+                            $(this).find(".user-level-block__circle--image").attr({ src: "/img/" + result.nextLevel.case.image });
+                            break;
+                    }
+                });
+                setTimeout(async () => {
+                    await page.support.pageLoading.promise;
+                    page.support.actionOnLoaded["go_home"]();
+                    $(".page-part:first-child").css({ animation: "1s emphasize cubic-beizer(0.5, 0, 0.75, 0.5)" });
+                }, 500);
+            }
+        });
+    },
+});
+
 // Popup
 
 page.popup.on["withdraw"] = function (options) {
-    var itemPrice = options.item.price + options.rnd;
-    this.tmp = options;
+    var itemPrice = options.item.price;
+    this.tmp.options = options;
     this.wEdit({
         summary: this.summary.replace('{itemPrice}', itemPrice),
-        content: `<div style="display:flex;justify-content:center;flex-direction:column;align-items:center;"><span class="withdraw__price skewed-element">${options.item.random_number}</span><input class="popup-window__button button1 js-item-withdraw-input" withdraw-skin placeholder="${this.wText("other.placeholder")}"><button class="popup-window__button button1 js-item-withdraw-submit">${this.wText("other.button")}</button></div>`,
+        content: `<div style="display:flex;justify-content:center;flex-direction:column;align-items:center;"><span class="withdraw__price skewed-element">${options.item.price}</span><input class="popup-window__button button1 js-item-withdraw-input" withdraw-skin placeholder="${this.wText("other.placeholder")}"><button class="popup-window__button button1 js-item-withdraw-submit">${this.wText("other.button")}</button></div>`,
     });
 };
 
@@ -564,7 +656,7 @@ page.popup.on["auth"] = function () {
 };
 
 page.popup.on["sell"] = function (options) {
-    this.tmp = options;
+    this.tmp.options = options;
     this.wEdit({
         summary: this.summary.ias("price", options.item.price),
         content: `<div style="display:flex;justify-content:center;"><button class="popup-window__button button1 js-item-sell_submit">${this.wText("buttons.yes")}</button><button class="popup-window__button button2" onclick="page.popup.close();">${this.wText("buttons.no")}</button></div>`,
@@ -614,16 +706,16 @@ page.popup.on["top_up"] = function (options) {
     });
 };
 
-page.popup.on["vk-accept"] = function (options) {
+page.popup.on["vk_participation"] = function (options) {
     this.wEdit({
-        content: '<div class="vk-accept"> <section> <div class="vk-accept__title">' + this.wText("sections.1") + '</div> <div class="vk-accept__content"> <div class="mauto" id="vk_groups"></div> </div> </section> <section> <div class="vk-accept__title">' + this.wText("sections.2") + '</div> <div class="vk-accept__content"> <div class="mauto width150" id="vk_allow_messages_from_community"></div> </div> </section> <section> <div class="vk-accept__title">' + this.wText("sections.3") + '</div></section> <button onclick="_closePopup()" class="button1">' + this.wText("button") + '</button> </div>',
+        content: '<div class="vk-accept"> <section> <div class="vk-accept__title">' + this.wText("sections.1") + '</div> <div class="vk-accept__content"> <div class="mauto" id="vk_groups"></div> </div> </section> <section> <div class="vk-accept__title">' + this.wText("sections.2") + '</div> <div class="vk-accept__content"> <div class="mauto width150" id="vk_allow_messages_from_community"></div> </div> </section> <section> <div class="vk-accept__title">' + this.wText("sections.3") + '</div></section> <button onclick="page.popup.close()" class="popup-window__button button1">' + this.wText("button") + '</button> </div>',
     });
 
     // VK Widgets
-    VK.Widgets.AllowMessagesFromCommunity("vk_allow_messages_from_community", { height: 30 }, 187346506);
-    VK.Widgets.Group("vk_groups", { mode: 1, no_cover: 1 }, 187346506);
+    VK.Widgets.AllowMessagesFromCommunity("vk_allow_messages_from_community", { height: 30 }, 190286598);
+    VK.Widgets.Group("vk_groups", { mode: 1, no_cover: 1 }, 190286598);
 };
 
 $(document).on("click", ".popup-window__close, .popup__cover", () => {
-    page.popup.fadeOut();
+    page.popup.close();
 });

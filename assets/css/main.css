@@ -67,6 +67,21 @@
     }
 }
 
+@keyframes emphasize {
+    0% {
+        background: transparent;
+    }
+    25% {
+        background: rgba(55, 55, 60, 0.5);
+    }
+    35% {
+        background: rgba(55, 55, 60, 0.75);
+    }
+    100% {
+        background: transparent;
+    }
+}
+
 *, ::before, ::after {
     position: relative;
     box-sizing: border-box;
@@ -91,7 +106,7 @@ body {
 }
 
 body::-webkit-scrollbar {
-    width: 0.25em;
+    width: 0.35em;
 }
 
 body::-webkit-scrollbar-track {
@@ -544,7 +559,7 @@ a.ghost {
 .social-row {
     display: flex;
     align-items: center;
-    font-size: 0.75em;
+    font-size: 0.85em;
     z-index: 1;
 }
 
@@ -585,7 +600,7 @@ a.ghost {
 }
 
 .weapon-skins__weapon {
-    display: inline-grid;
+    display: grid;
     animation: 0.24s ease weapon-fade-in;
     cursor: pointer;
 }
@@ -597,6 +612,7 @@ a.ghost {
 .weapon-skins__image {
     width: 6.7em;
     height: 3.8em;
+    margin: auto;
 }
 
 .weapon-skins__unit .weapon-skins__image, .weapon-skins__unit .weapon-skins__quality {
@@ -667,7 +683,7 @@ a.ghost {
 .live-drops .weapon-skins__image {
     width: 7em;
     height: 3.7em;
-    transition: 0.225s linear transform 0.225s;
+    transition: 0.225s linear background-color;
     z-index: 2;
 }
 
@@ -677,23 +693,28 @@ a.ghost {
     align-items: center;
     justify-content: center;
     padding: 1em;
-    background: #565558;
+    background: rgba(0, 0, 0, 0.5);
     width: 100%;
     height: 100%;
     font-size: 0.45em;
-    transform: rotateY(90deg);
-    transition: 0.225s linear transform 0s;
+    opacity: 0;
+    transition: 0.175s linear opacity 0s;
     z-index: 3;
 }
 
+.weapon-skins__quality--blue+.weapon-skins-owner {
+    background: rgba(1, 84, 198, 0.425);
+}
+
 .live-drops .weapon-skins__weapon:hover .weapon-skins__image {
-    transform: rotateY(-90deg);
+    /* transform: rotateY(-90deg); */
     transition-delay: 0s;
 }
 
 .live-drops .weapon-skins__weapon:hover .weapon-skins-owner {
-    transform: rotateY(0deg);
-    transition-delay: 0.225s;
+    /* transform: rotateY(0deg); */
+    /* transition-delay: 0.225s; */
+    opacity: 1;
 }
 
 .weapon-skins-owner__case-image {
@@ -925,6 +946,10 @@ main {
     text-align: center;
 }
 
+.page-part__text {
+    text-transform: uppercase;
+}
+
 .page-part__icon {
     background-image: url("../img/lumen.png");
     width: 16em;
@@ -989,6 +1014,10 @@ article {
     background: #88cc31;
 }
 
+.stndfspin-cases__cost[data-time] {
+    width: 6em;
+}
+
 .stndfspin-cases__title {
     font-size: 1.1em;
     font-weight: 600;
@@ -1041,7 +1070,7 @@ article {
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
-    padding-bottom: 10em;
+    padding-bottom: 5em;
     margin-bottom: 5em;
     min-height: 25em;
 }
@@ -1086,6 +1115,31 @@ article {
 
 .box__input--active::before, .box__input:hover::before {
     background: #89cc32;
+}
+
+.box__text {
+    max-width: 35em;
+    font-size: 0.85em;
+    font-weight: 600;
+    text-transform: uppercase;
+    line-height: 1.5;
+}
+
+.box__column {
+    display: grid;
+    row-gap: 0.5em;
+}
+
+.box__column--0 {
+    font-size: 0.85em;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.box__column--1 {
+    font-size: 2em;
+    font-weight: bold;
+    font-style: italic;
 }
 
 .fortune__circle {
@@ -1488,7 +1542,7 @@ article {
 }
 
 .sorted-skins__icon {
-    padding: 0.5em;
+    padding: 0.6em 0.75em;
     margin-left: 0.25em;
     border-radius: 0.125em;
     font-size: 0.85em;
@@ -1505,15 +1559,15 @@ article {
 
 .sorted-skins__icon--arrow {
     background-image: url("../img/icons/arrow.png");
-    width: 0.75em;
-    height: 0.75em;
+    width: 0.85em;
+    height: 0.85em;
     z-index: 2;
 }
 
 .sorted-skins__icon--dollar {
     background-image: url("../img/icons/dollar.png");
-    width: 0.75em;
-    height: 0.75em;
+    width: 0.85em;
+    height: 0.85em;
     z-index: 2;
 }
 
@@ -1822,9 +1876,6 @@ tr.table__disables {
 
 .profile-cells {
     display: flex;
-    align-items: stretch;
-    justify-content: space-between;
-    width: 100%;
     margin: 5em 0;
     font-size: 0.95em;
 }
@@ -1888,6 +1939,9 @@ b {
 .profile-confirmation {
     display: flex;
     align-items: center;
+    justify-content: center;
+    margin: 0 2.5em;
+    flex: 1;
 }
 
 .profile-confirmation__avatar {
@@ -1921,6 +1975,7 @@ b {
 .profile-stats {
     display: flex;
     align-items: center;
+    flex-shrink: 0;
 }
 
 .profile-stats__title {
@@ -1948,11 +2003,9 @@ b {
     font-size: 0.9em;
 }
 
-.profile-info::before, .profile-confirmation::before {
-    left: unset;
-    right: -2.5em;
-    width: 0.125em;
-    background: linear-gradient(to bottom, transparent, rgba(255, 255, 255, 0.25), transparent);
+.profile-confirmation::before {
+    box-shadow: 1em 0 0.25em -0.75em rgba(255, 255, 255, 0.125), -1em 0 0.25em -0.75em rgba(255, 255, 255, 0.125);
+    /* border-left: 0.125em solid rgba(255,255,255,0.125); */
 }
 
 /* Another Profile */
@@ -2099,7 +2152,7 @@ b {
     bottom: 0;
     width: 100%;
     height: 100%;
-    z-index: 25;
+    z-index: 26;
 }
 
 .popup {
@@ -2187,6 +2240,12 @@ input.popup-window__button.button1 {
     transition: 0.125s linear border-color;
 }
 
+button.popup-window__button.button1[disabled] {
+    background: transparent;
+    border: 0.125em solid #88cc31;
+    cursor: not-allowed;
+}
+
 input.popup-window__button.button1:hover, input.popup-window__button.button1:focus {
     border-color: rgba(255, 255, 255, 0.75);
 }
@@ -2204,8 +2263,14 @@ input.popup-window__button.button1:hover, input.popup-window__button.button1:foc
     border: 0.1em solid #88cc31;
 }
 
-.popup-window__button.button2 {
+button.popup-window__button.button2 {
     background: rgba(255, 255, 255, 0.05);
+}
+
+.popup-window__button.button2[disabled] {
+    background: transparent;
+    border: 0.125em solid rgba(255, 255, 255, 0.25);
+    cursor: not-allowed;
 }
 
 .popup-window__marked {
@@ -2269,7 +2334,7 @@ input.promocode__input:focus::placeholder {
 .top-up__row {
     display: flex;
     align-items: center;
-    justify-content: space-between;
+    justify-content: space-around;
     margin-top: 2.5em;
 }
 
@@ -2896,6 +2961,10 @@ span.contract-window__bill--numeric {
     border-radius: 0.125em;
 }
 
+.feeder--filled:first-child {
+    margin-right: 2.5em;
+}
+
 .feeder__title {
     display: flex;
     align-items: center;
@@ -3080,7 +3149,8 @@ span.contract-window__bill--numeric {
     bottom: -15%;
     display: grid;
     padding: 1em 1.5em;
-    background: rgba(255, 255, 255, 0.1);
+    background: rgba(50, 50, 50, 1);
+    box-shadow: 0 0 15px -5px black;
     border-radius: 0.12em;
     z-index: 6;
 }
@@ -3349,13 +3419,15 @@ span.contract-window__bill--numeric {
     display: grid;
     align-content: flex-start;
     row-gap: 1em;
-    margin-right: 2em;
+    margin-right: 1em;
     margin-top: 3.35em;
+    flex: 0;
 }
 
-.battles__sidebar--box {
+.battles__sidebar-box {
     display: flex;
     align-items: center;
+    justify-content: center;
     padding: 2em;
     background: rgba(255, 255, 255, 0.025);
 }
@@ -3364,7 +3436,7 @@ span.contract-window__bill--numeric {
     display: grid;
 }
 
-.battles-last-game__title {
+.battles__title {
     font-weight: 700;
     font-style: italic;
     text-transform: uppercase;
@@ -3417,33 +3489,75 @@ span.contract-window__bill--numeric {
 
 .battles-stats__column {
     display: grid;
-    row-gap: 0.25em;
+    row-gap: 0.35em;
+    margin-left: 1em;
     font-size: 0.85em;
+    text-transform: uppercase;
+}
+
+.battles-stats__column:first-child {
+    margin: 0;
 }
 
 .battles-stats__number {
     font-size: 1.25em;
     font-weight: 700;
     font-style: italic;
+    text-align: center;
+}
+
+.battles-stats__number--big {
+    font-size: 1.75em
 }
 
 .battles-stats__text {
     color: #767d8c;
+    font-size: 0.9em;
+    font-weight: 600;
 }
 
 .battles__button {
     padding: 1.15em 1.75em;
     border-radius: 0.15em;
-    font-size: 0.75em;
+    font-size: 0.85em;
     font-weight: 600;
     text-transform: uppercase;
     cursor: pointer;
     color: white;
-    margin-left: 2em;
+    margin-left: 2.5em;
 }
 
 .battles__button::before {
     background: #88cc31;
+}
+
+.battles-system {
+    display: grid;
+}
+
+.battles-system__point {
+    display: flex;
+    align-items: center;
+}
+
+.battles-system__point--number {
+    padding: 0.65em 0.9em;
+    margin-right: 1em;
+    border-radius: 0.125em;
+    font-size: 1.25em;
+    font-weight: bold;
+    font-style: italic;
+}
+
+.battles-system__point--number::before {
+    background: #88cc31;
+}
+
+.battles-system__point--explanation {
+    font-size: 0.85em;
+    font-weight: 500;
+    text-transform: uppercase;
+    line-height: 1.25;
 }
 
 .battles__content {
@@ -3466,15 +3580,16 @@ span.contract-window__bill--numeric {
 
 .battles-table__button {
     padding: 1.15em 1.75em;
+    margin-left: 1em;
     border-radius: 0.15em;
-    font-size: 0.75em;
-    font-weight: 600;
+    font-size: 0.85em;
+    font-style: normal;
     text-transform: uppercase;
     cursor: pointer;
 }
 
 .battles-table__button:first-child {
-    margin-right: 1em;
+    margin: 0;
 }
 
 .battles-table__button::before {
@@ -3584,7 +3699,7 @@ span.contract-window__bill--numeric {
 }
 
 .user-level-block__circle--action::before {
-    content: "ÃƒÂÃ¢â‚¬â€ÃƒÂÃ‚Â°ÃƒÂÃ‚Â±Ãƒâ€˜Ã¢â€šÂ¬ÃƒÂÃ‚Â°Ãƒâ€˜Ã¢â‚¬Å¡Ãƒâ€˜Ã…â€™ ÃƒÂÃ‚Â¿Ãƒâ€˜Ã¢â€šÂ¬ÃƒÂÃ‚Â¸ÃƒÂÃ‚Â·";
+    content: "Забрать приз";
     position: absolute;
     font-size: 1em;
     font-weight: 800;
