@@ -224,7 +224,7 @@ a.ghost {
 .stndfspin-button--unfilled::before {
     background: transparent;
     border: 0.05em solid #29292b;
-    transition: .125s linear border-color;
+    transition: .125s border-color;
 }
 
 .stndfspin-features__pattern:hover .stndfspin-button--unfilled::before {
@@ -315,7 +315,7 @@ a.ghost {
     background-size: 6em;
     border-radius: 100%;
     width: 1.25em;
-    animation: 10s linear spinning infinite;
+    animation: 10s spinning infinite;
 }
 
 .topbar__logo--2 {
@@ -683,7 +683,7 @@ a.ghost {
 .live-drops .weapon-skins__image {
     width: 7em;
     height: 3.7em;
-    transition: 0.225s linear background-color;
+    transition: 0.225s background-color;
     z-index: 2;
 }
 
@@ -698,7 +698,7 @@ a.ghost {
     height: 100%;
     font-size: 0.45em;
     opacity: 0;
-    transition: 0.175s linear opacity 0s;
+    transition: 0.175s opacity 0s;
     z-index: 3;
 }
 
@@ -982,7 +982,7 @@ article {
 .stndfspin-cases__case {
     padding: 1.25em;
     font-size: 0.85em;
-    transition: .125s linear background-color;
+    transition: .125s background-color;
 }
 
 .stndfspin-cases__case:hover {
@@ -1042,7 +1042,7 @@ article {
     height: 0.25em;
     background: rgb(37, 38, 41);
     border-radius: 0 0 0.25em 0.25em;
-    transition: .125s linear background-color, .125s linear box-shadow;
+    transition: .125s background-color, .125s box-shadow;
 }
 
 .stndfspin-cases__case:hover .stndfspin-cases__lumen::before {
@@ -1106,7 +1106,7 @@ article {
     font-style: italic;
     cursor: pointer;
     user-select: none;
-    transition: .125s linear background;
+    transition: .125s background;
 }
 
 .box__input::before {
@@ -1153,7 +1153,7 @@ article {
     border-radius: 100%;
     overflow: hidden;
     transition: 16s cubic-bezier(.1, 0, 0, 1) transform;
-    animation: 100s linear spinning infinite;
+    animation: 100s spinning infinite;
 }
 
 .fortune__circle--stop {
@@ -1450,7 +1450,7 @@ article {
     align-items: center;
     justify-items: center;
     cursor: pointer;
-    transition: 0.125s linear opacity;
+    transition: 0.125s opacity;
 }
 
 .sorted-skins__unit[pickable]:active {
@@ -1461,7 +1461,7 @@ article {
     content: '';
     opacity: 0;
     cursor: pointer;
-    transition: .125s linear opacity;
+    transition: .125s opacity;
 }
 
 .sorted-skins__unit[pickable]:hover>* {
@@ -1484,7 +1484,7 @@ article {
 }
 
 .sorted-skins__unit[pickable] .weapon-skins__weapon {
-    transition: .125s linear opacity;
+    transition: .125s opacity;
 }
 
 .sorted-skins__unit[pickable]:hover .weapon-skins__weapon {
@@ -2249,7 +2249,7 @@ input.popup-window__button.button1 {
     width: calc(35% - 0.6em);
     border-bottom: 0.1em solid rgba(255, 255, 255, 0.5);
     cursor: text;
-    transition: 0.125s linear border-color;
+    transition: 0.125s border-color;
 }
 
 button.popup-window__button.button1[disabled] {
@@ -2271,7 +2271,7 @@ input.popup-window__button.button1:hover, input.popup-window__button.button1:foc
 }
 
 .withdraw__price::before {
-    background: repeating-linear-gradient(45deg, rgba(255, 255, 255, 0.1) 60%, rgba(136, 204, 49, 0.35) 68%);
+    background: repeating-linear linear-gradient(45deg, rgba(255, 255, 255, 0.1) 60%, rgba(136, 204, 49, 0.35) 68%);
     border: 0.1em solid #88cc31;
 }
 
@@ -2467,7 +2467,7 @@ input.promocode__input:focus::placeholder {
 
 .contract__button::before {
     background: #88cc31;
-    transition: 0.125s linear background-color, 0.125s linear border-color;
+    transition: 0.125s background-color, 0.125s border-color;
 }
 
 .contract__button[disabled] {
@@ -2652,14 +2652,14 @@ span.contract-window__bill--numeric {
 .scale-out {
     transform: scale(0.75);
     opacity: 0;
-    transition: .175s linear transform, .125s linear opacity;
+    transition: .175s transform, .125s opacity;
     z-index: 25;
 }
 
 .scale-in {
     transform: scale(1);
     opacity: 1;
-    transition: .175s linear transform, .125s linear opacity;
+    transition: .175s transform, .125s opacity;
     z-index: 26;
 }
 
@@ -2679,7 +2679,7 @@ span.contract-window__bill--numeric {
     height: 1.75em;
     filter: contrast(0.5) opacity(0.2) grayscale(1);
     cursor: pointer;
-    transition: .125s linear filter;
+    transition: .125s filter;
 }
 
 .paysys__image:last-child {
@@ -2709,7 +2709,7 @@ span.contract-window__bill--numeric {
     color: white;
     font-size: 18px;
     font-weight: 600;
-    transition: 0.125s linear background;
+    transition: 0.125s background;
     text-decoration: none;
     text-align: center;
 }
@@ -3029,7 +3029,7 @@ span.contract-window__bill--numeric {
     font-style: italic;
     text-transform: uppercase;
     cursor: text;
-    transition: .125s linear border-color;
+    transition: .125s border-color;
 }
 
 .feeder__gap:focus {
@@ -3057,7 +3057,7 @@ span.contract-window__bill--numeric {
     font-weight: 600;
     text-transform: uppercase;
     cursor: pointer;
-    transition: .125s linear background-color;
+    transition: .125s background-color;
 }
 
 .feeder__button:hover {
@@ -3138,10 +3138,10 @@ span.contract-window__bill--numeric {
     top: 0;
     left: 0;
     right: 0;
-    height: 0.15em;
-    background: #f4f4f4;
+    height: 0.2em;
+    background: rgba(136, 204, 49, 0.5);
     z-index: 99;
-    transition: .1s linear opacity;
+    transition: .1s opacity;
 }
 
 .load-indicator__fill {
@@ -3150,7 +3150,7 @@ span.contract-window__bill--numeric {
     width: 0%;
     height: 100%;
     z-index: inherit;
-    transition: 0.5s ease-out width;
+    transition: 0.35s ease-out width;
 }
 
 /* Notifier */
@@ -3303,7 +3303,7 @@ span.contract-window__bill--numeric {
 }
 
 .fortune-wheel--right .fortune__circle {
-    animation: 100s linear spinning-reverse infinite;
+    animation: 100s spinning-reverse infinite;
 }
 
 .fortune-wheel-user {
@@ -3703,7 +3703,7 @@ span.contract-window__bill--numeric {
 
 .user-level-block__circle--action {
     cursor: pointer;
-    transition: .125s linear background-color;
+    transition: .125s background-color;
 }
 
 .user-level-block__circle--action:hover {
@@ -3720,7 +3720,7 @@ span.contract-window__bill--numeric {
     text-transform: uppercase;
     opacity: 0;
     z-index: 1;
-    transition: 0.125s linear opacity;
+    transition: 0.125s opacity;
 }
 
 .user-level-block__circle--action:hover::before {
@@ -3776,7 +3776,7 @@ span.contract-window__bill--numeric {
     border-radius: 10em;
     width: 80%;
     height: 100%;
-    transition: 0.5s linear width;
+    transition: 0.5s width;
 }
 
 .user-level__advice {

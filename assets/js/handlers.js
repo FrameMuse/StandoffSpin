@@ -30,10 +30,7 @@ DOM.listen(page.support.fickle, type => {
         // ...Mobile
         if (page.mobile.if) this.EventPageLoaded(this.pageLoaded, "mobile");
     });
-    page.support.progress = 100;
-    setTimeout(() => {
-        page.support.progress = null;
-    }, 282.5);
+    ProgressBar.end();
 });
 
 // Socket
@@ -85,12 +82,6 @@ DOM.listen(page.support.fickle, type => {
 })();
 
 (function () {
-    setInterval(() => {
-        api.post("/user/update");
-    }, 270000);
-})();
-
-(function () {
     page.lang.tap = $(".topbar-language__text").html();
     $(".topbar-language__icon").css({
         "background-image": `url(${page.lang.path + page.lang.tap + ".png"})`,
@@ -115,6 +106,7 @@ page.lang.onclick = function (tap) {
 
 // When any pages are loaded 
 page.support.onPageLoaded = function (url) {
+    if (ServiceController.userId == 0) return;
     api.post("/user/update");
     api.get("/user/notifications", {}, async (result) => {
         for (var i = 0; i < result.length; i++) {
@@ -164,7 +156,7 @@ page.support.context(function () {
         errors: {
             403: function () {
                 page.popup.open("vk_participation");
-            }
+            },
         },
     });
     // Mobile Pages
@@ -183,7 +175,7 @@ page.support.context(function () {
         },
     });
     this.__addPage({
-        page: "/refral",
+        page: "/referal",
         device: "mobile",
         action: function () {
             $(".skewed-row__row").removeClass("skewed-element");
@@ -391,7 +383,7 @@ DOM.on("click", "item", {
             item: {
                 id: weapon_id,
                 object: weapon,
-                price: (+Math.random() + weapon_price).toFixed(3),
+                price: (+Math.random() + weapon_price).toFixed(2),
                 initial_price: weapon_price,
             },
         });
@@ -399,7 +391,7 @@ DOM.on("click", "item", {
     "withdraw-submit": function () {
         var item = page.popup.tmp.options.item;
         $(".popup-window__button").attr({ disabled: "" });
-        page.support.progress = 75;
+        ProgressBar.start();
         ItemsController.CreateWithdrawal({
             item: item.id,
             price: item.price - item.initial_price,
@@ -408,7 +400,7 @@ DOM.on("click", "item", {
             item.object.remove();
             ItemsController.Callback();
             page.popup.close();
-            page.support.end_progress();
+            ProgressBar.end();
         });
     },
     sell: function() {
@@ -426,12 +418,12 @@ DOM.on("click", "item", {
     sell_submit: function () {
         var item = page.popup.tmp.options.item;
         $(".popup-window__button").attr({ disabled: "" });
-        page.support.progress = 75;
+        ProgressBar.start();
         ItemsController.Sell(item.id, function () {
-            item.object.remove();
+            item.object.prependTo(DOM.$("tab", "history"));
             ItemsController.Callback();
             page.popup.close();
-            page.support.end_progress();
+            ProgressBar.end();
         });
     },
 });
@@ -519,7 +511,7 @@ $(document).on("click", ".contract-window__button", function () {
     page.contract.spot.spots.filter(function (spot) {
         items.push(spot.data.weapon_id);
     });
-    page.support.progress = 25;
+    ProgressBar.start();
     // API Connection
     api.post("/contract/create", {
         items: items
@@ -544,7 +536,7 @@ $(document).on("click", ".contract-window__button", function () {
             ItemsController.AppendItemTo($(".contract"));
         }, 750);
         // Progress
-        page.support.end_progress();
+        ProgressBar.end();
     });
 });
 

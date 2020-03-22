@@ -166,6 +166,21 @@ class interpret {
     }
 }
 
+class ProgressBar {
+    static start() {
+        $(".load-indicator").css({ opacity: 1 });
+        $(".load-indicator__fill").css({ width: 15 + "%" });
+    }
+
+    static end() {
+        $(".load-indicator__fill").css({ width: 100 + "%" });
+        setTimeout(() => {
+            $(".load-indicator__fill").css({ width: "" });
+            $(".load-indicator").css({ opacity: 0 });
+        }, 350);
+    }
+}
+
 const api = new class {
     constructor() {
         this.version = "v1";
@@ -191,7 +206,9 @@ const api = new class {
                 }
 
                 if ("error" in result) {
-                    page.support.notify("error", getLanguage(result.error_msg))
+                    page.support.notify("error", getLanguage(result.error_msg));
+                    // Progress
+                    ProgressBar.end();
                     return;
                 } else success(result);
             },
@@ -202,7 +219,9 @@ const api = new class {
                 }
                 console.warn("API Request Error:", error);
                 if (typeof error.responseJSON == "undefined") error.responseJSON = { message: "Undefined error" };
-                page.support.notify(error.statusText, `API Request Error: "` + error.responseJSON.message + `"`)
+                page.support.notify(error.statusText, `API Request Error: "` + error.responseJSON.message + `"`);
+                // Progress
+                ProgressBar.end();
             },
         });
     }
@@ -397,7 +416,7 @@ class features_wheel {
     }
 
     __init() {
-        page.support.progress = 75;
+        ProgressBar.start();
         this.promise = $.Postpone();
         this.data.current = {
             items: [],
@@ -455,8 +474,6 @@ class features_wheel {
             circle.css({ transform: `rotate(${degrees}deg)` });
         }
 
-        page.support.progress = 100;
-
         return block;
     }
 
@@ -496,10 +513,6 @@ class features_wheel {
             // Setting Weapon ID
             wheel.find(".js-wheel-sell-item").attr({ "weapon-id": data.id });
         }, timeout);
-        // Extra
-        setTimeout(() => {
-            page.support.progress = null;
-        }, 250);
     }
 
     multiple_win(data = {}, fast = false, overideThen = false) {
@@ -532,6 +545,8 @@ class features_wheel {
             // Remove box--no-indent Class
             $(".box").removeClass("box--no-indent");
         });
+        // Progress
+        ProgressBar.end();
         // Return
         return this.promise;
     }
@@ -1014,7 +1029,6 @@ class features_paging {
         this.pages = {};
         this.errors = {};
         this.fickle = ".ajax-fickle";
-        this.progress = 15;
         this.DeviceType = "desktop";
         this.actionOnLoaded = [];
         this.pageLoading = $.Postpone();
@@ -1028,6 +1042,9 @@ class features_paging {
         $("body").append(`<div class="notifier"><div class="notifier__message"></div><span class="notifier__signal"></span></div>`);
         $(document).on("click", "a.ajax-link", (e) => {
             e.preventDefault();
+            // Progress
+            ProgressBar.start();
+            // Other
             this.pageLoading = $.Postpone();
             var href = $(e.currentTarget).attr("href");
             if (href != null) {
@@ -1046,7 +1063,7 @@ class features_paging {
 
     load(url, hashAction = false) {
         var url = hashAction ? url + "#!" + hashAction : url;
-        this.progress = 25;
+        ProgressBar.start();
         this.dynamic_request(url, (result) => {
             // Histoty Push
             if (history.state == null) {
@@ -1074,7 +1091,7 @@ class features_paging {
             success: $success,
             error: (error) => {
                 this.pageLoading.reject();
-                this.progress = null;
+                ProgressBar.end();
                 console.warn("Page Loading Error:", error);
             },
             statusCode: this.errors[url.split("/")[1]],
@@ -1091,11 +1108,14 @@ class features_paging {
     }
 
     final(result, url) {
+        // Progress
+        ProgressBar.end();
+        // Other
         this.pageLoaded = url.split("/");
         this.active_page = "/" + this.pageLoaded[1];
         $(this.fickle).html(result);
     }
-
+    
     addPage(page_name, run) {
         page_name = page_name.replace("/", "");
         this.pages[page_name] = run;
@@ -1135,27 +1155,6 @@ class features_paging {
             $(this).find("a").removeClass(active_name);
             $(this).find("a[href='" + url + "']").addClass(active_name);
         });
-    }
-
-    set progress(percent) {
-        if (percent == null) {
-            var opacity = 0;
-            percent = "";
-        } else {
-            var opacity = "";
-            percent += "%";
-        }
-        $(".load-indicator")
-            .css({ opacity: opacity })
-            .find(".load-indicator__fill")
-            .css({ width: percent });
-    }
-
-    end_progress() {
-        this.progress = 100;
-        setTimeout(() => {
-            this.progress = null;
-        }, 350);
     }
 
     clear_hash() {
@@ -1454,7 +1453,7 @@ class FortuneWheelController {
             }, timeout);
             // Extra
             setTimeout(() => {
-                page.support.progress = null;
+                ProgressBar.start();
             }, 500);
         });
         var timeout = setTimeout(page.wheel.promise.resolve, page.wheel.data.duration);
@@ -1475,10 +1474,9 @@ class BalanceController {
     }
 
     static GetUserBalance() {
+        if (ServiceController.userId == 0) return 0;
         var balance = alter_by_currency(DOM.$("required-update", "balance").html(), false);
-        if (this.CurrentBalance) {
-            return this.CurrentBalance;
-        }// else window.location.reload();
+        if (this.CurrentBalance) return this.CurrentBalance;
     }
 
     static HasSufficientFunds(CustomPrice = false) {
