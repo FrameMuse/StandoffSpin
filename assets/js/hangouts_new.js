@@ -686,20 +686,25 @@ class features_popup {
 
 class features_referal {
     init() {
-        this.name = name;
         this.default();
         this.progress_block = '<div class="goal__line"><div class="goal__line--line-progress"></div><div class="goal__counter"><span class="goal__counter--icon"></span><span class="goal__counter--amount"></span></div></div>';
-        this.commit_progress(2, 89);
+        this.commit_progress(0, 0, 0);
     }
 
     default() {
-        this.goals_number = $(".goal").length;
-        this.width = $(this.name).outerWidth();
-        this.goal_width = $(".goal").outerWidth();
-        this.goal_height = $(".goal__image").outerHeight();
-        this.goal_indent = $(".goal[data-goal-id='2']").css("margin-left").replace("px", "").intConvert();
-        this.goal_image = $(".goal__image").outerWidth();
-        this.goal_goal_height = $(".goal__goal").outerHeight();
+        this.counter_indent = 1;
+        this.goal = {
+            width: $(".goal").outerWidth(),
+            height: $(".goal__image").outerHeight(),
+            indent: $(".goal[data-goal-id='2']").css("margin-left").replace("px", "").intConvert(),
+            image_width: $(".goal__image").outerWidth(),
+            goal_height: $(".goal__goal").outerHeight(),
+        };
+        this.goals = {
+            number: $(".goal").length,
+        };
+        this.goals.width = (this.goal.width * this.goals.number) + (this.goal.indent * (this.goals.number - 1));
+        $(".goal__line").css({ width: this.goals.width - (15.85).toPx() + "px" })
     }
 
     create_progress_block() {
@@ -723,10 +728,13 @@ class features_referal {
     }
 
     get_progress(goal_number, percent) {
-        var step = this.goal_width + this.goal_indent;
-        var indent = step * goal_number;
+        var counter_indent = this.counter_indent.toPx();
+        var goal = this.goal;
+        var goal_number = (goal_number < 1 ? 1 : goal_number);
+        var step = (this.goal.width + this.goal.indent) * (goal_number - 1);
+        var goal_image_indent = (goal.width - goal.image_width) / 2;
         var percent = percent / 100;
-        var progress = (indent - step) + (this.goal_width) + ((step * percent)) - step;
+        var progress = (step + ((goal.indent + counter_indent + 12) * percent)) + goal_image_indent + counter_indent;
         return progress;
     }
 
@@ -743,12 +751,7 @@ class features_referal {
             console.error("Too few elements at the page (" + this.goals_number + ")");
             return;
         }
-        if ((percent >= 90 && percent <= 100) || (percent >= 10 && percent <= 2)) {
-            $(".goal__counter").addClass("hidden");
-        } else {
-            $(".goal__counter").removeClass("hidden");
-        }
-        if (counter) $(".goal__counter--amount").html(counter);
+        $(".goal__counter--amount").html(counter);
         $(".goal__line--line-progress").css("width", progress + "px");
         $(".goal__counter").css("left", progress - ($(".goal__counter").outerWidth() / 2) + "px");
         $(".goal__line").css("top", this.goal_image_indent + this.goal_goal_height + (this.goal_height / 2) + "px");
@@ -1057,7 +1060,8 @@ class features_paging {
         this.refresh();
         // Extending History API
         window.onpopstate = (event) => {
-            window.location.href = event.state.href;
+            console.log(event);
+            
         }
     }
 

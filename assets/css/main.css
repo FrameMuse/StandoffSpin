@@ -2779,7 +2779,6 @@ span.contract-window__bill--numeric {
 /* Goals */
 
 .goals {
-    display: flex;
     margin-top: 5em;
 }
 
@@ -2788,8 +2787,8 @@ span.contract-window__bill--numeric {
 }
 
 .goal {
-    width: 13em;
-    margin-left: 5em;
+    width: 10em;
+    margin-left: 8em;
     text-align: center;
     z-index: 20;
 }
@@ -2861,7 +2860,7 @@ span.contract-window__bill--numeric {
 .goal__line {
     position: absolute;
     top: 6em;
-    left: 9em;
+    left: 8em;
     width: calc(100% - 18em);
     height: 2px;
     background: rgba(255, 255, 255, .1);
@@ -2879,26 +2878,20 @@ span.contract-window__bill--numeric {
 .goal__counter {
     position: absolute;
     display: inline-flex;
-    top: -75px;
+    top: -0.775em;
     left: calc((100%)/4.5 - 25px);
-    width: 100px;
-    transform: rotate(-90deg)
-}
-
-.goal__counter--icon {
-    display: inline-block;
-    width: 16px;
-    height: 16px;
-    margin-right: 10px;
-    background: url("https://standoffcase.ru/assets/img/icons/triangle.png") no-repeat center;
-    background-size: contain
+    margin-left: -2em;
+    width: 2.25em;
+    padding: 0.225em;
+    background: #18191b;
+    border: 0.1em solid #88cc31;
+    border-radius: 10em;
 }
 
 .goal__counter--amount {
-    transform: rotate(90deg);
-    font-size: 16px;
+    font-size: 0.75em;
     font-weight: 300;
-    line-height: 12px
+    margin: auto;
 }
 
 /* Skewed Row */

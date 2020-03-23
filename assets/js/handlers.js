@@ -445,8 +445,9 @@ $(document).on("click", ".tab-swithcer__button--only[tab]", function () {
 });
 
 $(document).on("click", ".sorted-skins-more-button", function () {
-    var config = {};
-    var sorted = $(this).parent().attr("class");
+    var item = $(this).parent();
+    var sorted = item.attr("class");
+    var config = item.data("config") != undefined ? item.data("config") : {};
     var classes = sorted.split(" ");
     var sorted_specified = classes[2].replace("js-tab-", "");
     var page_id = button_more[sorted_specified];

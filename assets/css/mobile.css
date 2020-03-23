@@ -1070,6 +1070,7 @@ article {
     width: calc(var(--wheel-item-size) * 1.4);
     height: var(--wheel-item-size);
     background: transparent;
+    border-top: 0.75em solid var(--color);
 }
 
 .fortune__item::before {
@@ -1099,7 +1100,7 @@ article {
     z-index: -1;
 }
 */
-
+/*
 .fortune__item::after {
     content: '';
     position: absolute;
@@ -1107,9 +1108,9 @@ article {
     width: 62%;
     border-top: 3em solid var(--color);
     border-radius: 50% 50% 0 0/100% 100% 0 0;
-    /*box-shadow: 0 0 10px -4px var(--color);*/
+    /*box-shadow: 0 0 10px -4px var(--color);
 }
-
+*/
 .fortune__item>* {
     font-size: 1.75em !important;
 }
@@ -1153,11 +1154,11 @@ article {
 
 .fortune-wheel__curve-2 {
     position: absolute;
-    top: calc(50% - 4.25em);
-    left: calc(50% - (54.5em + 17em) / 2);
-    width: calc(54.5em + 17em);
-    height: calc(54.5em + 17em);
-    background: url(../img/wheel_curves_2.png) no-repeat center/93%, #18191b;
+    top: calc(50% - 1em);
+    left: calc(50% - (54.5em + 8em) / 2);
+    width: calc(54.5em + 8em);
+    height: calc(54.5em + 8em);
+    background: url(../img/wheel_curves_2.png) no-repeat center/cover;
     border-radius: 100%;
     z-index: 1;
 }
@@ -2649,11 +2650,9 @@ span.contract-window__bill--numeric {
 /* Goals */
 
 .goals {
-    display: flex;
-    flex-wrap: nowrap;
-    margin: 5em 10em 0;
-    width: 100%;
-    overflow: auto;
+    margin-top: 5em;
+    justify-self: stretch;
+    overflow: scroll;
 }
 
 .goals__inner {
@@ -2661,8 +2660,8 @@ span.contract-window__bill--numeric {
 }
 
 .goal {
-    width: 13em;
-    margin-left: 5em;
+    width: 10em;
+    margin-left: 8em;
     text-align: center;
     flex-shrink: 0;
     z-index: 4;
@@ -2735,7 +2734,7 @@ span.contract-window__bill--numeric {
 .goal__line {
     position: absolute;
     top: 6em;
-    left: 9em;
+    left: 6em;
     width: calc(100% - 18em);
     height: 2px;
     background: rgba(255, 255, 255, .1);
