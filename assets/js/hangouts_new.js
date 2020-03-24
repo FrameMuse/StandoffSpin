@@ -469,9 +469,9 @@ class features_wheel {
         var circle = block.parent();
 
         if (reverse) {
-            circle.css({ transform: `rotate(-${degrees + 60}deg)` });
+            //circle.css({ transform: `rotate(-${degrees + 60}deg)` });
         } else {
-            circle.css({ transform: `rotate(${degrees}deg)` });
+            //circle.css({ transform: `rotate(${degrees}deg)` });
         }
 
         return block;
@@ -525,6 +525,14 @@ class features_wheel {
             // Setting Inner Price
             FortuneWheelController.SetInnerPrice(id, item.item.price);
         });
+        //$(".fortune__circle").each(function () {
+            anime({
+                targets: ".fortune__circle",
+                rotate: '1280deg',
+                easing: 'cubicBezier(.1, 0, 0, 1)',
+                duration: 16000,
+            });
+        //});
         // Wheel Promise
         if (fast) this.promise.resolve();
         var timeout = setTimeout(() => this.promise.resolve(), this.data.duration);

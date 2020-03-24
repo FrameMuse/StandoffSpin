@@ -1048,12 +1048,18 @@ article {
     padding: 0;
     margin: auto;
     will-change: transform;
-    backface-visibility: hidden;
     border-radius: 100%;
-    overflow: hidden;
-    transition: 16s cubic-bezier(.1, 0, 0, 1) transform;
+    /*transition: 16s cubic-bezier(.1, 0, 0, 1) transform;*/
     animation: 100s linear spinning infinite;
-    -webkit-font-smoothing: antialiased;
+    overflow: hidden;
+}
+
+div {
+    -webkit-tap-highlight-color: rgba(255, 255, 255, 0);
+}
+
+body {
+    transform: translate3d(0, 0, 0);
 }
 
 .fortune__circle--stop {
@@ -1071,6 +1077,9 @@ article {
     height: var(--wheel-item-size);
     background: transparent;
     border-top: 0.75em solid var(--color);
+    backface-visibility: hidden;
+    -webkit-perspective: 1000;
+    -webkit-backface-visibility: hidden;
 }
 
 .fortune__item::before {
@@ -1100,6 +1109,7 @@ article {
     z-index: -1;
 }
 */
+
 /*
 .fortune__item::after {
     content: '';
@@ -1111,6 +1121,7 @@ article {
     /*box-shadow: 0 0 10px -4px var(--color);
 }
 */
+
 .fortune__item>* {
     font-size: 1.75em !important;
 }
@@ -1124,6 +1135,10 @@ article {
     font-size: var(--wheel-font-size);
     overflow: hidden;
     will-change: contents;
+    perspective: 1000;
+    backface-visibility: hidden;
+    -webkit-perspective: 1000;
+    -webkit-backface-visibility: hidden;
 }
 
 .fortune-wheel::before {
