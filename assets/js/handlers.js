@@ -403,7 +403,7 @@ DOM.on("click", "item", {
             ProgressBar.end();
         });
     },
-    sell: function() {
+    sell: function () {
         var weapon = $(this).parent().parent().parent();
         var weapon_id = weapon.data("id");
         var weapon_price = alter_by_currency(weapon.find(".sorted-skins__cost").html(), false);

@@ -426,7 +426,7 @@ class features_wheel {
 
     init() {
         this.__init();
-        this.stop_wheel();
+        //this.stop_wheel();
         // Multipling
         this.multiple(this.data.multiplier);
         this.count(12);
@@ -452,13 +452,11 @@ class features_wheel {
     }
 
     stop_wheel() {
-        $(".fortune__circle").each((i, e) => {
-            var startPosition = this.getRotationDegrees($(e));
-            DOM.listen(e, () => {
-                this.getRotationDegrees($(e));
-                $(e).css("animation");
-            });
-            $(e).css({ animation: "unset", transform: `rotate(${startPosition}deg)` });
+        var circle = $(".fortune__circle");
+        var startPosition = this.getRotationDegrees(circle);
+        circle.css({
+            animation: "unset",
+            transform: `rotate(${startPosition}deg)`,
         });
     }
 
@@ -468,11 +466,15 @@ class features_wheel {
         var degrees = (this.data.spins * 360) - this.getRotationDegrees(block) + random;
         var circle = block.parent();
 
-        if (reverse) {
-            //circle.css({ transform: `rotate(-${degrees + 60}deg)` });
-        } else {
-            //circle.css({ transform: `rotate(${degrees}deg)` });
-        }
+        this.stop_wheel();
+
+        anime({
+            targets: circle.get(),
+            rotate: (reverse ? "-" : "+") + degrees + "deg",
+            easing: 'cubicBezier(.1, 0, 0, 1)',
+            duration: 16000,
+            complete: this.promise.resolve,
+        });
 
         return block;
     }
@@ -495,10 +497,9 @@ class features_wheel {
         // Fix a wheel position
         //this.stop_wheel();
         // Variables
-        var skin = this.spinTo(8, atWheel),
+        var skin = this.spinTo(8, atWheel, false, true),
             wheel = skin.parent().parent(),
-            timeout = fast ? 0 : 3000,
-            type = fast ? "fast" : "slow";
+            timeout = fast ? 0 : 3000;
         setTimeout(() => {
             // Skin
             ItemsController.CreateItem({ icons: false });
@@ -525,14 +526,6 @@ class features_wheel {
             // Setting Inner Price
             FortuneWheelController.SetInnerPrice(id, item.item.price);
         });
-        //$(".fortune__circle").each(function () {
-            anime({
-                targets: ".fortune__circle",
-                rotate: '1280deg',
-                easing: 'cubicBezier(.1, 0, 0, 1)',
-                duration: 16000,
-            });
-        //});
         // Wheel Promise
         if (fast) this.promise.resolve();
         var timeout = setTimeout(() => this.promise.resolve(), this.data.duration);
@@ -545,11 +538,12 @@ class features_wheel {
             $(".fortune__circle, .fortune-wheel__inner, .fortune-wheel__curve-1, .fortune-wheel__curve-2").toggleClass("hidden");
             $(".fortune-wheel").addClass("fortune-wheel--final");
             if (this.data.only) {
-                $(".fortune-wheel__buttons").parent().not(".hidden").scrollTo();
+                //$(".fortune-wheel__buttons").parent().not(".hidden").scrollTo();
             } else {
                 this.box_view(1);
-                $(".fortune-wheel__buttons1").scrollTo();
+                //$(".fortune-wheel__buttons1").scrollTo();
             }
+            //$(".fortune-wheel__buttons").parent().not(".hidden").scrollTo();
             // Remove box--no-indent Class
             $(".box").removeClass("box--no-indent");
         });
@@ -1445,7 +1439,8 @@ class FortuneWheelController {
 
     static BattleInit() {
         page.wheel.__init();
-        page.wheel.stop_wheel();
+        ProgressBar.start();
+        //page.wheel.stop_wheel();
     }
 
     static BattleCry(data = {}, wheelWinnerId = 0) {
@@ -1464,16 +1459,17 @@ class FortuneWheelController {
                 ItemsController.ReplaceWithItemContent(skin);
             }, timeout);
             // Extra
-            setTimeout(() => {
-                ProgressBar.start();
-            }, 500);
+            ProgressBar.end();
         });
-        var timeout = setTimeout(page.wheel.promise.resolve, page.wheel.data.duration);
+
         page.wheel.promise.then(function () {
-            clearTimeout(timeout);
             $(".battle").addClass("battle__over--" + wheelWinnerId);
             $(".fortune-wheel__skin").removeClass("hidden");
             $(".battle__buttons").removeClass("hidden");
+            if (page.mobile.if) {
+                $(".fortune__circle, .fortune-wheel__curve-1, .fortune-wheel__curve-2").addClass("hidden");
+                $(".fortune-wheel").addClass("fortune-wheel--final");
+            }
         });
     }
 }

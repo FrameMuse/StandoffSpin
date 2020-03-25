@@ -556,38 +556,50 @@ a.ghost {
 
 /* Scoial Networks */
 
-.social-row {
-    display: flex;
-    align-items: center;
+.social-group {
     font-size: 0.85em;
     z-index: 1;
 }
 
-.social-row__title {
+.social-group--row {
+    display: flex;
+    align-items: center;
+}
+
+.social-group--col {
+    display: grid;
+    row-gap: 0.5em;
+}
+
+.social-group__inner {
+    display: inline-flex;
+}
+
+.social-group__title {
     font-size: 1em;
     font-weight: 600;
     font-style: italic;
     text-transform: uppercase;
 }
 
-.social-row__icon {
+.social-group__icon {
     padding: 0.65em 0.75em;
     margin-left: 1em;
     border-radius: 0.25em;
 }
 
-.social-row__icon::before {
+.social-group__icon::before {
     background: rgba(255, 255, 255, 0.04);
 }
 
-.social-row__icon--icon {
+.social-group__icon--icon {
     width: 1em;
     height: 1em;
     filter: contrast(0.1) opacity(0.5);
     transition: .125s ease filter;
 }
 
-.social-row__icon:hover .social-row__icon--icon {
+.social-group__icon:hover .social-group__icon--icon {
     filter: contrast(1) opacity(1);
 }
 
@@ -689,31 +701,19 @@ a.ghost {
 
 .weapon-skins-owner {
     position: absolute;
-    display: grid;
+    display: flex;
     align-items: center;
     justify-content: center;
     padding: 1em;
-    background: rgba(0, 0, 0, 0.5);
+    background: rgba(0, 0, 0, 0.4);
     width: 100%;
     height: 100%;
-    font-size: 0.45em;
     opacity: 0;
     transition: 0.175s opacity 0s;
     z-index: 3;
 }
 
-.weapon-skins__quality--blue+.weapon-skins-owner {
-    background: rgba(1, 84, 198, 0.425);
-}
-
-.live-drops .weapon-skins__weapon:hover .weapon-skins__image {
-    /* transform: rotateY(-90deg); */
-    transition-delay: 0s;
-}
-
 .live-drops .weapon-skins__weapon:hover .weapon-skins-owner {
-    /* transform: rotateY(0deg); */
-    /* transition-delay: 0.225s; */
     opacity: 1;
 }
 
@@ -721,10 +721,12 @@ a.ghost {
     width: 5em;
     height: 5em;
     object-fit: contain;
+    opacity: 0.75;
 }
 
 .weapon-skins-owner__name {
-    font-size: 1.25em;
+    position: absolute;
+    font-size: 0.85em;
     text-align: center;
 }
 
@@ -1152,8 +1154,7 @@ article {
     backface-visibility: hidden;
     border-radius: 100%;
     overflow: hidden;
-    transition: 16s cubic-bezier(.1, 0, 0, 1) transform;
-    animation: 100s spinning infinite;
+    animation: 100s spinning linear infinite;
 }
 
 .fortune__circle--stop {
@@ -1170,6 +1171,7 @@ article {
     width: calc(var(--wheel-item-size) * 1.4);
     height: var(--wheel-item-size);
     background: transparent;
+    backface-visibility: hidden;
 }
 
 .fortune__item::before {
@@ -2878,11 +2880,11 @@ span.contract-window__bill--numeric {
 .goal__counter {
     position: absolute;
     display: inline-flex;
-    top: -0.775em;
+    top: -0.6em;
     left: calc((100%)/4.5 - 25px);
     margin-left: -2em;
-    width: 2.25em;
-    padding: 0.225em;
+    width: 2em;
+    padding: 0.1em;
     background: #18191b;
     border: 0.1em solid #88cc31;
     border-radius: 10em;
@@ -3840,7 +3842,7 @@ footer {
     font-size: 0.875em;
 }
 
-.bottombar .social-row {
+.bottombar .social-group {
     flex: unset;
 }
 

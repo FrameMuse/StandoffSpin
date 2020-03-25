@@ -140,8 +140,12 @@ a.ghost {
     z-index: 12;
 }
 
-.hidden, [hidden] {
+.hidden {
     display: none !important;
+}
+
+[hidden] {
+    visibility: hidden;
 }
 
 .marked {
@@ -1049,17 +1053,9 @@ article {
     margin: auto;
     will-change: transform;
     border-radius: 100%;
-    /*transition: 16s cubic-bezier(.1, 0, 0, 1) transform;*/
+    backface-visibility: hidden;
     animation: 100s linear spinning infinite;
     overflow: hidden;
-}
-
-div {
-    -webkit-tap-highlight-color: rgba(255, 255, 255, 0);
-}
-
-body {
-    transform: translate3d(0, 0, 0);
 }
 
 .fortune__circle--stop {
@@ -1076,10 +1072,8 @@ body {
     width: calc(var(--wheel-item-size) * 1.4);
     height: var(--wheel-item-size);
     background: transparent;
-    border-top: 0.75em solid var(--color);
     backface-visibility: hidden;
-    -webkit-perspective: 1000;
-    -webkit-backface-visibility: hidden;
+    z-index: 3;
 }
 
 .fortune__item::before {
@@ -1087,7 +1081,6 @@ body {
     border-top: var(--wheel-item-size) solid rgba(255, 255, 255, 0.025);
     border-left: var(--wheel-item-skew) solid transparent;
     border-right: var(--wheel-item-skew) solid transparent;
-    /* border-radius: 100% 141% 26% 41% / 25% 188% 1% 9%; */
     position: absolute;
     top: 0;
     left: 0;
@@ -1095,22 +1088,6 @@ body {
     z-index: -1;
 }
 
-/*
-.fortune__item::after {
-    content: '';
-    border-top: 0.625em solid #84c430;
-    border-left: var(--wheel-underline-width) solid transparent;
-    border-right: var(--wheel-underline-width) solid transparent;
-    position: absolute;
-    left: 18%;
-    right: 0;
-    bottom: 0;
-    width: 64%;
-    z-index: -1;
-}
-*/
-
-/*
 .fortune__item::after {
     content: '';
     position: absolute;
@@ -1118,9 +1095,7 @@ body {
     width: 62%;
     border-top: 3em solid var(--color);
     border-radius: 50% 50% 0 0/100% 100% 0 0;
-    /*box-shadow: 0 0 10px -4px var(--color);
 }
-*/
 
 .fortune__item>* {
     font-size: 1.75em !important;
@@ -1169,11 +1144,11 @@ body {
 
 .fortune-wheel__curve-2 {
     position: absolute;
-    top: calc(50% - 1em);
-    left: calc(50% - (54.5em + 8em) / 2);
-    width: calc(54.5em + 8em);
-    height: calc(54.5em + 8em);
-    background: url(../img/wheel_curves_2.png) no-repeat center/cover;
+    top: calc(50% - 4.175em);
+    left: calc(50% - (54.5em + 17em) / 2);
+    width: calc(54.5em + 17em);
+    height: calc(54.5em + 17em);
+    background: url(../img/wheel_curves_2.png) no-repeat center/98%, #18191b;
     border-radius: 100%;
     z-index: 1;
 }
@@ -1194,7 +1169,7 @@ body {
 }
 
 .fortune-wheel--final::after, .fortune-wheel--final::before {
-    content: unset;
+    content: unset !important;
 }
 
 .fortune-wheel__inner {
@@ -1390,10 +1365,12 @@ body {
 }
 
 .sorted-skins__skin-title--0, .sorted-skins__skin-title--1 {
-    font-size: 1em;
+    max-width: 9em;
     font-weight: 600;
     font-style: italic;
     text-transform: uppercase;
+    text-overflow: ellipsis;
+    overflow: hidden;
 }
 
 .sorted-skins__marks {
@@ -3117,6 +3094,49 @@ span.contract-window__bill--numeric {
     margin-bottom: -9em;
 }
 
+.battle::before, .battle::after {
+    position: absolute;
+    top: 8em;
+    bottom: 0;
+    width: 5em;
+    height: 35%;
+    border-radius: 100%;
+    box-shadow: 0 0 7.5em 5em #88cc31;
+}
+
+.battle__over--0::before {
+    content: "";
+    left: 14em;
+}
+
+.battle__over--0::after {
+    content: "";
+    right: 14em;
+    box-shadow: 0 0 7.5em 5em #ff3648;
+}
+
+.battle__over--1::before {
+    content: "";
+    right: 14em;
+}
+
+.battle__over--1::after {
+    content: "";
+    left: 14em;
+    box-shadow: 0 0 7.5em 5em #ff3648;
+}
+
+.battle__over--2::before, .battle__over--2::after {
+    content: "";
+    left: 14em;
+    box-shadow: 0 0 7.5em 5em #fcff3f;
+}
+
+.battle__over--2::after {
+    left: unset;
+    right: 14em;
+}
+
 .fortune-wheel--left, .fortune-wheel--right {
     margin: unset;
     height: 121em;
@@ -3164,6 +3184,7 @@ span.contract-window__bill--numeric {
     display: grid;
     row-gap: 2em;
     font-size: 1.75em;
+    margin-top: auto;
 }
 
 .fortune-wheel__inner--2 {
@@ -3172,7 +3193,9 @@ span.contract-window__bill--numeric {
     height: 37.5%;
     left: calc(50% + 22em);
     display: flex;
-    justify-content: space-between;
+    flex-direction: column-reverse;
+    align-items: center;
+    justify-content: flex-end;
     font-size: 1.5em;
     z-index: 2;
 }
