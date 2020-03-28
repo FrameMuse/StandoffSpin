@@ -274,6 +274,12 @@ a.ghost {
     background-image: url(https://standoffcasetest.ru/assets/img/icons/youtube.png);
 }
 
+.icon__funnel {
+    background-image: url("/assets/img/icons/funnel_4.svg");
+    width: 1.25em;
+    height: 1.25em;
+}
+
 /* Topbar */
 
 .topbar {
@@ -718,8 +724,8 @@ a.ghost {
 }
 
 .weapon-skins-owner__case-image {
-    width: 5em;
-    height: 5em;
+    width: 3em;
+    height: 3em;
     object-fit: contain;
     opacity: 0.75;
 }
@@ -955,8 +961,8 @@ main {
 .page-part__icon {
     background-image: url("../img/lumen.png");
     width: 16em;
-    height: 1.5em;
-    margin: 0 auto;
+    height: 0.5em;
+    margin: 0.5em auto 0;
 }
 
 article {
@@ -2114,6 +2120,10 @@ b {
     cursor: pointer;
 }
 
+.tab-swithcer__button--stable {
+    padding: 1em;
+}
+
 .tab-swithcer__button--active::before, .tab-swithcer__button--active {
     background: rgba(255, 255, 255, 0.15);
 }
@@ -2808,10 +2818,16 @@ span.contract-window__bill--numeric {
     padding: 1.5em;
     margin: 1.5em 0;
     border-radius: 0.125em;
+    cursor: pointer;
 }
 
 .goal__image::before {
-    background: rgba(30, 31, 33, 1);
+    background: #1e1f21;
+    transition: 0.125s linear background-color;
+}
+
+.goal__image:hover::before {
+    background: #313336;
 }
 
 .goal__reached+.goal__image::before {
@@ -2833,7 +2849,6 @@ span.contract-window__bill--numeric {
     line-height: 1.25;
     text-transform: uppercase;
     right: 0.5em;
-    max-width: 10em;
     margin: 0 auto;
 }
 
@@ -2882,12 +2897,16 @@ span.contract-window__bill--numeric {
     display: inline-flex;
     top: -0.6em;
     left: calc((100%)/4.5 - 25px);
-    margin-left: -2em;
+    padding: 0.25em;
+    margin-left: -2.25em;
     width: 2em;
-    padding: 0.1em;
+    border-radius: 0.1em;
+    z-index: 3;
+}
+
+.goal__counter::before {
     background: #18191b;
     border: 0.1em solid #88cc31;
-    border-radius: 10em;
 }
 
 .goal__counter--amount {
@@ -2932,9 +2951,7 @@ span.contract-window__bill--numeric {
     object-fit: cover;
 }
 
-.skewed-row__row::before {
-    left: unset;
-    right: -1em;
+.skewed-row__row--line::before {
     width: 0.125em;
     background: linear-gradient(to bottom, transparent, rgba(255, 255, 255, 0.25), transparent);
 }
@@ -2946,7 +2963,9 @@ span.contract-window__bill--numeric {
 /* Invites Row & Feeder & Bonuses */
 
 .invites-row {
-    display: flex;
+    display: grid;
+    column-gap: 2.5em;
+    grid-template-columns: repeat(2, 1fr);
     margin-top: 5em;
 }
 
@@ -2966,10 +2985,6 @@ span.contract-window__bill--numeric {
     padding: 2em;
     background: rgba(34, 35, 38, 0.5);
     border-radius: 0.125em;
-}
-
-.feeder--filled:first-child {
-    margin-right: 2.5em;
 }
 
 .feeder__title {

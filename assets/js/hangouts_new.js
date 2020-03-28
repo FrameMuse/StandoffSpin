@@ -170,6 +170,7 @@ class ProgressBar {
     static start() {
         $(".load-indicator").css({ opacity: 1 });
         $(".load-indicator__fill").css({ width: 15 + "%" });
+        $("body, button, input, a").css({ cursor: "wait" });
     }
 
     static end() {
@@ -177,6 +178,7 @@ class ProgressBar {
         setTimeout(() => {
             $(".load-indicator__fill").css({ width: "" });
             $(".load-indicator").css({ opacity: 0 });
+            $("body, button, input, a").css({ cursor: "" });
         }, 350);
     }
 }
@@ -528,10 +530,8 @@ class features_wheel {
         });
         // Wheel Promise
         if (fast) this.promise.resolve();
-        var timeout = setTimeout(() => this.promise.resolve(), this.data.duration);
         // Aftermaths
         if (!overideThen) this.promise.then(() => {
-            clearTimeout(timeout);
             DOM.update("wheel", {
                 "all-prices": alter_by_currency(this.sum, true)
             });
@@ -1062,23 +1062,27 @@ class features_paging {
         this.refresh();
         // Extending History API
         window.onpopstate = (event) => {
-            console.log(event);
-            
+            this.__load(event.state.href, event.state.data);
         }
     }
 
     load(url, hashAction = false) {
-        var url = hashAction ? url + "#!" + hashAction : url;
         ProgressBar.start();
         this.dynamic_request(url, (result) => {
             // Histoty Push
             if (history.state == null) {
-                history.replaceState({ href: url, first: true, data: result }, "", url);
+                history.replaceState({ href: url, data: result }, "", url);
             } else {
                 history.pushState({ href: url, data: result }, "", url);
             }
-            this.final(result, url);
+            this.final(result, hashAction ? url + "#!" + hashAction : url);
         });
+        return this.pageLoading;
+    }
+
+    __load(url, result) {
+        ProgressBar.start();
+        this.final(result, url);
         return this.pageLoading;
     }
 
@@ -1164,7 +1168,7 @@ class features_paging {
     }
 
     clear_hash() {
-        window.history.replaceState("", "", window.location.href.split('#')[0]);
+        history.replaceState(history.state, "", window.location.href.split('#')[0]);
     }
 
     notify(signal, message) {
@@ -1327,14 +1331,14 @@ class ItemsController extends STNDFItems {
     }
 
     static ModifyItemByData(data = {}) {
-        const params = this.parseData(data, { item_id: data.id });
-        this.items.last(function ($this) {
-            $this.attr({ "data-id": params.item_id });
-            $this.find(".sorted-skins__cost").html(alter_by_currency(params.price, true));
-            $this.find(".sorted-skins__skin-title--0").html(params.name);
-            $this.find(".sorted-skins__skin-title--1").html(params.subname);
-            $this.find(".weapon-skins__image:only-child").attr({ src: "/img/" + params.image });
-            $this.addClass("sorted-skins__unit--" + params.class_name);
+        const params = this.parseData(data, { item_id: data.id, status: data.status });
+        this.items.last(function () {
+            this.attr({ "data-id": params.item_id });
+            this.find(".sorted-skins__cost").html(alter_by_currency(params.price, true));
+            this.find(".sorted-skins__skin-title--0").html(params.name);
+            this.find(".sorted-skins__skin-title--1").html(params.subname);
+            this.find(".weapon-skins__image:only-child").attr({ src: "/img/" + params.image });
+            this.addClass("sorted-skins__unit--" + params.class_name);
         });
     }
 
@@ -1522,8 +1526,49 @@ class ServiceController {
     }
 }
 
-class asd {
+class cache {
 
+}
+
+class filter {
+    constructor(object) {
+        filter.ElementsArray = $(object).get();
+        filter.obj = $(object).find(">");
+        filter.ExclusionMap = {
+            name: function () { },
+            price: function () { },
+        };
+    }
+    
+    static exclude(params = false) {
+        if (params) {
+            var ExclusionMap = this.ExclusionMap;
+            if (params.name != undefined) ExclusionMap.name = this.Exclusion__name;
+            if (params.price != undefined) ExclusionMap.price = this.Exclusion__price;
+            $(this.obj).each(function () {
+                try {
+                    for (const key in ExclusionMap) ExclusionMap[key](this, params);
+                } catch (error) {}
+            });
+        }
+    }
+
+    static Exclusion__name(context, params) {
+        var names = [
+            $(context).find(".sorted-skins__skin-title--0").html(),
+            $(context).find(".sorted-skins__skin-title--1").html(),
+        ];
+        if (names.toString().multiReplace([",", " "], "").toLowerCase() == params.name.multiReplace([" "], "").toLowerCase()) {
+            $(context).addClass("hidden");
+        }
+    }
+
+    static Exclusion__price(context, params) {
+        var price = alter_by_currency($(context).find(".sorted-skins__cost").html(), false);
+        if ((price < params.price.min || price > params.price.max)) {
+            $(context).addClass("hidden");
+        }
+    }
 }
 
 // Functions

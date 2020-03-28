@@ -159,6 +159,12 @@ page.support.context(function () {
             },
         },
     });
+    this.__addPage({
+        page: "/lobby",
+        action: function () {
+            $(".page-part").scrollTo(null);
+        },
+    });
     // Mobile Pages
     this.__addPage({
         page: "/profile",
@@ -611,6 +617,49 @@ DOM.on("click", "level", {
                 }, 500);
             }
         });
+    },
+});
+
+DOM.on("click", "filter", {
+    button: function () {
+        var current = $(".tab-swithcer__button--active");
+        new filter(".js-tab-" + current.attr("tab")), 
+        filter.exclude({
+            price: {
+                min: 25,
+                max: 9999,
+            },
+        });
+    },
+});
+
+DOM.on("click", "referal", {
+    save: function () {
+        var promo = DOM.$("referal", "me_gap").val();
+        api.post("/referal/save", { code: promo }, () => {
+            page.support.notify("success", "Заебок")
+        });
+    },
+    activate: function () {
+        var promo = DOM.$("referal", "your_gap").val();
+        api.post("/referal/active", { code: promo }, () => {
+            $(this).attr({ disabled: "" });
+            page.support.notify("success", "Заебок")
+        });
+    },
+    copyMe: function () {
+        var id = $(this).attr("for");
+        var target = $("#" + id);
+        
+        if (target.is("[disabled]")) {
+            target.removeAttr("disabled");
+            target[0].select();
+            document.execCommand('copy');
+            target.attr({ disabled: "" });
+        } else {
+            target[0].select();
+            document.execCommand('copy');
+        }
     },
 });
 

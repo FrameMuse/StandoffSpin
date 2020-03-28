@@ -258,6 +258,12 @@ a.ghost {
     background-image: url(https://standoffcasetest.ru/assets/img/icons/youtube.png);
 }
 
+.icon__funnel {
+    background-image: url("/assets/img/icons/funnel_4.svg");
+    width: 1.25em;
+    height: 1.25em;
+}
+
 /* Topbar */
 
 .topbar {
@@ -1371,6 +1377,7 @@ article {
     text-transform: uppercase;
     text-overflow: ellipsis;
     overflow: hidden;
+    white-space: nowrap;
 }
 
 .sorted-skins__marks {
@@ -1979,6 +1986,10 @@ b {
     font-weight: 500;
     text-transform: uppercase;
     cursor: pointer;
+}
+
+.tab-swithcer__button--stable {
+    padding: 1em;
 }
 
 .tab-swithcer__button--active {
