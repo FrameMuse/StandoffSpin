@@ -49,7 +49,8 @@ Array.prototype.last = function (argument1) {
     if (this == null) return;
     switch (typeof argument1) {
         case "function":
-            argument1(this[this.length - 1]);
+            const $this = this[this.length - 1];
+            argument1.apply($this, [$this]);
             return this[this.length - 1];
             break;
         default:
@@ -85,13 +86,17 @@ $.Postpone = function () {
         $resolve = resolve;
         $reject = reject;
     });
+    this.state = "pending";
 
     return {
         promise: this.promise,
         resolve: $resolve,
         reject: $reject,
         then: ($then) => {
-            this.promise.then($then);
+            this.promise.then((r) => { this.state = "resolved"; $then(r); }, () => { this.state = "rejected" });
+        },
+        status: () => {
+            return this.state;
         },
     };
 };
@@ -292,6 +297,18 @@ const DOM = new class {
         var origin = ".js-" + prefix + "-";
         for (const key in handlers) {
             $(document).on(event, origin + key, handlers[key]);
+        }
+    }
+
+    click(prefix = [], handler = () => {}) {
+        switch (typeof prefix) {
+            case "array":
+                this.on("click", prefix[0], {}[prefix[1]] = handler);
+                break;
+        
+            default:
+                $(document).on("click", prefix, handler);
+                break;
         }
     }
 
@@ -883,6 +900,7 @@ class features_contract {
                 page.support.notify("warning", msg);
             }
         }
+        this.promise = $.Postpone();
     }
 
     init() {
@@ -1178,12 +1196,14 @@ class features_paging {
             success: 100,
         };
 
-        $(".notifier")
-            .animate({ bottom: "0%", }, 350)
-            .delay(10000).animate({ bottom: "-15%", }, 350);
+        $(".notifier").animate({ bottom: "2em", }, 350);
         $(".notifier__message").html(message);
         $(".notifier__signal").css({
             background: "hsl(" + singals[signal] + ", 50%, 40%)",
+        }).animate({
+            width: "100%",
+        }, 5000, "linear", function () {
+            $(".notifier").animate({ bottom: "-5em", }, 350, () => $(this).css({ width: "" }));
         });
     }
 
@@ -1281,8 +1301,8 @@ const page = new class {
 }
 
 class STNDFItems {
-    static Sell(weapon_id, callback) {
-        api.post("/item/sell", { id: weapon_id }, callback);
+    static Sell(argument1, callback) {
+        api.post("/item/sell", { id: typeof argument1 == "number" ? argument1 : +$(argument1).attr("weapon-id") }, callback);
     }
 
     static sellAll() {
@@ -1302,6 +1322,16 @@ class STNDFItems {
 
     static Callback(result) {
         page.support.notify("success", "Операция Выполнена");
+    }
+
+    static StatusMap(status) {
+        return {
+            NOTHING: "",
+            CONTRACT: `<div class="sorted-skins__icon sorted-skins__icon--blue skewed-element"><span class="sorted-skins__icon--contract"></span></div>`,
+            SELL: `<div class="sorted-skins__icon sorted-skins__icon--orange skewed-element"><span class="sorted-skins__icon--dollar"></span></div>`,
+            WITHDRAW: `<div class="sorted-skins__icon sorted-skins__icon--green skewed-element"><span class="sorted-skins__icon--arrow"></span></div>`,
+            WAITING: `<div class="sorted-skins__icon sorted-skins__icon--green skewed-element"><span class="sorted-skins__icon--refresh"></span></div>`,
+        }[status];
     }
 }
 
@@ -1332,6 +1362,7 @@ class ItemsController extends STNDFItems {
 
     static ModifyItemByData(data = {}) {
         const params = this.parseData(data, { item_id: data.id, status: data.status });
+        const StatusMap = this.StatusMap;
         this.items.last(function () {
             this.attr({ "data-id": params.item_id });
             this.find(".sorted-skins__cost").html(alter_by_currency(params.price, true));
@@ -1339,6 +1370,10 @@ class ItemsController extends STNDFItems {
             this.find(".sorted-skins__skin-title--1").html(params.subname);
             this.find(".weapon-skins__image:only-child").attr({ src: "/img/" + params.image });
             this.addClass("sorted-skins__unit--" + params.class_name);
+            // ---------------------------------------------------------------------------
+            if (params.status != "NOTHING") {
+                $(this).find(".sorted-skins__icons").empty().append(StatusMap(params.status));
+            }
         });
     }
 

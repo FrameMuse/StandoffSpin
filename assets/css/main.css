@@ -613,8 +613,6 @@ a.ghost {
 
 .weapon-skins {
     display: flex;
-    overflow-y: visible;
-    perspective: 1000px, 1em;
 }
 
 .weapon-skins__weapon {
@@ -686,11 +684,14 @@ a.ghost {
 
 .live-drops {
     display: flex;
-    max-width: 1320px;
-    max-width: 100%;
+    width: 100%;
+    height: 3.175em;
     margin: 2em auto 0;
     font-size: 1.25em;
-    overflow: hidden;
+}
+
+.live-drops__inner {
+    position: absolute;
 }
 
 .live-drops .weapon-skins__weapon {
@@ -707,33 +708,53 @@ a.ghost {
 
 .weapon-skins-owner {
     position: absolute;
-    display: flex;
-    align-items: center;
+    top: 150%;
+    display: grid;
     justify-content: center;
     padding: 1em;
-    background: rgba(0, 0, 0, 0.4);
+    background: hsl(200, 5%, 15%);
+    border: 0.2em solid hsl(200, 5%, 20%);
+    /*border-bottom-color: var(--color);*/
+    border-radius: 0.25em;
     width: 100%;
-    height: 100%;
     opacity: 0;
-    transition: 0.175s opacity 0s;
+    transform: scale(0);
+    transition: 0.175s opacity, 0.175s top, 0s transform 0.175s;
     z-index: 3;
+}
+
+.weapon-skins-owner::before {
+    content: '';
+    position: absolute;
+    top: -1em;
+    left: calc(50% - 1em);
+    width: 0;
+    height: 0;
+    border-left: 1em solid transparent!important;
+    border-right: 1em solid transparent!important;
+    border-bottom: 1em solid;
+    border-bottom-color: hsl(200, 5%, 15%);
 }
 
 .live-drops .weapon-skins__weapon:hover .weapon-skins-owner {
     opacity: 1;
+    top: calc(100% + 1.25em);
+    transform: scale(1);
+    transition-delay: 0s;
 }
 
 .weapon-skins-owner__case-image {
     width: 3em;
     height: 3em;
     object-fit: contain;
-    opacity: 0.75;
+    margin-bottom: 0.25em;
 }
 
 .weapon-skins-owner__name {
-    position: absolute;
-    font-size: 0.85em;
+    font-size: 0.75em;
+    font-weight: 600;
     text-align: center;
+    text-transform: uppercase;
 }
 
 .live-drops::before, .live-drops::after {
@@ -1544,16 +1565,13 @@ article {
 .sorted-skins__icons {
     display: flex;
     align-items: center;
-    /*justify-content: flex-end;*/
-    /*flex: 1;*/
     cursor: pointer;
 }
 
 .sorted-skins__icon {
-    padding: 0.6em 0.75em;
+    padding: 0.35em;
     margin-left: 0.25em;
     border-radius: 0.125em;
-    font-size: 0.85em;
     z-index: 1;
 }
 
@@ -1565,18 +1583,36 @@ article {
     background: #ffc500;
 }
 
+.sorted-skins__icon--blue::before {
+    background: #1f98ff;
+}
+
 .sorted-skins__icon--arrow {
     background-image: url("../img/icons/arrow.png");
-    width: 0.85em;
-    height: 0.85em;
-    z-index: 2;
+    background-size: 0.75em;
+    width: 1em;
+    height: 1em;
 }
 
 .sorted-skins__icon--dollar {
     background-image: url("../img/icons/dollar.png");
-    width: 0.85em;
-    height: 0.85em;
-    z-index: 2;
+    background-size: 0.6em;
+    width: 1em;
+    height: 1em;
+}
+
+.sorted-skins__icon--contract {
+    background-image: url(../img/icons/contract.svg);
+    background-size: 1em;
+    width: 1em;
+    height: 1em;
+}
+
+.sorted-skins__icon--refresh {
+    background-image: url(../img/icons/refresh.svg);
+    background-size: 1em;
+    width: 1em;
+    height: 1em;
 }
 
 .sorted-skins__empty {
@@ -2426,7 +2462,7 @@ input.promocode__input:focus::placeholder {
 
 .contract {
     display: grid;
-    justify-content: center;
+    justify-items: center;
     margin: 5em 0;
 }
 
@@ -3167,21 +3203,28 @@ span.contract-window__bill--numeric {
 
 .notifier {
     position: fixed;
-    left: 5%;
-    bottom: -15%;
+    left: calc(50vw - 41.5em);
+    bottom: -5em;
     display: grid;
-    padding: 1em 1.5em;
-    background: rgba(50, 50, 50, 1);
-    box-shadow: 0 0 15px -5px black;
-    border-radius: 0.12em;
+    padding: 1.25em 1.75em;
+    background: #27282c;
+    box-shadow: 0 0 1em -0.5em black;
+    border-radius: 0.25em;
     z-index: 6;
+}
+
+.notifier__message {
+    font-size: 1em;
+    font-weight: 500;
+    font-style: italic;
 }
 
 .notifier__signal {
     position: absolute;
     bottom: 0;
-    width: 100%;
+    width: 0%;
     height: 0.15em;
+    border-radius: 0 0 0.25em 0.25em;
 }
 
 /* Dev Notifier */
@@ -3313,7 +3356,7 @@ span.contract-window__bill--numeric {
 }
 
 .fortune-wheel--right .fortune__circle {
-    animation: 100s spinning-reverse infinite;
+    animation: 100s spinning-reverse linear infinite;
 }
 
 .fortune-wheel-user {
@@ -3721,7 +3764,7 @@ span.contract-window__bill--numeric {
 }
 
 .user-level-block__circle--action::before {
-    content: "Забрать приз";
+    content: "Получить приз";
     position: absolute;
     font-size: 1em;
     font-weight: 800;

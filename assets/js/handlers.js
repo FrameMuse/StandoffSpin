@@ -69,6 +69,7 @@ DOM.listen(page.support.fickle, type => {
                 if ((result.owner_id == ServiceController.userId || result.rival_id == ServiceController.userId) && result.battle_id == ServiceController.battle_id || true) {
                     FortuneWheelController.BattleInit();
                     FortuneWheelController.BattleCry(result.itemList, result.wheelWinnerId);
+                    page.support.actionOnLoaded["battle_hide_all"]();
                     $(".fortune-wheel--right .fortune-wheel-user__image").attr({ src: result.user.photo });
                     $(".fortune-wheel--right .fortune-wheel-user__nickname").html(result.user.first_name + " " + result.user.last_name);
                 }
@@ -150,7 +151,6 @@ page.support.context(function () {
             };
             page.wheel.__init();
             page.wheel.box_input_change($(".box__input[data-id='0']"));
-            $(".fortune-wheel").scrollTo(null);
             $(".box__column--1[data-time]").timer();
         },
         errors: {
@@ -162,7 +162,7 @@ page.support.context(function () {
     this.__addPage({
         page: "/lobby",
         action: function () {
-            $(".page-part").scrollTo(null);
+            $(".page-part").scrollTo();
         },
     });
     // Mobile Pages
@@ -178,6 +178,7 @@ page.support.context(function () {
         device: "mobile",
         action: function () {
             $("[class *= 'battle__button']").removeClass("skewed-element");
+            $(".page-part").scrollTo();
         },
     });
     this.__addPage({
@@ -192,8 +193,7 @@ page.support.context(function () {
 page.support.addPage("/battle", () => {
     page.wheel.__init();
     if ($(".battle").data("status") == "END") {
-        $(".fortune-wheel__skin").removeClass("hidden");
-        $(".battle__buttons").removeClass("hidden");
+        $(".fortune-wheel__skin, .battle__buttons").removeClass("hidden");
     }
 });
 
@@ -233,8 +233,11 @@ page.support.actionOnLoaded["go_home"] = async function () {
 };
 
 page.support.actionOnLoaded["battle_hide_all"] = function () {
-    $(".fortune-wheel__skin").addClass("hidden");
-    $(".battle__buttons").addClass("hidden");
+    $(".fortune-wheel__skin, .battle__buttons").addClass("hidden");
+};
+
+page.support.actionOnLoaded["to_wheel"] = function () {
+    $(".fortune-wheel").scrollTo(null);
 };
 
 // Wheel Opencase
@@ -450,6 +453,10 @@ $(document).on("click", ".tab-swithcer__button--only[tab]", function () {
     $("[class *= 'js-tab-']").toggleClass("hidden");
 });
 
+DOM.click(".tab-swithcer__button--active[onreclick]", function () {
+    eval($(this).attr("onreclick"));
+});
+
 $(document).on("click", ".sorted-skins-more-button", function () {
     var item = $(this).parent();
     var sorted = item.attr("class");
@@ -522,28 +529,29 @@ $(document).on("click", ".contract-window__button", function () {
     // API Connection
     api.post("/contract/create", {
         items: items
-    }, function (result) {
+    }, async function (result) {
         var gap = {
             0: result.item.name + " | " + result.item.subname,
             1: result.item.price + " Р",
         }
         // Fill the gaps
-        $(".contract-result__input").each(function (i, e) {
-            $(e).val(gap[i]);
-        });
-        // Close popup
-        setTimeout(() => {
-            // Hidding Contract Disposal
-            $(".contract__disposal, .contract__flex, .contract__caution").addClass("hidden");
-            // Closing Popup Window
-            page.popup.close();
-            // Creating Item
-            ItemsController.CreateItem();
-            ItemsController.ModifyItemByData(result);
-            ItemsController.AppendItemTo($(".contract"));
-        }, 750);
+        $(".contract-result__input").each((i, e) => $(e).val(gap[i]));
+        // Resolve the promise
+        page.contract.promise.resolve();
         // Progress
         ProgressBar.end();
+        await page.popup.closed.promise;
+        // Hidding Contract Disposal
+        $(".contract__disposal, .contract__flex, .contract__caution").addClass("hidden");
+        $(".fortune-wheel__buttons").removeClass("hidden");
+        $(".fortune-wheel__button--1").attr({ "weapon-id": result.item.id });
+            DOM.$("contract", "item_price").html(alter_by_currency(result.item.price, true));
+        // Closing Popup Window
+        page.popup.close();
+        // Creating Item
+        ItemsController.CreateItem();
+        ItemsController.ModifyItemByData(result);
+        ItemsController.PrependItemTo($(".contract"));
     });
 });
 
@@ -620,6 +628,8 @@ DOM.on("click", "level", {
     },
 });
 
+// Filter
+
 DOM.on("click", "filter", {
     button: function () {
         var current = $(".tab-swithcer__button--active");
@@ -632,6 +642,8 @@ DOM.on("click", "filter", {
         });
     },
 });
+
+// Referal
 
 DOM.on("click", "referal", {
     save: function () {

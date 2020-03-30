@@ -127,7 +127,7 @@ strong {
 }
 
 a {
-    color: #767d8c;
+    color: #88cc31;
     text-decoration: none;
 }
 
@@ -583,7 +583,6 @@ a.ghost {
 
 .weapon-skins {
     display: flex;
-    overflow-y: visible;
 }
 
 .weapon-skins__weapon {
@@ -654,10 +653,14 @@ a.ghost {
 
 .live-drops {
     display: flex;
-    max-width: 1320px;
-    max-width: 100%;
+    width: 100%;
+    height: 3.175em;
     margin: 2em auto 0;
-    overflow: auto;
+    font-size: 1.25em;
+}
+
+.live-drops__inner {
+    position: absolute;
 }
 
 .live-drops .weapon-skins__weapon {
@@ -674,38 +677,53 @@ a.ghost {
 
 .weapon-skins-owner {
     position: absolute;
+    top: 150%;
     display: grid;
-    align-items: center;
     justify-content: center;
     padding: 1em;
-    background: #565558;
+    background: hsl(200, 5%, 15%);
+    border: 0.2em solid hsl(200, 5%, 20%);
+    /*border-bottom-color: var(--color);*/
+    border-radius: 0.25em;
     width: 100%;
-    height: 100%;
-    font-size: 0.45em;
-    transform: rotateY(90deg);
-    transition: 0.225s linear transform 0s;
+    opacity: 0;
+    transform: scale(0);
+    transition: 0.175s opacity, 0.175s top, 0s transform 0.175s;
     z-index: 3;
 }
 
-.live-drops .weapon-skins__weapon:hover .weapon-skins__image {
-    transform: rotateY(-90deg);
-    transition-delay: 0s;
+.weapon-skins-owner::before {
+    content: '';
+    position: absolute;
+    top: -1em;
+    left: calc(50% - 1em);
+    width: 0;
+    height: 0;
+    border-left: 1em solid transparent!important;
+    border-right: 1em solid transparent!important;
+    border-bottom: 1em solid;
+    border-bottom-color: hsl(200, 5%, 15%);
 }
 
 .live-drops .weapon-skins__weapon:hover .weapon-skins-owner {
-    transform: rotateY(0deg);
-    transition-delay: 0.225s;
+    opacity: 1;
+    top: calc(100% + 1.25em);
+    transform: scale(1);
+    transition-delay: 0s;
 }
 
 .weapon-skins-owner__case-image {
-    width: 5em;
-    height: 5em;
+    width: 3em;
+    height: 3em;
     object-fit: contain;
+    margin-bottom: 0.25em;
 }
 
 .weapon-skins-owner__name {
-    font-size: 1.25em;
+    font-size: 0.75em;
+    font-weight: 600;
     text-align: center;
+    text-transform: uppercase;
 }
 
 .live-drops::before, .live-drops::after {
@@ -3483,6 +3501,28 @@ span.contract-window__bill--numeric {
     justify-content: center;
     min-height: 20em;
     text-align: center;
+}
+
+.battle__inner::before, .battle__inner::after {
+    content: '';
+    position: absolute;
+    top: calc(50% - 7em);
+    left: calc(50% - 1em);
+    background: url(/assets/img/icons/diamond_shield.png) no-repeat center/contain;
+    width: 2em;
+    height: 2em;
+}
+
+.battle__inner::before {
+    top: calc(50% - 1em);
+    left: calc(50% - 6em);
+    transform: rotate(90deg);
+}
+
+.battle__inner::after {
+    top: calc(50% - 1em);
+    left: calc(50% + 4em);
+    transform: rotate(-90deg);
 }
 
 .battle__inner .stndfspin-cases__case:hover {
