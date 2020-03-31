@@ -25,7 +25,7 @@ DOM.listen(page.support.fickle, type => {
         // After page is loaded
         this.onPageLoaded(this.pageLoaded[1]);
         this.EventPageLoaded(this.pageLoaded);
-        this.startActionOnLoaded(this.pageLoaded);
+        this.startActionOnLoaded();
         this.pageLoading.resolve();
         // ...Mobile
         if (page.mobile.if) this.EventPageLoaded(this.pageLoaded, "mobile");
@@ -93,6 +93,7 @@ DOM.listen(page.support.fickle, type => {
         });
     }
     ServiceController.MinWithdrawalPrice = 25;
+    $("html, body").offset().left != 0 ? $("html, body").scrollLeft(0) : "";
 })();
 
 // Language
@@ -127,8 +128,8 @@ page.mobile.onMobile = function () {
     // Layout
     $("#adaptive-style").remove();
     $(".timer-v2__text").remove();
-    $($(".social-row")[0]).remove();
-    $(".topbar-menu, .social-row__title").remove();
+    $($(".social-group")[0]).remove();
+    $(".topbar-menu, .social-group__title").remove();
     $(".bottombar").after($(".bottombar__description"));
     $(".lastbar").after($(".bottombar-menu"));
     $(".stndfspin-features__options").after($(".topbar-language"));
@@ -406,7 +407,10 @@ DOM.on("click", "item", {
             price: item.price - item.initial_price,
             name: DOM.$("item", "withdraw-input").val(),
         }, function () {
-            item.object.remove();
+            const obj = DOM.$("tab", "history");
+            item.object.find(".js-item-sell").remove();
+            item.object.find(".sorted-skins__icon").removeClass("js-item-sell js-item-withdraw");
+            item.object.prependTo(obj);
             ItemsController.Callback();
             page.popup.close();
             ProgressBar.end();
@@ -429,7 +433,10 @@ DOM.on("click", "item", {
         $(".popup-window__button").attr({ disabled: "" });
         ProgressBar.start();
         ItemsController.Sell(item.id, function () {
-            item.object.prependTo(DOM.$("tab", "history"));
+            const obj = DOM.$("tab", "history");
+            item.object.find(".js-item-withdraw").remove();
+            item.object.find(".sorted-skins__icon").removeClass("js-item-sell js-item-withdraw");
+            item.object.prependTo(obj);
             ItemsController.Callback();
             page.popup.close();
             ProgressBar.end();
@@ -540,18 +547,19 @@ $(document).on("click", ".contract-window__button", function () {
         page.contract.promise.resolve();
         // Progress
         ProgressBar.end();
+        // Closing Popup Window
+        page.popup.close();
         await page.popup.closed.promise;
         // Hidding Contract Disposal
         $(".contract__disposal, .contract__flex, .contract__caution").addClass("hidden");
         $(".fortune-wheel__buttons").removeClass("hidden");
         $(".fortune-wheel__button--1").attr({ "weapon-id": result.item.id });
-            DOM.$("contract", "item_price").html(alter_by_currency(result.item.price, true));
-        // Closing Popup Window
-        page.popup.close();
+        DOM.$("contract", "item_price").html(alter_by_currency(result.item.price, true));
         // Creating Item
         ItemsController.CreateItem();
         ItemsController.ModifyItemByData(result);
         ItemsController.PrependItemTo($(".contract"));
+        $(".page-part").scrollTo();
     });
 });
 
@@ -654,15 +662,16 @@ DOM.on("click", "referal", {
     },
     activate: function () {
         var promo = DOM.$("referal", "your_gap").val();
-        api.post("/referal/active", { code: promo }, () => {
+        api.post("/referal/active", { code: promo }, (result) => {
+            BalanceController.UpdateBalance(result.balance);
             $(this).attr({ disabled: "" });
-            page.support.notify("success", "Заебок")
+            page.support.notify("success", "Заебок");
         });
     },
     copyMe: function () {
         var id = $(this).attr("for");
         var target = $("#" + id);
-        
+        target.css({ "text-transform": "lowercase" });
         if (target.is("[disabled]")) {
             target.removeAttr("disabled");
             target[0].select();
@@ -672,6 +681,7 @@ DOM.on("click", "referal", {
             target[0].select();
             document.execCommand('copy');
         }
+        target.css({ "text-transform": "" });
     },
 });
 

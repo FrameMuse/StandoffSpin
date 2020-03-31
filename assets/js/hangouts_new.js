@@ -489,7 +489,7 @@ class features_wheel {
 
         anime({
             targets: circle.get(),
-            rotate: (reverse ? "-" : "+") + degrees + "deg",
+            rotate: (reverse ? -degrees - 60 : degrees) + "deg",
             easing: 'cubicBezier(.1, 0, 0, 1)',
             duration: 16000,
             complete: this.promise.resolve,
@@ -785,8 +785,8 @@ class features_contract {
                 this.error = function () { };
                 this.saf = true;
                 this.cautionMap = {
-                    insufficient: "Добавьте минимум 3 предмета",
-                    ranged: "Может выпасть от {contract=>price->min} до {contract=>price->max}"
+                    insufficient: getLanguage("contracts.text.insufficient"),
+                    ranged: getLanguage("contracts.text.ranged"),
                 };
             }
             init() {
@@ -1057,9 +1057,7 @@ class features_paging {
         this.pageLoading = $.Postpone();
         this.onPageLoaded = () => { };
 
-        postLoader.add(() => {
-            this.default();
-        });
+        postLoader.add(() => this.default());
 
         // Events
         $("body").append(`<div class="notifier"><div class="notifier__message"></div><span class="notifier__signal"></span></div>`);
@@ -1069,9 +1067,9 @@ class features_paging {
             ProgressBar.start();
             // Other
             this.pageLoading = $.Postpone();
-            var href = $(e.currentTarget).attr("href");
+            var href = $(e.currentTarget).attr("href").split("#!");
             if (href != null) {
-                this.load(href);
+                this.load(href[0], href[1]);
             } else console.error("The link attr is empty");
         });
     }
@@ -1093,7 +1091,8 @@ class features_paging {
             } else {
                 history.pushState({ href: url, data: result }, "", url);
             }
-            this.final(result, hashAction ? url + "#!" + hashAction : url);
+            if (hashAction) this.save_hash(hashAction);
+            this.final(result, url);
         });
         return this.pageLoading;
     }
@@ -1166,10 +1165,8 @@ class features_paging {
     }
 
     startActionOnLoaded() {
-        var hash = window.location.hash.split("!");
-        this.clear_hash();
-        if (hash[0] == "" || hash[1] == undefined) return false;
-        this.actionOnLoaded[hash[1]]();
+        if (this.hash == undefined) return false;
+        this.actionOnLoaded[this.hash]();
     }
 
     isFirstInHistory() {
@@ -1221,6 +1218,11 @@ class features_paging {
         })
     }
 
+    save_hash(hash = false) {
+        this.hash = hash ? hash : window.location.hash.split("!");
+        this.clear_hash();
+    }
+
     context(object) {
         object.apply(this);
     }
@@ -1228,16 +1230,14 @@ class features_paging {
 
 class features_liveFeed {
     constructor() {
-        this.singleItem = `<div class="weapon-skins__weapon"><img src="/img/nZQWFYGPHj-Screenshot_83.png" class="weapon-skins__image"><span class="weapon-skins__quality weapon-skins__quality--pink"></span><div class="weapon-skins-owner"><img src="" class="weapon-skins-owner__case-image"><span class="weapon-skins-owner__name"></span><a href="" class="ghost ajax-link"></a></div></div>`;
+        this.singleItem = `<div class="weapon-skins__weapon"><img class="weapon-skins__image"><span class="weapon-skins__quality"></span><div class="weapon-skins-owner"><img class="weapon-skins-owner__case-image"><span class="weapon-skins-owner__name"></span><a class="ghost ajax-link"></a></div></div>`;
         this.parsedItem = $.parseHTML(this.singleItem);
     }
 
     CreateByData(data) {
         this.item = $(this.parsedItem).clone();
+        $(this.item).addClass("weapon-skins__quality--" + data.class_name);
         $(this.item).find(".weapon-skins__image").attr({ src: "/img/" + data.item_src });
-        $(this.item).find(".weapon-skins__quality")
-            .attr({ class: "weapon-skins__quality" })
-            .addClass("weapon-skins__quality--" + data.class_name);
         $(this.item).find(".weapon-skins-owner__case-image").attr({ src: "/img/" + data.case_image });
         $(this.item).find(".weapon-skins-owner__name").html(data.name);
         $(this.item).find("a.ghost").attr({ href: data.user_id });

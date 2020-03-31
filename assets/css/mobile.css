@@ -127,7 +127,7 @@ strong {
 }
 
 a {
-    color: #88cc31;
+    color: #767d8c;
     text-decoration: none;
 }
 
@@ -589,6 +589,7 @@ a.ghost {
     display: inline-grid;
     animation: 0.24s ease weapon-fade-in;
     cursor: pointer;
+    outline: none;
 }
 
 .weapon-skins__unit {
@@ -610,7 +611,7 @@ a.ghost {
     display: block;
     width: 100%;
     height: 0.175em;
-    background: #ccc;
+    background: var(--color);
     z-index: 3;
 }
 
@@ -683,7 +684,7 @@ a.ghost {
     padding: 1em;
     background: hsl(200, 5%, 15%);
     border: 0.2em solid hsl(200, 5%, 20%);
-    /*border-bottom-color: var(--color);*/
+    border-bottom-color: var(--color);
     border-radius: 0.25em;
     width: 100%;
     opacity: 0;
@@ -1452,9 +1453,23 @@ article {
 
 .sorted-skins__icon--dollar {
     background-image: url("../img/icons/dollar.png");
-    width: 0.75em;
-    height: 0.75em;
-    z-index: 2;
+    background-size: 0.6em;
+    width: 1em;
+    height: 1em;
+}
+
+.sorted-skins__icon--contract {
+    background-image: url(../img/icons/contract.svg);
+    background-size: 1em;
+    width: 1em;
+    height: 1em;
+}
+
+.sorted-skins__icon--refresh {
+    background-image: url(../img/icons/refresh.svg);
+    background-size: 1em;
+    width: 1em;
+    height: 1em;
 }
 
 .sorted-skins__empty {
@@ -2200,6 +2215,10 @@ button.popup-window__button.button2 {
     font-size: 2.5em;
     color: #6f6f6f;
     cursor: pointer;
+}
+
+.popup-window__marked {
+    color: #88cc31;
 }
 
 /* Top Up */
