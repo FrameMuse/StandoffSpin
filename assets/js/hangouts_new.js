@@ -1548,6 +1548,7 @@ class FortuneWheelController {
 
 class BalanceController {
     static UpdateBalance(balance) {
+        BalanceController.CurrentBalance = balance;
         DOM.update("required-update", {
             balance: alter_by_currency(balance, true)
         });

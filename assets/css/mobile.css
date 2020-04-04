@@ -2754,7 +2754,7 @@ span.contract-window__bill--numeric {
     line-height: 1.25;
     text-transform: uppercase;
     right: 0.5em;
-    max-width: 10em;
+    width: 10.5em;
     margin: 0 auto;
 }
 
