@@ -263,15 +263,15 @@ a.ghost {
 }
 
 .icon__vk {
-    background-image: url(https://standoffcasetest.ru/assets/img/icons/vk.png);
+    background-image: url(/assets/img/icons/vk.png);
 }
 
 .icon__instagram {
-    background-image: url(https://standoffcasetest.ru/assets/img/icons/instagram.png);
+    background-image: url(/assets/img/icons/instagram.png);
 }
 
 .icon__youtube {
-    background-image: url(https://standoffcasetest.ru/assets/img/icons/youtube.png);
+    background-image: url(/assets/img/icons/youtube.png);
 }
 
 .icon__funnel {
@@ -1053,6 +1053,10 @@ article {
     width: 6em;
 }
 
+.stndfspin-cases__cost[data-days="1"] {
+    width: 7em;
+}
+
 .stndfspin-cases__title {
     font-size: 1.1em;
     font-weight: 600;
@@ -1407,6 +1411,15 @@ article {
 
 .fortune-wheel__button--1::before {
     background: #89cc32;
+}
+
+.fortune-wheel__button--0[disabled]::before, .fortune-wheel__button--1[disabled]::before {
+    background: transparent;
+    border: 0.125em solid #CC4450;
+}
+
+.fortune-wheel__button--0[disabled], .fortune-wheel__button--1[disabled] {
+    cursor: not-allowed;
 }
 
 .fortune-wheel__win-cover {
@@ -2131,6 +2144,35 @@ b {
     font-style: italic;
     text-transform: uppercase;
     margin-top: 1em;
+}
+
+.profile-another__button {
+    display: flex;
+    align-items: center;
+    padding: 0.5em 1.25em;
+    margin-top: 0.75em;
+    background: #FF0000;
+    border: 0.125em solid #FF0000;
+    border-radius: 0.25em;
+    transition: .35s background-color;
+}
+
+.profile-another__button:hover {
+    background: transparent;
+}
+
+.profile-another__button--text {
+    top: -0.05em;
+    font-size: 0.85em;
+    font-weight: 700;
+    text-transform: uppercase;
+    color: white;
+}
+
+.profile-another__button--icon {
+    width: 1.1em;
+    height: 1.1em;
+    margin-left: 0.5em;
 }
 
 .topbar-profile__avatar--lvl {

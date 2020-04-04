@@ -90,8 +90,14 @@ $.Postpone = function () {
 
     return {
         promise: this.promise,
-        resolve: $resolve,
-        reject: $reject,
+        resolve: () => {
+            $resolve();
+            this.state = "resolved";
+        },
+        reject: () => {
+            $reject();
+            this.state = "rejected";
+        },
         then: ($then) => {
             this.promise.then((r) => { this.state = "resolved"; $then(r); }, () => { this.state = "rejected" });
         },
@@ -128,6 +134,7 @@ $.fn.extend({
         })();
         this.each(function (i) {
             var data_time = $(this).attr("data-time");
+            var data_days = $(this).data("days");
 
             config.intervals.push(setInterval(() => {
                 if (+data_time) {
@@ -136,8 +143,8 @@ $.fn.extend({
                     var timestamp = new Date(new Date(data_time).getTime() - Date.now());
                 }
 
-                if (days_on) {
-                    var time = timestamp.toISOString().substr(8, 10).replace("T", ":");
+                if (days_on || +data_days) {
+                    var time = timestamp.toISOString().substr(8, 11).replace("T", ":");
                 } else {
                     var time = timestamp.toISOString().substr(11, 8);
                 }
@@ -145,7 +152,8 @@ $.fn.extend({
 
                 if (timestamp < 0) {
                     clearInterval(config.intervals[i]);
-                    $(this).html("EXPIRED");
+                    $(this).parent().remove();
+                    eval($(this).attr("ontimerover"));
                 } else $(this).html(time);
                 if (+data_time) data_time = (data_time - 1000);
             }, 1000));
@@ -172,13 +180,29 @@ class interpret {
 }
 
 class ProgressBar {
-    static start() {
+    static async start() {
+        this.progress = $.Postpone();
+        this.rail = 0;
+        this.TimerSteps = [
+            { time: 500, width: 30 },
+            { time: 350, width: 45 },
+            { time: 450, width: 55 },
+            { time: 250, width: 60 },
+            { time: 750, width: 80 },
+        ];
         $(".load-indicator").css({ opacity: 1 });
         $(".load-indicator__fill").css({ width: 15 + "%" });
         $("body, button, input, a").css({ cursor: "wait" });
+        
+        for (var i = 0; i < this.TimerSteps.length; i++) {
+            await delay(this.TimerSteps[i]["time"]);
+            if (this.progress.status() == "resolved") return;
+            $(".load-indicator__fill").css({ width: this.TimerSteps[i]["width"] + "%" });
+        }
     }
 
     static end() {
+        this.progress.resolve();
         $(".load-indicator__fill").css({ width: 100 + "%" });
         setTimeout(() => {
             $(".load-indicator__fill").css({ width: "" });
@@ -707,7 +731,6 @@ class features_referal {
     init() {
         this.default();
         this.progress_block = '<div class="goal__line"><div class="goal__line--line-progress"></div><div class="goal__counter"><span class="goal__counter--icon"></span><span class="goal__counter--amount"></span></div></div>';
-        this.commit_progress(0, 0, 0);
     }
 
     default() {
@@ -1053,6 +1076,7 @@ class features_paging {
         this.errors = {};
         this.fickle = ".ajax-fickle";
         this.DeviceType = "desktop";
+        this.ScrollInspector = {};
         this.actionOnLoaded = [];
         this.pageLoading = $.Postpone();
         this.onPageLoaded = () => { };
@@ -1091,7 +1115,7 @@ class features_paging {
             } else {
                 history.pushState({ href: url, data: result }, "", url);
             }
-            if (hashAction) this.save_hash(hashAction);
+            if (hashAction) this.save_hash(hashAction); else this.save_hash();
             this.final(result, url);
         });
         return this.pageLoading;
@@ -1150,6 +1174,15 @@ class features_paging {
 
     __addPage(settings) {
         settings.page = settings.page.replace("/", "");
+        if ("ScrollInspector" in settings) {
+            this.ScrollInspector[settings.page] = function () {
+                try {
+                    settings.ScrollInspector.apply(new ScrollInspector("/" + settings.page));
+                } catch (error) {
+                    console.warn(error);
+                }
+            };
+        }
         this.pages[settings.page + (settings.device != undefined ? "__mobile" : "")] = settings.action;
         this.errors[settings.page] = settings.errors;
     }
@@ -1165,7 +1198,7 @@ class features_paging {
     }
 
     startActionOnLoaded() {
-        if (this.hash == undefined) return false;
+        if (!this.hash || this.hash == "") return false;
         this.actionOnLoaded[this.hash]();
     }
 
@@ -1522,8 +1555,7 @@ class BalanceController {
 
     static GetUserBalance() {
         if (ServiceController.userId == 0) return 0;
-        var balance = alter_by_currency(DOM.$("required-update", "balance").html(), false);
-        if (this.CurrentBalance) return this.CurrentBalance;
+        return this.CurrentBalance;
     }
 
     static HasSufficientFunds(CustomPrice = false) {
@@ -1606,6 +1638,60 @@ class filter {
     }
 }
 
+class ScrollInspector {
+    constructor(page = "") {
+        this.data = {
+            page: page,
+        };
+        this.listeners = [];
+        this.entry = $.Postpone();
+        this.CurrentListener = this.GetOncrollEvent();
+        window.addEventListener('scroll', this.CurrentListener);
+    }
+
+    GetOncrollEvent() {
+        try {
+            return async event => {
+                await this.entry.promise;
+                if (!event.isTrusted || event.type != "scroll") return;
+                if (this.listeners != undefined) {
+                    this.listeners.filter($this => {
+                        if (event.path[1].scrollY >= $this.offset()) {
+                            $this.event.apply($this.context, [event, this]);
+                        }
+                    });
+                }
+            };
+        } catch(error) {
+            this.deconstruct();
+            console.error(error);
+        }
+    }
+
+    OnScrollEvent(offset = 0, event = () => {}) {
+        const $offset = typeof offset == "function" ? offset : function () {
+            return typeof offset == "number" ? offset : $(offset).offset().top;
+        };
+        this.listeners.push({
+            offset: $offset,
+            event: event,
+            context: this,
+        });
+        this.entry.resolve();
+    }
+
+    deconstruct() {
+        window.removeEventListener('scroll', this.CurrentListener);
+        delete this;
+    }
+
+    destroy() {
+        getEventListeners(window).scroll.forEach((e) => {
+            removeEventListener("scroll", e.listener);
+        })
+    }
+}
+
 // Functions
 
 function num_split(number = 0, bandwidth = 0) {
@@ -1626,13 +1712,12 @@ function prevent_error_function($function, ...$args) {
     try {
         $function(...$args);
     } catch (error) {
-        console.warn("Function error prevented: " + error);
+        //console.warn("Function error prevented: " + error);
     }
 }
 
-async function __wait(seconds, $function) {
-    await $function();
-    await setTimeout(() => { }, seconds);
+async function delay(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
 }
 
 function split_number(x) {

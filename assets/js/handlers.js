@@ -2,6 +2,8 @@
 
 page.setup({
     AutoScrollOffset: -2.5, // 2.5em
+    ReferalLoadByElement: 6,
+    ReferalCurrentTablePage: 0,
 });
 
 // DOM Listening for LiveFeed Change
@@ -25,7 +27,10 @@ DOM.listen(page.support.fickle, type => {
         // After page is loaded
         this.onPageLoaded(this.pageLoaded[1]);
         this.EventPageLoaded(this.pageLoaded);
-        this.startActionOnLoaded();
+        if (this.hash) this.startActionOnLoaded();
+        prevent_error_function(() => {
+            this.ScrollInspector[this.pageLoaded[1]]();
+        });
         this.pageLoading.resolve();
         // ...Mobile
         if (page.mobile.if) this.EventPageLoaded(this.pageLoaded, "mobile");
@@ -66,7 +71,9 @@ DOM.listen(page.support.fickle, type => {
 
             case "battle_join":
                 await page.support.pageLoading.promise; // Wait for page is loaded
-                if ((result.owner_id == ServiceController.userId || result.rival_id == ServiceController.userId) && result.battle_id == ServiceController.battle_id || true) {
+                console.log(page.support.pageLoaded, result);
+                
+                if ((result.owner_id == ServiceController.userId || result.rival_id == ServiceController.userId) && result.battle_id == page.support.pageLoaded[2]) {
                     FortuneWheelController.BattleInit();
                     FortuneWheelController.BattleCry(result.itemList, result.wheelWinnerId);
                     page.support.actionOnLoaded["battle_hide_all"]();
@@ -93,7 +100,6 @@ DOM.listen(page.support.fickle, type => {
         });
     }
     ServiceController.MinWithdrawalPrice = 25;
-    $("html, body").offset().left != 0 ? $("html, body").scrollLeft(0) : "";
 })();
 
 // Language
@@ -121,6 +127,11 @@ page.support.onPageLoaded = function (url) {
     if (typeof page.wheel.promise == "object" && (url != "case" && url != "battle")) {
         page.wheel.promise.resolve();
     }
+    // Preventing Unexpected Scrolling
+    $("html, body").scrollLeft(0);
+    // Clearing
+    config.ReferalCurrentTablePage = 0;
+    if (page.inspector != undefined) page.inspector.deconstruct();
 };
 
 page.mobile.onMobile = function () {
@@ -148,7 +159,7 @@ page.support.context(function () {
         action: function () {
             ServiceController.SetCurrentService = {
                 Name: $(".fortune-wheel__image").html(),
-                Price: DOM.$("wheel", "price").data("price"),
+                Price: $(".box").data("price"),
             };
             page.wheel.__init();
             page.wheel.box_input_change($(".box__input[data-id='0']"));
@@ -164,6 +175,48 @@ page.support.context(function () {
         page: "/lobby",
         action: function () {
             $(".page-part").scrollTo();
+        },
+    });
+    this.__addPage({
+        page: "/referal",
+        action: function () {
+            page.referal.init();
+        },
+        ScrollInspector: function () {
+            page.inspector = this;
+            //const StaticInt = (3.2 * 1.15).toPx() + (config.ReferalLoadByElement * (5.2 * 1.15).toPx());
+            const ScrollInt = () => {
+                try {
+                    return $(".table").offset().top + ($(".table").outerHeight() / 2) - window.innerHeight;
+                } catch (error) {
+                    this.deconstruct();
+                    console.error(error);
+                }
+            };
+            const newElement = $(".table tr:last-child").clone();
+            $(".table tr:last-child").remove();
+            this.OnScrollEvent(ScrollInt, function () {
+                this.entry = $.Postpone();
+                ProgressBar.start();
+                api.get(["/user/load/", ServiceController.userId, "/referal/", config.ReferalCurrentTablePage], {}, result => {
+                    result.result.filter(function (person, index) {
+                        newElement.find("td:nth-child(1)").html(index + (config.ReferalCurrentTablePage * 30) + 1);
+                        newElement.find("td:nth-child(2) .table-user__image").attr({ src: person.photo });
+                        newElement.find("td:nth-child(2) span").html(person.first_name + " " + person.last_name);
+                        newElement.find("td:nth-child(3)").html(person.ref_balance);
+                        newElement.find("td:nth-child(4)").html(person.profit);
+                        newElement.clone().appendTo(".table");
+                    });
+                    if (result.nextPage) {
+                        config.ReferalCurrentTablePage++;
+                        this.entry.resolve();
+                    } else {
+                        config.ReferalCurrentTablePage = 0;
+                        this.deconstruct();
+                    }
+                    ProgressBar.end();
+                });
+            });
         },
     });
     // Mobile Pages
@@ -202,10 +255,6 @@ page.support.addPage("/contracts", () => {
     page.contract.init();
     page.contract.spot.init();
     page.canvas.init();
-});
-
-page.support.addPage("/referal", () => {
-    page.referal.init();
 });
 
 page.support.addPage("/bonuses", () => {
@@ -249,7 +298,9 @@ DOM.on("click", "wheel", {
         page.support.refresh();
     },
     "sell-item": function () {
-        ItemsController.Sell($(this).attr("weapon-id"), (result) => {
+        console.log($(this).attr("weapon-id"));
+        
+        ItemsController.Sell(this, (result) => {
             // Balance Update
             BalanceController.UpdateBalance(result.balance);
             // Reload Page
@@ -291,9 +342,10 @@ page.wheel.release = function (fast = false) {
 
 page.wheel.box_input_change = function (e) {
     // Set Wheel Multiplier
-    page.wheel.data.multiplier = page.wheel.data.multiplies[e.data("id")];
+    page.wheel.data.multiplier = page.wheel.data.multiplies[typeof e == "object" ? e.data("id") : 0];
     var case_price = $(".js-wheel-price").data("price");
     var price = page.wheel.data.multiplier * case_price;
+    var price = price == NaN ? 0 : price;
     // Update Case Price & Funds Lack
     DOM.update("wheel", {
         price: price ? alter_by_currency(price, true) : getLanguage("case.buttons.free"),
@@ -308,7 +360,7 @@ page.wheel.box_input_change = function (e) {
         $(".fortune-wheel__buttons").attr({ hidden: "" });
     }
     // Check for minimal price threshold
-    if (!BalanceController.HasSufficientFunds()) $(".box__multiply").attr({ hidden: "" });
+    if (!BalanceController.HasSufficientFunds()) $(".box__multiply").addClass("hidden");
 }
 
 $(document).on("click", ".box__input", function () {

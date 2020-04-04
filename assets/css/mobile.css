@@ -1280,6 +1280,15 @@ article {
     background: #89cc32;
 }
 
+.fortune-wheel__button--0[disabled]::before, .fortune-wheel__button--1[disabled]::before {
+    background: transparent;
+    border: 0.125em solid #CC4450;
+}
+
+.fortune-wheel__button--0[disabled], .fortune-wheel__button--1[disabled] {
+    cursor: not-allowed;
+}
+
 .fortune-wheel__win-cover {
     background-image: url("../img/win_cover.png");
     background-size: 90em;
