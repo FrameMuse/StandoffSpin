@@ -1372,6 +1372,7 @@ article {
     font-style: italic;
     text-transform: uppercase;
     padding: 0.35em 0;
+    max-width: 10em;
 }
 
 .fortune-wheel__image::before {
