@@ -274,6 +274,10 @@ a.ghost {
     background-image: url(/assets/img/icons/youtube.png);
 }
 
+.icon__twitch {
+    background-image: url(/assets/img/icons/twitch.png);
+}
+
 .icon__funnel {
     background-image: url("/assets/img/icons/funnel_4.svg");
     width: 1.25em;
@@ -2156,6 +2160,11 @@ b {
     border: 0.125em solid #FF0000;
     border-radius: 0.25em;
     transition: .35s background-color;
+}
+
+.profile-another__button--blue {
+    background: #4a76a8;
+    border-color: #4a76a8;
 }
 
 .profile-another__button:hover {

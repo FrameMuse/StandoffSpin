@@ -83,6 +83,7 @@ DOM.listen(page.support.fickle, type => {
                 break;
 
             case "battle_create":
+                if (ServiceController.userId = 0) return;
                 $(`tr[data-id="${result.case_id}"] .battles-table__buttons`).prepend(`<button class="battles-table__button battles-table__button--green skewed-element js-battle-join">Войти</button>`);
                 break;
         }
@@ -183,6 +184,7 @@ page.support.context(function () {
             page.referal.init();
         },
         ScrollInspector: function () {
+            if (ServiceController.userId = 0) return;
             page.inspector = this;
             //const StaticInt = (3.2 * 1.15).toPx() + (config.ReferalLoadByElement * (5.2 * 1.15).toPx());
             const ScrollInt = () => {
@@ -225,6 +227,15 @@ page.support.context(function () {
         device: "mobile",
         action: function () {
             $(".profile-info, .profile-confirmation").removeClass("skewed-element");
+        },
+    });
+    this.__addPage({
+        page: "/lobby",
+        device: "mobile",
+        action: function () {
+            if (ServiceController.userId = 0) {
+                $(".battles-table__buttons").remove();
+            }
         },
     });
     this.__addPage({
@@ -743,8 +754,8 @@ page.popup.on["withdraw"] = function (options) {
     var itemPrice = options.item.price;
     this.tmp.options = options;
     this.wEdit({
-        summary: this.summary.replace('{itemPrice}', itemPrice),
-        content: `<div style="display:flex;justify-content:center;flex-direction:column;align-items:center;"><span class="withdraw__price skewed-element">${options.item.price}</span><input class="popup-window__button button1 js-item-withdraw-input" withdraw-skin placeholder="${this.wText("other.placeholder")}"><button class="popup-window__button button1 js-item-withdraw-submit">${this.wText("other.button")}</button></div>`,
+        summary: this.summary.replace('{price}', options.item.price),
+        content: `<div style="display:flex;justify-content:center;flex-direction:column;align-items:center;"><input class="popup-window__button button1 js-item-withdraw-input" withdraw-skin placeholder="${this.wText("other.placeholder")}"><button class="popup-window__button button1 js-item-withdraw-submit">${this.wText("other.button")}</button></div>`,
     });
 };
 

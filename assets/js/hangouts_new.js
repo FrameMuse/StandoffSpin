@@ -1429,11 +1429,14 @@ class ItemsController extends STNDFItems {
             user_0_item: data.owner_item,
             user_1_item: data.rival_item,
         });
-        this.battles.last(function ($this) {
-            $this.attr({ "data-id": params.case_id });
-            $this.find(".sorted-battles__case-image").attr({ src: "/img/" + params.image });
+        this.battles.last(function () {
+            this.attr({ "data-id": params.case_id });
+            if (params.user_0_item.price > params.user_1_item.price) var status = 0; else
+            if (params.user_0_item.price < params.user_1_item.price) var status = 1; else var status = 2;
+            this.addClass("sorted-battles__battle--" + status);
+            this.find(".sorted-battles__case-image").attr({ src: "/img/" + params.image });
             // ---------------------------------------------------------------
-            $this.find(".sorted-battles-player").each(function (i, e) {
+            this.find(".sorted-battles-player").each(function (i, e) {
                 var user = params["user_" + i];
                 var item = params["user_" + i + "_item"];
                 // ---------------------------------------------------------------

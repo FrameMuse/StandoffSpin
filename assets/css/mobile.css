@@ -154,6 +154,10 @@ a.ghost {
 
 /* Colours */
 
+.green {
+    color: #89cc32;
+}
+
 .darkgray {
     color: #3e4147;
 }
@@ -429,6 +433,40 @@ a.ghost {
     border: 0.05em solid #313438;
     border-radius: 100%;
     object-fit: cover;
+}
+
+.profile-another__button {
+    display: flex;
+    align-items: center;
+    padding: 0.5em 1.25em;
+    margin-top: 0.75em;
+    background: #FF0000;
+    border: 0.125em solid #FF0000;
+    border-radius: 0.25em;
+    transition: .35s background-color;
+}
+
+.profile-another__button--blue {
+    background: #4a76a8;
+    border-color: #4a76a8;
+}
+
+.profile-another__button:hover {
+    background: transparent;
+}
+
+.profile-another__button--text {
+    top: -0.05em;
+    font-size: 0.85em;
+    font-weight: 700;
+    text-transform: uppercase;
+    color: white;
+}
+
+.profile-another__button--icon {
+    width: 1.1em;
+    height: 1.1em;
+    margin-left: 0.5em;
 }
 
 .topbar-profile__avatar--lvl {
@@ -906,6 +944,11 @@ main {
     text-align: center;
 }
 
+.page-part__text {
+    text-transform: uppercase;
+    text-align: center;
+}
+
 .page-part__icon {
     background-image: url("../img/lumen.png");
     width: 16em;
@@ -1024,7 +1067,6 @@ article {
     justify-content: center;
     padding-bottom: 6em;
     margin-bottom: 5em;
-    min-height: 25em;
 }
 
 .box--no-indent {
@@ -1035,7 +1077,7 @@ article {
 
 .box__view {
     position: absolute;
-    bottom: 0;
+    top: 12em;
     display: grid;
     row-gap: 2em;
     align-content: center;
@@ -1234,7 +1276,7 @@ article {
 }
 
 .fortune-wheel__image {
-    font-size: 4em;
+    font-size: 2em;
     font-weight: 800;
     font-style: italic;
     text-transform: uppercase;
@@ -1300,6 +1342,19 @@ article {
     right: -300%;
     bottom: -150%;
     z-index: -1;
+}
+
+.fortune-wheel__lack-of-funds {
+    position: absolute;
+    top: 3.25em;
+    width: 25em;
+    padding: 2.5em 2em;
+    background: rgba(24, 25, 27, 0.75);
+    font-size: 0.85em;
+    font-weight: 700;
+    font-style: italic;
+    line-height: 1.5;
+    text-transform: uppercase;
 }
 
 /* Weapon Pattern */
@@ -2251,11 +2306,11 @@ button.popup-window__button.button2 {
     font-style: italic;
     text-transform: uppercase;
     text-align: center;
-    color: #686c75;
+    color: #88cc31;
 }
 
 input.promocode__input::placeholder {
-    color: #686c75;
+    color: #88cc31;
 }
 
 input.promocode__input:focus::placeholder {
@@ -2267,7 +2322,7 @@ input.promocode__input:focus::placeholder {
     font-style: italic;
     text-transform: uppercase;
     text-align: center;
-    color: #3e4147;
+    color: white;
     margin-top: 1.25em;
 }
 
@@ -2285,7 +2340,7 @@ input.promocode__input:focus::placeholder {
     font-weight: 700;
     font-style: italic;
     text-align: center;
-    color: #393b3f;
+    color: white;
 }
 
 .top-up__button {
@@ -3478,8 +3533,9 @@ span.contract-window__bill--numeric {
 }
 
 .battles__content {
-    flex: 1;
     margin-top: 1em;
+    width: 100%;
+    overflow: auto;
 }
 
 .battles-table {
