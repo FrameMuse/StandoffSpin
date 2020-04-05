@@ -184,7 +184,7 @@ page.support.context(function () {
             page.referal.init();
         },
         ScrollInspector: function () {
-            if (ServiceController.userId = 0) return;
+            if (ServiceController.userId == 0) return;
             page.inspector = this;
             //const StaticInt = (3.2 * 1.15).toPx() + (config.ReferalLoadByElement * (5.2 * 1.15).toPx());
             const ScrollInt = () => {

@@ -1766,5 +1766,5 @@ function IsDefined($this) {
 
 function img_error(element, isAvatar = false) {
     element.src = '/assets/img/guest.png';
-    page.popup.tmp.NeedsToSetAvatar = !isAvatar;
+    page.popup.tmp.NeedsToSetAvatar = isAvatar;
 }
