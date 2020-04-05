@@ -1126,7 +1126,7 @@ article {
 
 .box__view {
     position: absolute;
-    bottom: 0;
+    top: 22em;
     display: grid;
     row-gap: 2em;
     align-content: center;
@@ -1134,6 +1134,11 @@ article {
     text-align: center;
     min-width: 30em;
     z-index: 2;
+}
+
+.box__view--1 {
+    top: unset;
+    bottom: 0;
 }
 
 .box__multiply {
@@ -1787,10 +1792,15 @@ article {
 .faq__content {
     word-break: break-all;
     line-height: 1.25;
+    height: 0;
+    overflow: hidden;
+    transition: 0.35s ease height;
+}
+
+.faq__content--inner {
     border-left: 0.125em solid #ffc600;
     padding: 0.5em 1em;
     margin: 1em 2em;
-    display: none;
 }
 
 .faq__summary::before {
@@ -1807,7 +1817,7 @@ article {
 }
 
 .faq__clause--deployed .faq__content {
-    display: unset;
+    height: var(--height);
 }
 
 /* Top */

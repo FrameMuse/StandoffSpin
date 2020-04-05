@@ -173,6 +173,15 @@ page.support.context(function () {
         },
     });
     this.__addPage({
+        page: "/faq",
+        action: function () {
+            var faq_content = $(".faq__content");
+            faq_content.each(function () {
+                $(this).css({ "--height": $(this).find(">").outerHeight() + (2).toPx(faq_content) });
+            });
+        },
+    });
+    this.__addPage({
         page: "/lobby",
         action: function () {
             $(".page-part").scrollTo();
@@ -411,7 +420,6 @@ DOM.on("click", "bonus", {
 });
 
 // Referal
-
 DOM.on("click", "referal", {
     "active-button": function () {
         api.post("/referal/active", {
@@ -428,10 +436,12 @@ DOM.on("click", "referal", {
         });
     },
 });
-// FAQ
 
+// FAQ
 $(document).on("click", ".faq__summary", function () {
-    $(this).parent().toggleClass("faq__clause--deployed");
+    const clause = $(this).parent();
+    $(".faq__clause").not(clause).removeClass("faq__clause--deployed");
+    clause.toggleClass("faq__clause--deployed");
 });
 
 // Item Events

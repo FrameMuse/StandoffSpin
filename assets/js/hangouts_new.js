@@ -41,8 +41,8 @@ String.prototype.ias = function (argument1 = "", argument2 = "") {
     return this.multiReplace([`{${argument1}}`], argument2);
 };
 
-Number.prototype.toPx = function () {
-    return this * $("html").css("font-size").replace("px", "");
+Number.prototype.toPx = function (parent = "html") {
+    return this * $(parent).css("font-size").replace("px", "");
 };
 
 Array.prototype.last = function (argument1) {
@@ -540,7 +540,7 @@ class features_wheel {
         // Fix a wheel position
         //this.stop_wheel();
         // Variables
-        var skin = this.spinTo(8, atWheel, false, true),
+        var skin = fast ? this.find_item(atWheel, 8) : this.spinTo(8, atWheel, false, true),
             wheel = skin.parent().parent(),
             timeout = fast ? 0 : 3000;
         setTimeout(() => {
