@@ -674,7 +674,7 @@ class features_popup {
 
     wEdit(options = {}) {
         for (var option in options) {
-            this.tend(option).html(interpret.JSDOM(options[option]));
+            this.tend(option).html(options[option]);
         }
     }
 
@@ -1078,6 +1078,7 @@ class features_paging {
         this.DeviceType = "desktop";
         this.ScrollInspector = {};
         this.actionOnLoaded = [];
+        this.AbleScrollDown = true;
         this.pageLoading = $.Postpone();
         this.onPageLoaded = () => { };
 
@@ -1085,7 +1086,7 @@ class features_paging {
 
         // Events
         $("body").append(`<div class="notifier"><div class="notifier__message"></div><span class="notifier__signal"></span></div>`);
-        $(document).on("click", "a.ajax-link", (e) => {
+        $(document).on("click", "a.ajax-link[href]", (e) => {
             e.preventDefault();
             // Progress
             ProgressBar.start();
@@ -1225,15 +1226,26 @@ class features_paging {
             warning: 50,
             success: 100,
         };
+        if (page.mobile.if) {
+            var values = {
+                bottom_start: "4.5em",
+                bottom_end: "-5em",
+            };
+        } else {
+            var values = {
+                bottom_start: "4em",
+                bottom_end: "-5em",
+            };
+        }
 
-        $(".notifier").animate({ bottom: "2em", }, 350);
+        $(".notifier").animate({ bottom: values.bottom_start, }, 350);
         $(".notifier__message").html(message);
         $(".notifier__signal").css({
             background: "hsl(" + singals[signal] + ", 50%, 40%)",
         }).animate({
             width: "100%",
         }, 5000, "linear", function () {
-            $(".notifier").animate({ bottom: "-5em", }, 350, () => $(this).css({ width: "" }));
+            $(".notifier").animate({ bottom: values.bottom_end, }, 350, () => $(this).css({ width: "" }));
         });
     }
 
@@ -1354,7 +1366,7 @@ class STNDFItems {
     }
 
     static Callback(result) {
-        page.support.notify("success", "Операция Выполнена");
+        page.support.notify("success", getLanguage("settings.notify"));
     }
 
     static StatusMap(status) {

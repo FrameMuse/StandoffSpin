@@ -129,7 +129,8 @@ page.support.onPageLoaded = function (url) {
         page.wheel.promise.resolve();
     }
     // Preventing Unexpected Scrolling
-    $("html, body").scrollLeft(0);
+    if (window.scrollX) $("html, body").scrollLeft(0);
+    if (window.scrollY > (5).toPx("body") && page.support.AbleScrollDown) $(".page-part").scrollTo();
     // Clearing
     config.ReferalCurrentTablePage = 0;
     if (page.inspector != undefined) page.inspector.deconstruct();
@@ -198,7 +199,7 @@ page.support.context(function () {
             //const StaticInt = (3.2 * 1.15).toPx() + (config.ReferalLoadByElement * (5.2 * 1.15).toPx());
             const ScrollInt = () => {
                 try {
-                    return $(".table").offset().top + ($(".table").outerHeight() / 2) - window.innerHeight;
+                    return $(".table").offset().top + ($(".table").outerHeight() - (2).toPx()) - window.innerHeight;
                 } catch (error) {
                     this.deconstruct();
                     console.error(error);
@@ -213,6 +214,7 @@ page.support.context(function () {
                     result.result.filter(function (person, index) {
                         newElement.find("td:nth-child(1)").html(index + (config.ReferalCurrentTablePage * 30) + 1);
                         newElement.find("td:nth-child(2) .table-user__image").attr({ src: person.photo });
+                        newElement.find("td:nth-child(2) a").attr({ href: "/profile/" + person.id });
                         newElement.find("td:nth-child(2) span").html(person.first_name + " " + person.last_name);
                         newElement.find("td:nth-child(3)").html(person.ref_balance);
                         newElement.find("td:nth-child(4)").html(person.profit);
@@ -279,7 +281,7 @@ page.support.addPage("/contracts", () => {
 
 page.support.addPage("/bonuses", () => {
     // Timer
-    $("[data-time]").timer(false); // True, если нужны дни
+    $("[data-time]").timer(true); // True, если нужны дни
 });
 
 page.support.addPage("/profile", () => {
@@ -466,7 +468,7 @@ DOM.on("click", "item", {
             item: {
                 id: weapon_id,
                 object: weapon,
-                price: (+Math.random() + weapon_price).toFixed(2),
+                price: (+Math.random() + (weapon_price / 0.2)).toFixed(2),
                 initial_price: weapon_price,
             },
         });
@@ -482,6 +484,7 @@ DOM.on("click", "item", {
         }, function () {
             const obj = DOM.$("tab", "history");
             item.object.find(".js-item-sell").remove();
+            item.object.find(".sorted-skins__icon--arrow").removeClass("sorted-skins__icon--arrow").addClass("sorted-skins__icon--refresh");
             item.object.find(".sorted-skins__icon").removeClass("js-item-sell js-item-withdraw");
             item.object.prependTo(obj);
             ItemsController.Callback();
@@ -640,6 +643,10 @@ $(document).on("click", ".contract-window__button", function () {
 
 DOM.on("click", "battle", {
     join: function () {
+        if (ServiceController.userId == 0) {
+            page.popup.open("auth");
+            return;
+        }
         var lobby_id = $(this).parent().parent().parent().data("id");
         api.post("/battle/join", { id: lobby_id }, function (result) {
             // Load the page
@@ -729,8 +736,8 @@ DOM.on("click", "filter", {
 DOM.on("click", "referal", {
     save: function () {
         var promo = DOM.$("referal", "me_gap").val();
-        api.post("/referal/save", { code: promo }, () => {
-            page.support.notify("success", "Заебок")
+        api.post("/referal/save", { code: promo }, result => {
+            page.support.notify("success", result.error_msg)
         });
     },
     activate: function () {
@@ -761,8 +768,15 @@ DOM.on("click", "referal", {
 // Popup
 
 page.popup.on["withdraw"] = function (options) {
+    // CLear Styles Option
+    if (this.summary.search("!clearStyles") != -1) {
+        this.summary = this.summary.replace("!clearStyles", "");
+        $(".popup-window__summary").addClass("popup-window__summary--clear-styles");
+    }
+    // Vars
     var itemPrice = options.item.price;
     this.tmp.options = options;
+    // Editing
     this.wEdit({
         summary: this.summary.replace('{price}', options.item.price),
         content: `<div style="display:flex;justify-content:center;flex-direction:column;align-items:center;"><input class="popup-window__button button1 js-item-withdraw-input" withdraw-skin placeholder="${this.wText("other.placeholder")}"><button class="popup-window__button button1 js-item-withdraw-submit">${this.wText("other.button")}</button></div>`,
@@ -773,16 +787,21 @@ page.popup.on["withdraw__error"] = function () {
     // Automataticly Filled
 };
 
+page.popup.on["withdraw__cancel"] = function (options) {
+    this.wEdit({
+        summary: this.summary.replace('{skin}', options.skin),
+    });
+};
+
 page.popup.on["withdraw__avatar"] = function () {
     this.wEdit({
-        content: "<form class='avatar-change' method='POST' enctype='multipart/form-data' action='/api/v1/user/avatar'><div class='avatar-change__title'>" + this.wText("avatar_change__title") + "</div><img src='/img/guest.png' class='avatar-change__avatar'><label class='avatar-change__input skewed-element' for='avatar_image'>" + this.wText("avatar_change__input") + "</label><input id='avatar_image' accept='.jpg, .png, .jpeg, .gif, .bmp, .tif, .tiff|image/*' type='file' onchange='this.form.submit();' name='file' style='display: none; position: absolute;'></form>",
+        content: "<form class='avatar-change' method='POST' enctype='multipart/form-data' action='/api/v1/user/avatar_update'><div class='avatar-change__title'>" + this.wText("avatar_change__title") + "</div><img src='/img/guest.png' class='avatar-change__avatar' onerror='img_error(this, true)'><label class='avatar-change__input skewed-element' for='avatar_image'>" + this.wText("avatar_change__input") + "</label><input id='avatar_image' accept='.jpg, .png, .jpeg, .gif, .bmp, .tif, .tiff|image/*' type='file' onchange='this.form.submit();' name='file' style='display: none; position: absolute;'>" + `<input type="hidden" name="_token" value="${api.token}"></form>`,
     });
 };
 
 page.popup.on["auth"] = function () {
     this.wEdit({
         content: '<div class="auth"><a href="/auth/vk" class="auth__button auth__button--vkontakte">Вконтакте</a><a href="/auth/twitch" class="auth__button auth__button--twitch">Twitch</a><a href="/auth/youtube" class="auth__button auth__button--youtube">Youtube</a></div>',
-        help: this.wText("help"),
     });
 };
 
@@ -797,7 +816,7 @@ page.popup.on["sell"] = function (options) {
 page.popup.on["sell_all"] = function (options) {
     this.wEdit({
         summary: this.summary.replace("{price}", options.inventoryPrice),
-        content: `<div style="display:flex;justify-content:center;"><button class="popup-window__button button2" onclick="page.popup.close();">${this.wText("buttons.no")}</button><button class="popup-window__button button1" onclick="ItemsController.sellAll();">${this.wText("buttons.yes")}</button></div>`,
+        content: `<div style="display:flex;justify-content:center;"><button class="popup-window__button button1" onclick="ItemsController.sellAll();">${this.wText("buttons.yes")}</button><button class="popup-window__button button2" onclick="page.popup.close();">${this.wText("buttons.no")}</button></div>`,
     });
 };
 
@@ -807,18 +826,16 @@ page.popup.on["sell_all_error"] = function () {
 
 page.popup.on["top_up"] = function (options) {
     this.wEdit({
-        // title: "Пополнение баланса",
-        // summary: "Для пополнения баланса вы будете перемещены на сайт платёжной системы",
         content: `<div class="top-up">
-                            <div class="promocode">
-                                <input type="text" class="promocode__input" placeholder="Промокод">
-                                <span class="promocode__text">Если у вас есть промокод введите выше</span>
-                            </div>
-                            <div class="top-up__row">
-                                <input type="text" class="top-up__text" value="100">
-                                <input type="submit" class="top-up__button" value="Пополнить">
-                            </div>
-                        </div>`,
+                        <div class="promocode">
+                            <input type="text" class="promocode__input" placeholder="${this.wText("promocode__input")}">
+                            <span class="promocode__text">${this.wText("promocode__text")}</span>
+                        </div>
+                        <div class="top-up__row">
+                            <input type="text" class="top-up__text" value="100">
+                            <input type="submit" class="top-up__button" value="${this.wText("top_up_btn")}">
+                        </div>
+                    </div>`,
         help: '<div class="paysys paysys--1"><img src="https://standoffcase.ru/assets/img/payments_systems/mastercard.svg" class="paysys__image"><img src="https://standoffcase.ru/assets/img/payments_systems/webmoney.svg" class="paysys__image"><img src="https://standoffcase.ru/assets/img/payments_systems/qiwi.svg" class="paysys__image"><img src="https://standoffcase.ru/assets/img/payments_systems/yandex.svg" class="paysys__image"><img src="https://standoffcase.ru/assets/img/payments_systems/visa.svg" class="paysys__image"></div>',
     });
     $(".popup-window__top-up--big-input").on('input', function () {

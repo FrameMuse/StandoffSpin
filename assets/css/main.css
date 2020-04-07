@@ -170,6 +170,10 @@ a.ghost {
     color: #89cc32;
 }
 
+.red {
+    color: #CC4450;
+}
+
 .darkgray {
     color: #3e4147;
 }
@@ -1126,7 +1130,7 @@ article {
 
 .box__view {
     position: absolute;
-    top: 22em;
+    top: 20em;
     display: grid;
     row-gap: 2em;
     align-content: center;
@@ -1271,12 +1275,12 @@ article {
 }
 
 .fortune-wheel {
+    position: relative;
     display: inline-flex;
-    width: 121em;
-    height: 60.5em;
     padding-top: 7.5em;
     margin: 0 auto;
-    position: relative;
+    width: 121em;
+    height: 60.5em;
     font-size: var(--wheel-font-size);
     overflow: hidden;
     will-change: contents;
@@ -1376,12 +1380,12 @@ article {
 }
 
 .fortune-wheel__image {
-    font-size: 4em;
+    font-size: 3em;
     font-weight: 800;
     font-style: italic;
     text-transform: uppercase;
     padding: 0.35em 0;
-    max-width: 10em;
+    max-width: 8em;
 }
 
 .fortune-wheel__image::before {
@@ -2325,6 +2329,12 @@ b {
     text-transform: uppercase;
 }
 
+.popup-window__summary--clear-styles {
+    font-weight: 500;
+    font-style: normal;
+    text-transform: none;
+}
+
 .popup-window__content {
     /* display: grid; */
     justify-content: center;
@@ -2376,6 +2386,10 @@ button.popup-window__button.button1[disabled] {
 
 input.popup-window__button.button1:hover, input.popup-window__button.button1:focus {
     border-color: rgba(255, 255, 255, 0.75);
+}
+
+input.popup-window__button.button1:focus::placeholder {
+    color: transparent;
 }
 
 .withdraw__price {
@@ -2889,7 +2903,7 @@ span.contract-window__bill--numeric {
 }
 
 .width150 {
-    width: 150px !important;
+    width: 190px !important;
 }
 
 /* Referal */

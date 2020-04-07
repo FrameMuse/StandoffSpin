@@ -3133,19 +3133,27 @@ span.contract-window__bill--numeric {
 
 .notifier {
     position: fixed;
-    left: 5%;
-    bottom: -15%;
+    left: 0.15em;
     display: grid;
-    padding: 1em 1.5em;
-    background: rgba(255, 255, 255, 0.1);
-    border-radius: 0.12em;
+    padding: 1.25em 1.75em;
+    background: #27282c;
+    box-shadow: 0 0 1em -0.5em black;
+    border-radius: 0.25em;
+    z-index: 6;
+}
+
+.notifier__message {
+    font-size: 1em;
+    font-weight: 500;
+    font-style: italic;
 }
 
 .notifier__signal {
     position: absolute;
     bottom: 0;
-    width: 100%;
+    width: 0%;
     height: 0.15em;
+    border-radius: 0 0 0.25em 0.25em;
 }
 
 /* Dev Notifier */
