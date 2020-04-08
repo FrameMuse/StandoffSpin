@@ -86,25 +86,71 @@ $.Postpone = function () {
         $resolve = resolve;
         $reject = reject;
     });
-    this.state = "pending";
+    if (typeof this.states != "object")
+        this.states = [];
+    var status_id = this.states.push({
+        status: "pending",
+    });
+
+    const $this = this;
 
     return {
+        index: status_id - 1,
         promise: this.promise,
-        resolve: () => {
+        resolve: async function () {
             $resolve();
-            this.state = "resolved";
+            $this.states[this.index]["status"] = "resolved";
         },
-        reject: () => {
+        reject: function () {
             $reject();
-            this.state = "rejected";
+            $this.states[this.index]["status"] = "rejected";
         },
-        then: ($then) => {
-            this.promise.then((r) => { this.state = "resolved"; $then(r); }, () => { this.state = "rejected" });
+        then: function ($then) {
+            $this.promise.then((r) => { $this.states[this.index]["status"] = "resolved"; $then(r); }, () => { this.state = "rejected" });
         },
-        status: () => {
-            return this.state;
+        status: function () {
+            return $this.states[this.index]["status"];
         },
     };
+};
+
+$.Defered = class {
+    constructor() {
+        this.promise = new Promise((resolve, reject) => {
+            this.$resolve = resolve;
+            this.$reject = reject;
+            this.status = "pending";
+            this.value = "";
+        });
+    }
+
+    deconstruct(value) {
+        this.resolve = "";
+        this.reject = "";
+        this.value = value;
+    }
+
+    resolve(value = "") {
+        this.status = "resolved";
+        this.$resolve(value);
+        return this.deconstruct(value);
+    }
+
+    reject(value = "") {
+        this.status = "rejected";
+        this.$reject(value);
+        this.deconstruct(value);
+    }
+
+    then(fulfilled, rejected) {
+        return this.promise.then((value) => {
+            this.resolve();
+            fulfilled(value);
+        }, (value) => {
+            this.reject();
+            rejected(value);
+        });
+    }
 };
 
 $.fn.extend({
@@ -148,7 +194,7 @@ $.fn.extend({
                 } else {
                     var time = timestamp.toISOString().substr(11, 8);
                 }
-                                
+
 
                 if (timestamp < 0) {
                     clearInterval(config.intervals[i]);
@@ -193,7 +239,7 @@ class ProgressBar {
         $(".load-indicator").css({ opacity: 1 });
         $(".load-indicator__fill").css({ width: 15 + "%" });
         $("body, button, input, a").css({ cursor: "wait" });
-        
+
         for (var i = 0; i < this.TimerSteps.length; i++) {
             await delay(this.TimerSteps[i]["time"]);
             if (this.progress.status() == "resolved") return;
@@ -324,12 +370,12 @@ const DOM = new class {
         }
     }
 
-    click(prefix = [], handler = () => {}) {
+    click(prefix = [], handler = () => { }) {
         switch (typeof prefix) {
             case "array":
                 this.on("click", prefix[0], {}[prefix[1]] = handler);
                 break;
-        
+
             default:
                 $(document).on("click", prefix, handler);
                 break;
@@ -1148,7 +1194,7 @@ class features_paging {
             },
             statusCode: this.errors[url.split("/")[1]],
         });
-        
+
     }
 
     request(url, $success) {
@@ -1167,7 +1213,7 @@ class features_paging {
         this.active_page = "/" + this.pageLoaded[1];
         $(this.fickle).html(result);
     }
-    
+
     addPage(page_name, run) {
         page_name = page_name.replace("/", "");
         this.pages[page_name] = run;
@@ -1228,12 +1274,12 @@ class features_paging {
         };
         if (page.mobile.if) {
             var values = {
-                bottom_start: "4.5em",
+                bottom_start: "4em",
                 bottom_end: "-5em",
             };
         } else {
             var values = {
-                bottom_start: "4em",
+                bottom_start: "4.5em",
                 bottom_end: "-5em",
             };
         }
@@ -1361,7 +1407,7 @@ class STNDFItems {
         });
     }
 
-    static CreateWithdrawal(params = {}, success = () => {}) {
+    static CreateWithdrawal(params = {}, success = () => { }) {
         api.post("/withdraw/create", params, success);
     }
 
@@ -1444,19 +1490,20 @@ class ItemsController extends STNDFItems {
         this.battles.last(function () {
             this.attr({ "data-id": params.case_id });
             if (params.user_0_item.price > params.user_1_item.price) var status = 0; else
-            if (params.user_0_item.price < params.user_1_item.price) var status = 1; else var status = 2;
+                if (params.user_0_item.price < params.user_1_item.price) var status = 1; else var status = 2;
             this.addClass("sorted-battles__battle--" + status);
             this.find(".sorted-battles__case-image").attr({ src: "/img/" + params.image });
             // ---------------------------------------------------------------
-            this.find(".sorted-battles-player").each(function (i, e) {
+            this.find(".sorted-battles-player").each(function (i) {
                 var user = params["user_" + i];
                 var item = params["user_" + i + "_item"];
                 // ---------------------------------------------------------------
-                $(e).find(".sorted-battles-player__image").attr({ src: user["photo"] });
-                $(e).find(".sorted-battles-player__price").html(alter_by_currency(item["price"], true));
+                $(this).append(`<a href="/profile/${user.id}" class="ghost ajax-link"></a>`);
+                $(this).find(".sorted-battles-player__image").attr({ src: user["photo"] });
+                $(this).find(".sorted-battles-player__price").html(alter_by_currency(item["price"], true));
                 // ---------------------------------------------------------------
-                $(e).find(".weapon-skins__image").attr({ src: "/img/" + item["image"] });
-                $(e).addClass("sorted-skins__unit--" + item["class_name"]);
+                $(this).find(".weapon-skins__image").attr({ src: "/img/" + item["image"] });
+                $(this).addClass("sorted-skins__unit--" + item["class_name"]);
             });
         });
     }
@@ -1526,8 +1573,6 @@ class FortuneWheelController {
 
     static BattleInit() {
         page.wheel.__init();
-        ProgressBar.start();
-        //page.wheel.stop_wheel();
     }
 
     static BattleCry(data = {}, wheelWinnerId = 0) {
@@ -1538,7 +1583,7 @@ class FortuneWheelController {
                 wheel = skin.parent().parent(),
                 timeout = 3000;
             setTimeout(() => {
-                wheel.find(".fortune-wheel__skin").prepend(`<span class="fortune-wheel__skin--price">${alter_by_currency(itemData.price, true)}</span>`);
+                //wheel.find(".fortune-wheel__skin").prepend(`<span class="fortune-wheel__skin--price">${alter_by_currency(itemData.price, true)}</span>`);
                 // Skin
                 ItemsController.CreateItem({ marks: false });
                 ItemsController.ModifyItemByData(itemData);
@@ -1622,7 +1667,7 @@ class filter {
             price: function () { },
         };
     }
-    
+
     static exclude(params = false) {
         if (params) {
             var ExclusionMap = this.ExclusionMap;
@@ -1631,7 +1676,7 @@ class filter {
             $(this.obj).each(function () {
                 try {
                     for (const key in ExclusionMap) ExclusionMap[key](this, params);
-                } catch (error) {}
+                } catch (error) { }
             });
         }
     }
@@ -1678,13 +1723,13 @@ class ScrollInspector {
                     });
                 }
             };
-        } catch(error) {
+        } catch (error) {
             this.deconstruct();
             console.error(error);
         }
     }
 
-    OnScrollEvent(offset = 0, event = () => {}) {
+    OnScrollEvent(offset = 0, event = () => { }) {
         const $offset = typeof offset == "function" ? offset : function () {
             return typeof offset == "number" ? offset : $(offset).offset().top;
         };

@@ -1069,6 +1069,23 @@ article {
     margin-bottom: 5em;
 }
 
+.box__column {
+    display: grid;
+    row-gap: 0.5em;
+}
+
+.box__column--0 {
+    font-size: 1em;
+    font-weight: bold;
+    text-transform: uppercase;
+}
+
+.box__column--1 {
+    font-size: 2.25em;
+    font-weight: bold;
+    text-transform: uppercase;
+}
+
 .box--no-indent {
     padding-bottom: unset;
     margin-bottom: unset;
@@ -1086,6 +1103,11 @@ article {
     width: 30em;
     font-size: 0.65em;
     z-index: 2;
+}
+
+.box__view--1 {
+    top: unset;
+    bottom: 0;
 }
 
 .box__multiply {
@@ -3133,7 +3155,7 @@ span.contract-window__bill--numeric {
 
 .notifier {
     position: fixed;
-    left: 0.15em;
+    left: 0.5em;
     display: grid;
     padding: 1.25em 1.75em;
     background: #27282c;

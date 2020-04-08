@@ -71,7 +71,7 @@ DOM.listen(page.support.fickle, type => {
 
             case "battle_join":
                 await page.support.pageLoading.promise; // Wait for page is loaded
-                console.log(page.support.pageLoaded, result);
+                console.log(page.wheel.promise.status());
                 
                 if ((result.owner_id == ServiceController.userId || result.rival_id == ServiceController.userId) && result.battle_id == page.support.pageLoaded[2]) {
                     FortuneWheelController.BattleInit();
@@ -83,7 +83,7 @@ DOM.listen(page.support.fickle, type => {
                 break;
 
             case "battle_create":
-                if (ServiceController.userId = 0) return;
+                if (ServiceController.userId == 0) return;
                 $(`tr[data-id="${result.case_id}"] .battles-table__buttons`).prepend(`<button class="battles-table__button battles-table__button--green skewed-element js-battle-join">Войти</button>`);
                 break;
         }
@@ -125,7 +125,7 @@ page.support.onPageLoaded = function (url) {
             page.popup.open(notify_data.popup, notify_data.data);
         }
     });
-    if (typeof page.wheel.promise == "object" && (url != "case" && url != "battle")) {
+    if (typeof page.wheel.promise == "object" && !(url == "case" || url == "battle")) {
         page.wheel.promise.resolve();
     }
     // Preventing Unexpected Scrolling
@@ -244,7 +244,7 @@ page.support.context(function () {
         page: "/lobby",
         device: "mobile",
         action: function () {
-            if (ServiceController.userId = 0) {
+            if (ServiceController.userId == 0) {
                 $(".battles-table__buttons").remove();
             }
         },
@@ -253,6 +253,7 @@ page.support.context(function () {
         page: "/battle",
         device: "mobile",
         action: function () {
+            page.wheel.promise = $.post
             $("[class *= 'battle__button']").removeClass("skewed-element");
             $(".page-part").scrollTo();
         },
