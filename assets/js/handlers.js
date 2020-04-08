@@ -71,7 +71,6 @@ DOM.listen(page.support.fickle, type => {
 
             case "battle_join":
                 await page.support.pageLoading.promise; // Wait for page is loaded
-                console.log(page.wheel.promise.status());
                 
                 if ((result.owner_id == ServiceController.userId || result.rival_id == ServiceController.userId) && result.battle_id == page.support.pageLoaded[2]) {
                     FortuneWheelController.BattleInit();
@@ -125,7 +124,7 @@ page.support.onPageLoaded = function (url) {
             page.popup.open(notify_data.popup, notify_data.data);
         }
     });
-    if (typeof page.wheel.promise == "object" && !(url == "case" || url == "battle")) {
+    if (typeof page.wheel.promise.status == "pending" && !(url == "case" || url == "battle")) {
         page.wheel.promise.resolve();
     }
     // Preventing Unexpected Scrolling

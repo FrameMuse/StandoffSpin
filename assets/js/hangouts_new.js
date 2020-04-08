@@ -125,8 +125,8 @@ $.Defered = class {
     }
 
     deconstruct(value) {
-        this.resolve = "";
-        this.reject = "";
+        //this.resolve = "";
+        //this.reject = "";
         this.value = value;
     }
 
@@ -142,12 +142,12 @@ $.Defered = class {
         this.deconstruct(value);
     }
 
-    then(fulfilled, rejected) {
+    then(fulfilled, rejected = () => {}) {
         return this.promise.then((value) => {
-            this.resolve();
+            if (this.status == "pending") this.resolve();
             fulfilled(value);
         }, (value) => {
-            this.reject();
+            if (this.status == "pending") this.reject();
             rejected(value);
         });
     }
@@ -227,7 +227,7 @@ class interpret {
 
 class ProgressBar {
     static async start() {
-        this.progress = $.Postpone();
+        this.progress = new $.Defered();
         this.rail = 0;
         this.TimerSteps = [
             { time: 500, width: 30 },
@@ -242,7 +242,7 @@ class ProgressBar {
 
         for (var i = 0; i < this.TimerSteps.length; i++) {
             await delay(this.TimerSteps[i]["time"]);
-            if (this.progress.status() == "resolved") return;
+            if (this.progress.status == "resolved") return;
             $(".load-indicator__fill").css({ width: this.TimerSteps[i]["width"] + "%" });
         }
     }
@@ -484,7 +484,7 @@ class features_timer {
 
 class features_wheel {
     constructor() {
-        this.promise = $.Postpone();
+        this.promise = new $.Defered();
         this.reopen = {
             onclick: function () { },
         }
@@ -506,7 +506,7 @@ class features_wheel {
 
     __init() {
         ProgressBar.start();
-        this.promise = $.Postpone();
+        this.promise = new $.Defered();
         this.data.current = {
             items: [],
         };
@@ -562,7 +562,7 @@ class features_wheel {
             rotate: (reverse ? -degrees - 60 : degrees) + "deg",
             easing: 'cubicBezier(.1, 0, 0, 1)',
             duration: 16000,
-            complete: this.promise.resolve,
+            complete: () => this.promise.resolve(),
         });
 
         return block;
@@ -710,7 +710,7 @@ class features_popup {
     constructor() {
         this.on = {};
         this.tmp = {};
-        this.closed = $.Postpone();
+        this.closed = new $.Defered();
     }
 
     tend(option) {
@@ -763,7 +763,7 @@ class features_popup {
         // Animation
         this.fadeIn($(".popup-window"));
         // Return Promise
-        return this.closed = $.Postpone();
+        return this.closed = new $.Defered();
     }
 
     close(force = false) {
@@ -969,7 +969,7 @@ class features_contract {
                 page.support.notify("warning", msg);
             }
         }
-        this.promise = $.Postpone();
+        this.promise = new $.Defered();
     }
 
     init() {
@@ -1125,7 +1125,7 @@ class features_paging {
         this.ScrollInspector = {};
         this.actionOnLoaded = [];
         this.AbleScrollDown = true;
-        this.pageLoading = $.Postpone();
+        this.pageLoading = new $.Defered();
         this.onPageLoaded = () => { };
 
         postLoader.add(() => this.default());
@@ -1137,7 +1137,7 @@ class features_paging {
             // Progress
             ProgressBar.start();
             // Other
-            this.pageLoading = $.Postpone();
+            this.pageLoading = new $.Defered();
             var href = $(e.currentTarget).attr("href").split("#!");
             if (href != null) {
                 this.load(href[0], href[1]);
@@ -1206,8 +1206,6 @@ class features_paging {
     }
 
     final(result, url) {
-        // Progress
-        ProgressBar.end();
         // Other
         this.pageLoaded = url.split("/");
         this.active_page = "/" + this.pageLoaded[1];
@@ -1705,7 +1703,7 @@ class ScrollInspector {
             page: page,
         };
         this.listeners = [];
-        this.entry = $.Postpone();
+        this.entry = new $.Defered();
         this.CurrentListener = this.GetOncrollEvent();
         window.addEventListener('scroll', this.CurrentListener);
     }

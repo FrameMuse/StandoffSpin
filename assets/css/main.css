@@ -92,6 +92,7 @@
     --wheel-item-size: 20em;
     --wheel-item-skew: 31.578947368421055px;
     --wheel-indent: -44.5em;
+    --width: 1320px;
 }
 
 body {
@@ -3385,35 +3386,35 @@ span.contract-window__bill--numeric {
 
 .battle__over--0::before {
     content: "";
-    left: calc((-100vw + 1320px - 20em) / 2);
+    left: calc((-100vw + var(--width) - 20em) / 2);
 }
 
 .battle__over--0::after {
     content: "";
-    right: calc((-100vw + 1320px - 20em) / 2);
+    right: calc((-100vw + var(--width) - 20em) / 2);
     box-shadow: 0 0 7.5em 5em #ff3648;
 }
 
 .battle__over--1::before {
     content: "";
-    right: calc((-100vw + 1320px - 20em) / 2);
+    right: calc((-100vw + var(--width) - 20em) / 2);
 }
 
 .battle__over--1::after {
     content: "";
-    left: calc((-100vw + 1320px - 20em) / 2);
+    left: calc((-100vw + var(--width) - 20em) / 2);
     box-shadow: 0 0 7.5em 5em #ff3648;
 }
 
 .battle__over--2::before, .battle__over--2::after {
     content: "";
-    left: calc((-100vw + 1320px - 20em) / 2);
+    left: calc((-100vw + var(--width) - 20em) / 2);
     box-shadow: 0 0 7.5em 5em #fcff3f;
 }
 
 .battle__over--2::after {
     left: unset;
-    right: calc((-100vw + 1320px - 20em) / 2);
+    right: calc((-100vw + var(--width) - 20em) / 2);
 }
 
 .fortune-wheel--left, .fortune-wheel--right {
