@@ -114,16 +114,17 @@ page.lang.onclick = function (tap) {
 
 // When any pages are loaded 
 page.support.onPageLoaded = function (url) {
-    if (ServiceController.userId == 0) return;
-    api.post("/user/update");
-    api.get("/user/notifications", {}, async (result) => {
-        for (var i = 0; i < result.length; i++) {
-            await page.popup.closed.promise;
-            var notify = result[i];
-            var notify_data = JSON.parse(notify.data);
-            page.popup.open(notify_data.popup, notify_data.data);
-        }
-    });
+    if (ServiceController.userId != 0) {
+        api.post("/user/update");
+        api.get("/user/notifications", {}, async (result) => {
+            for (var i = 0; i < result.length; i++) {
+                await page.popup.closed.promise;
+                var notify = result[i];
+                var notify_data = JSON.parse(notify.data);
+                page.popup.open(notify_data.popup, notify_data.data);
+            }
+        });
+    }
     if (typeof page.wheel.promise.status == "pending" && !(url == "case" || url == "battle")) {
         page.wheel.promise.resolve();
     }
@@ -347,6 +348,8 @@ DOM.on("click", "wheel", {
 });
 
 page.wheel.release = function (fast = false) {
+    // if a client is unauthorized, doing nothing
+    if (ServiceController.userId == 0) return;
     // Init
     page.wheel.init();
     // API Connection
