@@ -769,7 +769,7 @@ class features_popup {
     close(force = false) {
         if (force) this.fadeOut();
         this.fadeOut();
-        setTimeout(this.closed.resolve, 500);
+        setTimeout(() => this.closed.resolve(), 500);
     }
 }
 

@@ -1726,6 +1726,8 @@ article {
 
 .sorted-battles__battle--0 {
     box-shadow: inset 6em 0 4em -7em #88cc31, inset -6em 0 4em -7em #ff5858;
+    border-left: 0.125em solid #88cc31;
+    border-right: 0.125em solid #ff5858;
 }
 
 .sorted-battles__battle--1 {

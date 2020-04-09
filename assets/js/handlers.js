@@ -818,7 +818,7 @@ page.popup.on["sell"] = function (options) {
 
 page.popup.on["sell_all"] = function (options) {
     this.wEdit({
-        summary: this.summary.replace("{price}", options.inventoryPrice),
+        summary: this.summary.replace("{price}", STNDFItems.Total),
         content: `<div style="display:flex;justify-content:center;"><button class="popup-window__button button1" onclick="ItemsController.sellAll();">${this.wText("buttons.yes")}</button><button class="popup-window__button button2" onclick="page.popup.close();">${this.wText("buttons.no")}</button></div>`,
     });
 };
