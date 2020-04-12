@@ -712,7 +712,7 @@ a.ghost {
 
 .live-drops .weapon-skins__image {
     width: 7em;
-    height: 3.7em;
+    height: calc(3.7em - 3px);
     transition: 0.225s background-color;
     z-index: 2;
 }
@@ -990,9 +990,7 @@ main {
     text-align: center;
 }
 
-.page-part__text {
-    text-transform: uppercase;
-}
+.page-part__text {}
 
 .page-part__icon {
     background-image: url("../img/lumen.png");
@@ -1626,6 +1624,7 @@ article {
     background-size: 0.75em;
     width: 1em;
     height: 1em;
+    pointer-events: none;
 }
 
 .sorted-skins__icon--dollar {
@@ -1633,6 +1632,7 @@ article {
     background-size: 0.6em;
     width: 1em;
     height: 1em;
+    pointer-events: none;
 }
 
 .sorted-skins__icon--contract {
@@ -1869,6 +1869,7 @@ article {
     font-size: 1.5em;
     font-weight: 700;
     text-transform: uppercase;
+    white-space: nowrap;
 }
 
 .top__winner {
@@ -2114,6 +2115,11 @@ b {
     margin: 3em auto;
 }
 
+.profile-another__suite {
+    display: grid;
+    row-gap: 5em;
+}
+
 .profile-another__section {
     display: grid;
     justify-items: center;
@@ -2177,11 +2183,17 @@ b {
     border: 0.125em solid #FF0000;
     border-radius: 0.25em;
     transition: .35s background-color;
+    cursor: pointer;
 }
 
 .profile-another__button--blue {
     background: #4a76a8;
     border-color: #4a76a8;
+}
+
+.profile-another__button--purple {
+    background: #5e449f;
+    border-color: #5e449f;
 }
 
 .profile-another__button:hover {
@@ -2339,7 +2351,7 @@ b {
 }
 
 .popup-window__content {
-    /* display: grid; */
+    display: grid;
     justify-content: center;
     margin: 1.75em 0;
 }
@@ -2375,7 +2387,6 @@ b {
 input.popup-window__button.button1 {
     padding: 0.85em;
     background: rgba(255, 255, 255, 0.1);
-    width: calc(35% - 0.6em);
     border-bottom: 0.1em solid rgba(255, 255, 255, 0.5);
     cursor: text;
     transition: 0.125s border-color;
@@ -2442,12 +2453,6 @@ button.popup-window__button.button2 {
 
 /* Top Up */
 
-.top-up {
-    display: grid;
-    width: 60%;
-    margin: 0 auto;
-}
-
 .promocode {
     display: grid;
 }
@@ -2473,8 +2478,6 @@ input.promocode__input:focus::placeholder {
 
 .promocode__text {
     font-weight: 600;
-    font-style: italic;
-    text-transform: uppercase;
     text-align: center;
     color: white;
     margin-top: 1.25em;
@@ -3246,6 +3249,10 @@ span.contract-window__bill--numeric {
     font-size: 1.5em;
     font-weight: 700;
     font-style: italic;
+}
+
+.feeder__pattern--1[data-time] {
+    width: 5em;
 }
 
 .feeder__pattern--2 {

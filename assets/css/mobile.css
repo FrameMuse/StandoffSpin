@@ -158,6 +158,10 @@ a.ghost {
     color: #89cc32;
 }
 
+.red {
+    color: #CC4450;
+}
+
 .darkgray {
     color: #3e4147;
 }
@@ -251,15 +255,19 @@ a.ghost {
 }
 
 .icon__vk {
-    background-image: url(https://standoffcasetest.ru/assets/img/icons/vk.png);
+    background-image: url(/assets/img/icons/vk.png);
 }
 
 .icon__instagram {
-    background-image: url(https://standoffcasetest.ru/assets/img/icons/instagram.png);
+    background-image: url(/assets/img/icons/instagram.png);
 }
 
 .icon__youtube {
-    background-image: url(https://standoffcasetest.ru/assets/img/icons/youtube.png);
+    background-image: url(/assets/img/icons/youtube.png);
+}
+
+.icon__twitch {
+    background-image: url(/assets/img/icons/twitch.png);
 }
 
 .icon__funnel {
@@ -449,6 +457,11 @@ a.ghost {
 .profile-another__button--blue {
     background: #4a76a8;
     border-color: #4a76a8;
+}
+
+.profile-another__button--purple {
+    background: #5e449f;
+    border-color: #5e449f;
 }
 
 .profile-another__button:hover {
@@ -945,8 +958,8 @@ main {
 }
 
 .page-part__text {
-    text-transform: uppercase;
     text-align: center;
+    font-weight: 500;
 }
 
 .page-part__icon {
@@ -1389,8 +1402,9 @@ article {
     column-gap: 1em;
     grid-template-columns: repeat(3, 1fr);
     align-items: center;
+    justify-items: center;
     text-align: center;
-    padding: 0 2em 5em;
+    padding-bottom: 5em;
     margin-bottom: 5em;
     width: 100%;
 }
@@ -1401,7 +1415,7 @@ article {
     background: #212326;
     border-bottom: 0.125em solid;
     border-radius: 0.25em 0.25em 0 0;
-    font-size: 0.6em;
+    font-size: 0.7em;
 }
 
 .sorted-skins__unit--blue {
@@ -1497,7 +1511,7 @@ article {
 .sorted-skins__cost {
     padding: 0.5em 0.75em;
     border-radius: 0.125em;
-    font-size: 0.85em;
+    font-size: 0.75em;
     font-weight: 500;
     z-index: 1;
 }
@@ -1529,6 +1543,10 @@ article {
 
 .sorted-skins__icon--orange::before {
     background: #ffc500;
+}
+
+.sorted-skins__icon--blue::before {
+    background: #1f98ff;
 }
 
 .sorted-skins__icon--arrow {
@@ -1570,16 +1588,23 @@ article {
     display: unset;
 }
 
+.sorted-skins__empty>a {
+    color: #88cc31;
+}
+
 /* Sorted Contracts */
 
 .sorted-contracts {
     display: grid;
     row-gap: 2em;
     column-gap: 2em;
+    align-items: center;
     justify-items: center;
     grid-template-columns: repeat(1, 1fr);
     text-align: center;
     padding-bottom: 5em;
+    margin-bottom: 5em;
+    width: 100%;
 }
 
 .sorted-contracts__unit {
@@ -1600,7 +1625,7 @@ article {
     display: grid;
     row-gap: 1.5em;
     column-gap: 1.25em;
-    grid-template-columns: repeat(5, 1fr);
+    grid-template-columns: repeat(4, 1fr);
     font-size: 0.625em;
 }
 
@@ -1781,6 +1806,7 @@ article {
     font-size: 1.5em;
     font-weight: 700;
     text-transform: uppercase;
+    white-space: nowrap;
 }
 
 .top__winner {
@@ -1850,7 +1876,6 @@ tr.table__disables {
     font-weight: 700;
     font-style: italic;
     text-transform: uppercase;
-    white-space: nowrap;
 }
 
 .table td:nth-child(1) {
@@ -2045,6 +2070,11 @@ b {
     margin: 3em auto;
 }
 
+.profile-another__suite {
+    display: flex;
+    align-items: center;
+}
+
 .profile-another__section {
     display: grid;
     justify-items: center;
@@ -2112,16 +2142,16 @@ b {
     padding: 1em;
 }
 
-.tab-swithcer__button--active {
-    background: rgba(255, 255, 255, 0.15);
-}
-
 .skewed-element.tab-swithcer__button {
     background: unset;
 }
 
 .skewed-element.tab-swithcer__button::before {
     background: rgba(255, 255, 255, 0.05);
+}
+
+.skewed-element.tab-swithcer__button--active::before, .tab-swithcer__button--active {
+    background: rgba(255, 255, 255, 0.15);
 }
 
 .tab-swithcer {
@@ -2208,8 +2238,14 @@ b {
     text-transform: uppercase;
 }
 
+.popup-window__summary--clear-styles {
+    font-weight: unset;
+    font-style: unset;
+    text-transform: unset;
+}
+
 .popup-window__content {
-    /* display: grid; */
+    display: grid;
     justify-content: center;
     margin: 2.5em 0;
     font-size: 1.75em;
@@ -2247,7 +2283,7 @@ b {
 input.popup-window__button.button1 {
     padding: 0.85em;
     background: rgba(255, 255, 255, 0.1);
-    width: calc(50% - 0.6em);
+    width: 85%;
     border-bottom: 0.1em solid rgba(255, 255, 255, 0.5);
     cursor: text;
     transition: 0.125s linear border-color;
@@ -2261,6 +2297,10 @@ button.popup-window__button.button1[disabled] {
 
 input.popup-window__button.button1:hover, input.popup-window__button.button1:focus {
     border-color: rgba(255, 255, 255, 0.75);
+}
+
+input.popup-window__button.button1:focus::placeholder {
+    color: transparent;
 }
 
 .withdraw__price {
@@ -2325,7 +2365,6 @@ button.popup-window__button.button2 {
     border-bottom: 0.1em solid #88cc31;
     font-size: 1.5em;
     font-weight: 600;
-    font-style: italic;
     text-transform: uppercase;
     text-align: center;
     color: #88cc31;
@@ -2341,8 +2380,6 @@ input.promocode__input:focus::placeholder {
 
 .promocode__text {
     font-weight: 600;
-    font-style: italic;
-    text-transform: uppercase;
     text-align: center;
     color: white;
     margin-top: 1.25em;
@@ -2414,6 +2451,7 @@ input.promocode__input:focus::placeholder {
 .contract {
     display: grid;
     justify-content: center;
+    justify-items: center;
     padding: 0 2em;
     margin: 5em 0;
     font-size: 0.85em;
@@ -2476,6 +2514,15 @@ input.promocode__input:focus::placeholder {
     background: #88cc31;
 }
 
+.contract__button[disabled] {
+    cursor: not-allowed;
+}
+
+.contract__button[disabled]::before {
+    background: transparent;
+    border: 0.125em solid rgba(91, 102, 119, 0.5);
+}
+
 .contract__caution {
     margin-top: 1.5em;
     text-align: center;
@@ -2516,6 +2563,13 @@ input.promocode__input:focus::placeholder {
     padding: 3em;
 }
 
+.contract-window__bottom {
+    display: grid;
+    row-gap: 2em;
+    justify-content: center;
+    justify-items: center;
+}
+
 .contract-window__logo {}
 
 .contract-window__logo--logo {
@@ -2539,7 +2593,7 @@ input.promocode__input:focus::placeholder {
 }
 
 .contract-window__sign {
-    display: none;
+    /* display: none; */
     align-items: center;
 }
 
@@ -3088,6 +3142,7 @@ span.contract-window__bill--numeric {
     background: black;
     border-radius: 100%;
     margin-right: 1em;
+    flex-shrink: 0;
 }
 
 .feeder__pattern {
@@ -3416,6 +3471,7 @@ span.contract-window__bill--numeric {
 .battles {
     display: grid;
     margin-top: 2.5em;
+    overflow: hidden;
 }
 
 .battles__sidebar {
@@ -3864,6 +3920,7 @@ footer {
 .bottombar-menu {
     display: flex;
     align-items: center;
+    margin-top: 0.5em;
 }
 
 .bottombar-menu__link {
@@ -3930,6 +3987,12 @@ body {
 
 .popup {
     font-size: 2vw;
+}
+
+/* Agreement */
+
+.agreement h3 {
+    color: #88cc31;
 }
 
 /* Mobile Menu */

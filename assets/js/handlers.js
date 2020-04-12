@@ -49,6 +49,7 @@ DOM.listen(page.support.fickle, type => {
         var action = data.result.action;
         delete data.result.action;
         var result = data.result;
+        if (page.dev) console.log(action, result);
         switch (action) {
             case "online":
                 DOM.update("socket-update", result, true);
@@ -59,6 +60,7 @@ DOM.listen(page.support.fickle, type => {
                 break;
 
             case "livedrop":
+                await delay(result.items[0]["now"] ? 0 : 16000);
                 var sample = result.items[0];
                 if ("case_id" in sample ? sample["case_id"] : $(".battle").data("id") == page.support.pageLoaded[2]) {
                     await page.wheel.promise.promise;
@@ -70,20 +72,30 @@ DOM.listen(page.support.fickle, type => {
                 break;
 
             case "battle_join":
+                if (ServiceController.userId == 0) return;
                 await page.support.pageLoading.promise; // Wait for page is loaded
-                
-                if ((result.owner_id == ServiceController.userId || result.rival_id == ServiceController.userId) && result.battle_id == page.support.pageLoaded[2]) {
-                    FortuneWheelController.BattleInit();
-                    FortuneWheelController.BattleCry(result.itemList, result.wheelWinnerId);
-                    page.support.actionOnLoaded["battle_hide_all"]();
-                    $(".fortune-wheel--right .fortune-wheel-user__image").attr({ src: result.user.photo });
-                    $(".fortune-wheel--right .fortune-wheel-user__nickname").html(result.user.first_name + " " + result.user.last_name);
-                }
+                new Promise(function (resolve) {
+                    var interval = setInterval(() => {
+                        if (page.support.pageLoaded[2] != undefined) {
+                            clearInterval(interval);
+                            resolve();
+                            return;
+                        }
+                    }, 100);
+                }).then(function () {
+                    if ((result.owner_id == ServiceController.userId || result.rival_id == ServiceController.userId) && result.battle_id == page.support.pageLoaded[2]) {
+                        FortuneWheelController.BattleInit();
+                        FortuneWheelController.BattleCry(result.itemList, result.wheelWinnerId);
+                        page.support.actionOnLoaded["battle_hide_all"]();
+                        $(".fortune-wheel--right .fortune-wheel-user__image").attr({ src: result.user.photo });
+                        $(".fortune-wheel--right .fortune-wheel-user__nickname").html(result.user.first_name + " " + result.user.last_name);
+                    }
+                });
                 break;
 
             case "battle_create":
                 if (ServiceController.userId == 0) return;
-                $(`tr[data-id="${result.case_id}"] .battles-table__buttons`).prepend(`<button class="battles-table__button battles-table__button--green skewed-element js-battle-join">Войти</button>`);
+                if ($(`tr[data-id="${result.case_id}"] .js-battle-join`).length <= 0) $(`tr[data-id="${result.case_id}"] .battles-table__buttons`).prepend(`<button class="battles-table__button battles-table__button--green skewed-element js-battle-join">Войти</button>`);
                 break;
         }
     });
@@ -114,6 +126,7 @@ page.lang.onclick = function (tap) {
 
 // When any pages are loaded 
 page.support.onPageLoaded = function (url) {
+    page.popup.close();
     if (ServiceController.userId != 0) {
         api.post("/user/update");
         api.get("/user/notifications", {}, async (result) => {
@@ -130,7 +143,7 @@ page.support.onPageLoaded = function (url) {
     }
     // Preventing Unexpected Scrolling
     if (window.scrollX) $("html, body").scrollLeft(0);
-    if (window.scrollY > (5).toPx("body") && page.support.AbleScrollDown) $(".page-part").scrollTo();
+    if (window.scrollY > (5).toPx("body") && page.support.AbleScrollDown && page.support.hash.length < 2) $(".page-part").scrollTo();
     // Clearing
     config.ReferalCurrentTablePage = 0;
     if (page.inspector != undefined) page.inspector.deconstruct();
@@ -171,6 +184,9 @@ page.support.context(function () {
             403: function () {
                 page.popup.open("vk_participation");
             },
+            402: function () {
+                page.popup.open("vk_only");
+            },
         },
     });
     this.__addPage({
@@ -208,7 +224,7 @@ page.support.context(function () {
             const newElement = $(".table tr:last-child").clone();
             $(".table tr:last-child").remove();
             this.OnScrollEvent(ScrollInt, function () {
-                this.entry = $.Postpone();
+                this.entry = $.Defered();
                 ProgressBar.start();
                 api.get(["/user/load/", ServiceController.userId, "/referal/", config.ReferalCurrentTablePage], {}, result => {
                     result.result.filter(function (person, index) {
@@ -216,8 +232,8 @@ page.support.context(function () {
                         newElement.find("td:nth-child(2) .table-user__image").attr({ src: person.photo });
                         newElement.find("td:nth-child(2) a").attr({ href: "/profile/" + person.id });
                         newElement.find("td:nth-child(2) span").html(person.first_name + " " + person.last_name);
-                        newElement.find("td:nth-child(3)").html(person.ref_balance);
-                        newElement.find("td:nth-child(4)").html(person.profit);
+                        newElement.find("td:nth-child(3)").html(alter_by_currency(person.ref_balance, true));
+                        newElement.find("td:nth-child(4)").html(alter_by_currency(person.ref_balance * ($("[data-percent]").data("percent") * 0.1), true));
                         newElement.clone().appendTo(".table");
                     });
                     if (result.nextPage) {
@@ -318,16 +334,22 @@ page.support.actionOnLoaded["to_wheel"] = function () {
 DOM.on("click", "wheel", {
     reopen: function () {
         // Reload Page
-        page.support.refresh();
+        page.support.refresh(true);
     },
     "sell-item": function () {
-        console.log($(this).attr("weapon-id"));
-        
         ItemsController.Sell(this, (result) => {
             // Balance Update
             BalanceController.UpdateBalance(result.balance);
-            // Reload Page
-            page.support.refresh();
+            // Check for multiple win
+            if (page.wheel.data.current.length > 1) {
+                // Remove parent
+                $(this).parent().parent().remove();
+                // Remove from current wheel data
+                page.wheel.data.current.length = page.wheel.data.current.length - 1;
+            } else {
+                // Reload Page
+                page.support.refresh(true);
+            }
             // Notify
             page.support.notify("success", "Предмет успешно продан");
         });
@@ -355,7 +377,8 @@ page.wheel.release = function (fast = false) {
     // API Connection
     api.post("/case/open", {
         id: page.support.pageLoaded[2],
-        multiplier: page.wheel.data.multiplier
+        multiplier: page.wheel.data.multiplier,
+        type: fast ? "fast" : false,
     }, result => {
         page.wheel.multiple_win(result.itemList, fast);
         // Balance Update
@@ -373,7 +396,7 @@ page.wheel.box_input_change = function (e) {
     var price = price == NaN ? 0 : price;
     // Update Case Price & Funds Lack
     DOM.update("wheel", {
-        price: price ? alter_by_currency(price, true) : getLanguage("case.buttons.free"),
+        price: price ? alter_by_currency(price, true) : "",
         funds_lack: alter_by_currency(BalanceController.FundsLackAmount(price) * -1, true),
     });
     // Check for sufficient funds
@@ -405,12 +428,11 @@ $(document).on("click", ".box__view .fortune-wheel__button--1:not([class *= 'js'
 // Bonuses
 
 $(document).on("click", ".feeder[data-id] .feeder__button:not([disabled])", function () {
-    $(this).each(function () {
-        api.post("/bonus/request", {
-            id: +$(this).parent().attr("data-id"),
-        }, (result) => {
-            $(this).val(result.success_message)
-        });
+    api.post("/bonus/request", {
+        id: +$(this).parent().parent().attr("data-id"),
+    }, (result) => {
+        $(this).val(getLanguage(result.success_message));
+        $(this).attr({ disabled: "" });
     });
 });
 
@@ -419,7 +441,8 @@ DOM.on("click", "bonus", {
         api.post("/promo/prize_promo", {
             promo: $(".js-bonus-balance-gap").val(),
         }, (result) => {
-            page.support.notify("success", result.success_message)
+            BalanceController.UpdateBalance(result.balance);
+            page.support.notify("success", getLanguage("settings.notify"));
         });
     },
 });
@@ -429,15 +452,15 @@ DOM.on("click", "referal", {
     "active-button": function () {
         api.post("/referal/active", {
             code: $(".js-referal-active-gap").val(),
-        }, (result) => {
-            page.support.notify("success", result.success_message)
+        }, () => {
+            page.support.notify("success", getLanguage("settings.notify"));
         });
     },
     "save-button": function () {
         api.post("/referal/save", {
             code: $(".js-referal-save-gap").val(),
-        }, (result) => {
-            page.support.notify("success", result.success_message)
+        }, () => {
+            page.support.notify("success", getLanguage("settings.notify"))
         });
     },
 });
@@ -455,7 +478,7 @@ DOM.on("click", "item", {
     withdraw: function () {
         // Vars
         var weapon = $(this).parent().parent().parent();
-        var weapon_id = weapon.data("id");
+        var weapon_id = weapon.attr("weapon-id");
         var weapon_price = alter_by_currency(weapon.find(".sorted-skins__cost").html(), false);
         // Conditions
         if (page.popup.tmp.NeedsToSetAvatar) {
@@ -471,37 +494,41 @@ DOM.on("click", "item", {
             item: {
                 id: weapon_id,
                 object: weapon,
-                price: (+Math.random() + (weapon_price / 0.2)).toFixed(2),
+                price: (+Math.random() + (weapon_price * 1.2)).toFixed(2),
                 initial_price: weapon_price,
             },
         });
     },
     "withdraw-submit": function () {
+        var withdraw_input = DOM.$("item", "withdraw-input").val();
         var item = page.popup.tmp.options.item;
+        if (withdraw_input.length < 4) return;
         $(".popup-window__button").attr({ disabled: "" });
         ProgressBar.start();
         ItemsController.CreateWithdrawal({
             item: item.id,
             price: item.price - item.initial_price,
-            name: DOM.$("item", "withdraw-input").val(),
+            name: withdraw_input,
         }, function () {
             const obj = DOM.$("tab", "history");
             item.object.find(".js-item-sell").remove();
             item.object.find(".sorted-skins__icon--arrow").removeClass("sorted-skins__icon--arrow").addClass("sorted-skins__icon--refresh");
             item.object.find(".sorted-skins__icon").removeClass("js-item-sell js-item-withdraw");
             item.object.prependTo(obj);
-            ItemsController.Callback();
+            page.support.notify("success", getLanguage("settings.notify"));
             page.popup.close();
             ProgressBar.end();
         });
     },
     sell: function () {
         var weapon = $(this).parent().parent().parent();
-        var weapon_id = weapon.data("id");
+        var weapon_id = weapon.attr("weapon-id");
+        console.log(weapon_id);
+
         var weapon_price = alter_by_currency(weapon.find(".sorted-skins__cost").html(), false);
         page.popup.open("sell", {
             item: {
-                id: weapon_id,
+                id: +weapon_id,
                 object: weapon,
                 price: weapon_price,
             },
@@ -511,7 +538,8 @@ DOM.on("click", "item", {
         var item = page.popup.tmp.options.item;
         $(".popup-window__button").attr({ disabled: "" });
         ProgressBar.start();
-        ItemsController.Sell(item.id, function () {
+        ItemsController.Sell(item.id, function (result) {
+            BalanceController.UpdateBalance(result.balance);
             const obj = DOM.$("tab", "history");
             item.object.find(".js-item-withdraw").remove();
             item.object.find(".sorted-skins__icon").removeClass("js-item-sell js-item-withdraw");
@@ -593,14 +621,18 @@ $(document).on("click", ".sorted-skins-more-button", function () {
 // Skins
 
 $(document).on("click", ".sorted-skins .sorted-skins__unit[pickable]", function () {
-    $(this).attr({ pickable: "Убрать" });
-    page.contract.spot.takePlace($(this));
+    var object = page.contract.spot.takePlace($(this));
+    if (object) {
+        $(object).attr({ pickable: getLanguage("contracts.buttons.remove") });
+    }
     page.contract.update_DOM();
 });
 
 $(document).on("click", ".contract__spot .sorted-skins__unit[pickable]", function () {
-    $(this).attr({ pickable: "Выбрать" });
-    page.contract.spot.freeUpPlace($(this));
+    var object = page.contract.spot.freeUpPlace($(this));
+    if (object) {
+        $(object).attr({ pickable: getLanguage("contracts.buttons.pickable") });
+    }
     page.contract.update_DOM();
 });
 
@@ -654,14 +686,15 @@ DOM.on("click", "battle", {
         api.post("/battle/join", { id: lobby_id }, function (result) {
             // Load the page
             page.support.load(result.redirectURL, "battle_hide_all");
+            BalanceController.UpdateBalance(result.balance);
         });
-        page.support.pageLoading = $.Postpone();
     },
 
     create: function () {
         var lobby_id = $(this).parent().parent().parent().data("id");
         api.post("/battle/create", { id: lobby_id }, function (result) {
             page.support.load(result.redirectURL);
+            BalanceController.UpdateBalance(result.balance);
         });
     },
 });
@@ -724,13 +757,13 @@ DOM.on("click", "level", {
 DOM.on("click", "filter", {
     button: function () {
         var current = $(".tab-swithcer__button--active");
-        new filter(".js-tab-" + current.attr("tab")), 
-        filter.exclude({
-            price: {
-                min: 25,
-                max: 9999,
-            },
-        });
+        new filter(".js-tab-" + current.attr("tab")),
+            filter.exclude({
+                price: {
+                    min: 25,
+                    max: 9999,
+                },
+            });
     },
 });
 
@@ -740,7 +773,10 @@ DOM.on("click", "referal", {
     save: function () {
         var promo = DOM.$("referal", "me_gap").val();
         api.post("/referal/save", { code: promo }, result => {
-            page.support.notify("success", result.error_msg)
+            if (result.message != undefined) {
+                page.support.notify("success", result.message);
+            }
+            page.support.notify("error", result.error_msg);
         });
     },
     activate: function () {
@@ -748,7 +784,7 @@ DOM.on("click", "referal", {
         api.post("/referal/active", { code: promo }, (result) => {
             BalanceController.UpdateBalance(result.balance);
             $(this).attr({ disabled: "" });
-            page.support.notify("success", "Заебок");
+            page.support.notify("success", getLanguage("settings.notify"));
         });
     },
     copyMe: function () {
@@ -793,6 +829,7 @@ page.popup.on["withdraw__error"] = function () {
 page.popup.on["withdraw__cancel"] = function (options) {
     this.wEdit({
         summary: this.summary.replace('{skin}', options.skin),
+        content: `<button class="popup-window__button button1" onclick="page.popup.close();" style="margin: auto;">${this.wText("button")}</button>`,
     });
 };
 
@@ -803,8 +840,14 @@ page.popup.on["withdraw__avatar"] = function () {
 };
 
 page.popup.on["auth"] = function () {
+    // CLear Styles Option
+    if (this.summary.search("!RemoveItalic") != -1) {
+        this.summary = this.summary.replace("!RemoveItalic", "");
+        $(".popup-window__summary").css({ "font-style": "normal" });
+    }
     this.wEdit({
-        content: '<div class="auth"><a href="/auth/vk" class="auth__button auth__button--vkontakte">Вконтакте</a><a href="/auth/twitch" class="auth__button auth__button--twitch">Twitch</a><a href="/auth/youtube" class="auth__button auth__button--youtube">Youtube</a></div>',
+        summary: this.summary,
+        content: '<div class="auth"><a href="/auth/vk" class="auth__button auth__button--vkontakte">Вконтакте</a><a href="/auth/twitch" class="auth__button auth__button--twitch">Twitch</a><a href="/auth/youtube" class="auth__button auth__button--youtube">YouTube</a></div>',
     });
 };
 

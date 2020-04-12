@@ -142,7 +142,7 @@ $.Defered = class {
         this.deconstruct(value);
     }
 
-    then(fulfilled, rejected = () => {}) {
+    then(fulfilled, rejected = () => { }) {
         return this.promise.then((value) => {
             if (this.status == "pending") this.resolve();
             fulfilled(value);
@@ -366,7 +366,13 @@ const DOM = new class {
     on(event, prefix, handlers) {
         var origin = ".js-" + prefix + "-";
         for (const key in handlers) {
-            $(document).on(event, origin + key, handlers[key]);
+            $(document).on(event, origin + key, (element) => {
+                if (ServiceController.userId == 0) {
+                    page.popup.open("auth");
+                    return;
+                }
+                handlers[key].apply(element.currentTarget, [element.currentTarget]);
+            });
         }
     }
 
@@ -875,28 +881,30 @@ class features_contract {
                 });
             }
 
-            takePlace(obj) {
+            takePlace(object) {
                 var avail = this.whichAvail().shift(),
                     element = this.setOcp(avail);
-                if (!element) return;
-                obj.clone().appendTo(element);
+                if (!element) return false;
+                object.appendTo(element);
                 this.data("get", avail);
-                obj.remove();
+                //object.remove();
                 // Extra
                 this.caution();
+                return object;
             }
 
-            freeUpPlace(obj) {
-                var id = obj.parent().attr("data-id");
-                if (!this.setUnocp(id)) return;
+            freeUpPlace(object) {
+                var id = object.parent().attr("data-id");
+                if (!this.setUnocp(id)) return false;
 
-                obj.clone().appendTo(
+                object.appendTo(
                     $(".sorted-skins")
                 );
                 this.data(null, id);
-                obj.remove();
+                //object.remove();
                 // Extra
                 this.caution();
+                return object;
             }
 
             whichAvail($status = "unoccupied") {
@@ -911,6 +919,7 @@ class features_contract {
 
             setOcp(index) {
                 try {
+                    if (index == undefined) return false;
                     this.spots[index]["status"] = "occupied";
                     return this.spots[index]["object"];
                 } catch (error) {
@@ -1028,22 +1037,37 @@ class features_canvas {
         this.isMouseDown = false;
         this.canvas_out = $(".contract-window__canvas");
         this.canvas = this.canvas_out[0];
-        this.canvas.width = this.canvas_out.outerWidth();
-        this.canvas.height = this.canvas_out.outerHeight();
-        this.body = $("body"); this.canvas
+        this.resizeCanvas();
+        this.body = $("body");
         this.ctx = this.canvas.getContext('2d');
         this.linesArray = [];
         this.currentSize = 1;
         this.currentColor = "rgb(225,225,225)";
         this.currentBg = "white";
 
+        window.addEventListener('resize', this.resizeCanvas, false);
+        window.addEventListener('orientationchange', this.resizeCanvas, false);
+
         // DRAWING EVENT HANDLERS
 
-        this.canvas.addEventListener('mousedown', () => { this.mousedown(this.canvas, event); });
-        this.canvas.addEventListener('mousemove', () => { this.mousemove(this.canvas, event); });
-        this.canvas.addEventListener('mouseup', () => {
-            this.mouseup();
-        });
+        this.canvas.addEventListener('mousedown', (event) => this.mousedown(this.canvas, event));
+        this.canvas.addEventListener('mousemove', (event) => this.mousemove(this.canvas, event));
+        this.canvas.addEventListener('mouseup', () => this.mouseup());
+        this.canvas.addEventListener('touchmove', (event) => {
+            var touch = event.touches[0];
+            var mouseEvent = new MouseEvent("mousemove", {
+                clientX: touch.clientX,
+                clientY: touch.clientY
+            });
+            this.canvas.dispatchEvent(mouseEvent);
+        }, false);
+        this.canvas.addEventListener('touchstart', (event) => this.mousedown(this.canvas, event));
+        this.canvas.addEventListener('touchend', () => this.mouseup());
+    }
+
+    resizeCanvas() {
+        this.canvas.width = this.canvas_out.outerWidth();
+        this.canvas.height = this.canvas_out.outerHeight();
     }
 
     save() {
@@ -1064,18 +1088,20 @@ class features_canvas {
         }
     }
 
-    getMousePos(canvas, evt) {
+    getMousePos(canvas, event) {
         var rect = this.canvas.getBoundingClientRect();
         return {
-            x: evt.clientX - rect.left,
-            y: evt.clientY - rect.top
+            x: event.clientX - rect.left,
+            y: event.clientY - rect.top
         };
     }
 
-    mousedown(canvas, evt) {
-        var mousePos = this.getMousePos(this.canvas, evt);
+    mousedown(canvas, event) {
+        event.preventDefault();
+        event.stopPropagation();
+        var mousePos = this.getMousePos(this.canvas, event);
         this.isMouseDown = true
-        var currentPosition = this.getMousePos(this.canvas, evt);
+        var currentPosition = this.getMousePos(this.canvas, event);
         this.ctx.moveTo(currentPosition.x, currentPosition.y)
         this.ctx.beginPath();
         this.ctx.lineWidth = this.currentSize;
@@ -1083,9 +1109,9 @@ class features_canvas {
         this.ctx.strokeStyle = this.currentColor;
     }
 
-    mousemove(canvas, evt) {
+    mousemove(canvas, event) {
         if (this.isMouseDown) {
-            var currentPosition = this.getMousePos(this.canvas, evt);
+            var currentPosition = this.getMousePos(this.canvas, event);
             this.ctx.lineTo(currentPosition.x, currentPosition.y)
             this.ctx.stroke();
             this.store(currentPosition.x, currentPosition.y, this.currentSize, this.currentColor);
@@ -1165,7 +1191,7 @@ class features_paging {
             if (hashAction) this.save_hash(hashAction); else this.save_hash();
             this.final(result, url);
         });
-        return this.pageLoading;
+        return this.pageLoading = new $.Defered();
     }
 
     __load(url, result) {
@@ -1174,8 +1200,12 @@ class features_paging {
         return this.pageLoading;
     }
 
-    refresh() {
-        this.load(window.location.pathname);
+    async refresh(silent = false) {
+        if (silent) {
+            page.support.AbleScrollDown = false;
+            await this.load(window.location.pathname);
+            page.support.AbleScrollDown = true;
+        } else this.load(window.location.pathname);
     }
 
     dynamic_request(url, $success) {
@@ -1277,18 +1307,20 @@ class features_paging {
             };
         } else {
             var values = {
-                bottom_start: "4.5em",
+                bottom_start: "2em",
                 bottom_end: "-5em",
             };
         }
-
+        $(this).css({ width: "" });
         $(".notifier").animate({ bottom: values.bottom_start, }, 350);
         $(".notifier__message").html(message);
         $(".notifier__signal").css({
             background: "hsl(" + singals[signal] + ", 50%, 40%)",
-        }).animate({
+        });
+        $(".notifier__signal").animate({
             width: "100%",
         }, 5000, "linear", function () {
+            $(this).stop(true, false);
             $(".notifier").animate({ bottom: values.bottom_end, }, 350, () => $(this).css({ width: "" }));
         });
     }
@@ -1390,17 +1422,17 @@ const page = new class {
 }
 
 class STNDFItems {
-    static Sell(argument1, callback) {
-        api.post("/item/sell", { id: typeof argument1 == "number" ? argument1 : +$(argument1).attr("weapon-id") }, callback);
+    static Sell(argument1, callback = false) {
+        api.post("/item/sell", {
+            id: typeof argument1 == "number" ? argument1 : +$(argument1).attr("weapon-id")
+        }, callback ? callback : this.Callback);
     }
 
     static sellAll() {
-        api.post("/item/sellall", {}, (result) => {
+        api.post("/item/sellall", {}, async (result) => {
             page.popup.close();
-            page.support.refresh();
-            DOM.update("required-update", {
-                balance: split_number(result.balance) + " Р"
-            });
+            page.support.refresh(true);
+            BalanceController.UpdateBalance(result.balance);
             page.support.notify("success", "Предметы успешно проданы");
         });
     }
@@ -1411,6 +1443,7 @@ class STNDFItems {
 
     static Callback(result) {
         page.support.notify("success", getLanguage("settings.notify"));
+        page.support.refresh();
     }
 
     static StatusMap(status) {
@@ -1453,7 +1486,7 @@ class ItemsController extends STNDFItems {
         const params = this.parseData(data, { item_id: data.id, status: data.status });
         const StatusMap = this.StatusMap;
         this.items.last(function () {
-            this.attr({ "data-id": params.item_id });
+            this.attr({ "weapon-id": params.item_id });
             this.find(".sorted-skins__cost").html(alter_by_currency(params.price, true));
             this.find(".sorted-skins__skin-title--0").html(params.name);
             this.find(".sorted-skins__skin-title--1").html(params.subname);
@@ -1581,7 +1614,7 @@ class FortuneWheelController {
                 wheel = skin.parent().parent(),
                 timeout = 3000;
             setTimeout(() => {
-                //wheel.find(".fortune-wheel__skin").prepend(`<span class="fortune-wheel__skin--price">${alter_by_currency(itemData.price, true)}</span>`);
+                wheel.find(".fortune-wheel__skin").prepend(`<span class="fortune-wheel__skin--price">${alter_by_currency(itemData.price, true)}</span>`);
                 // Skin
                 ItemsController.CreateItem({ marks: false });
                 ItemsController.ModifyItemByData(itemData);
@@ -1705,23 +1738,25 @@ class ScrollInspector {
         this.listeners = [];
         this.entry = new $.Defered();
         this.CurrentListener = this.GetOncrollEvent();
-        window.addEventListener('scroll', this.CurrentListener);
+        window.addEventListener('scroll', this.CurrentListener, false);
+        window.addEventListener('touchmove', this.CurrentListener, false);
     }
 
     GetOncrollEvent() {
         try {
             return async event => {
                 await this.entry.promise;
-                if (!event.isTrusted || event.type != "scroll") return;
+                if (!event.isTrusted) return;
                 if (this.listeners != undefined) {
                     this.listeners.filter($this => {
-                        if (event.path[1].scrollY >= $this.offset()) {
+                        if (window.scrollY >= $this.offset()) {
                             $this.event.apply($this.context, [event, this]);
                         }
                     });
                 }
             };
         } catch (error) {
+            alert(123);
             this.deconstruct();
             console.error(error);
         }
@@ -1741,6 +1776,7 @@ class ScrollInspector {
 
     deconstruct() {
         window.removeEventListener('scroll', this.CurrentListener);
+        window.removeEventListener('touchmove', this.CurrentListener);
         delete this;
     }
 
