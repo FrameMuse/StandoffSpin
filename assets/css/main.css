@@ -635,14 +635,34 @@ a.ghost {
     cursor: pointer;
 }
 
+.weapon-skins__image, .weapon-skins__case {
+    opacity: 0;
+    transition: 0.175s linear opacity;
+}
+
 .weapon-skins__image {
     width: 6.7em;
     height: 3.8em;
     margin: auto;
+    opacity: 1;
+}
+
+.weapon-skins__case {
+    position: absolute;
+    justify-self: center;
+    height: 3.8em;
 }
 
 .weapon-skins__unit .weapon-skins__image, .weapon-skins__unit .weapon-skins__quality {
     z-index: 13;
+}
+
+[class *="js-tab"] .sorted-skins__unit .weapon-skins__weapon:hover .weapon-skins__image {
+    opacity: 0;
+}
+
+.weapon-skins__weapon:hover .weapon-skins__case {
+    opacity: 1;
 }
 
 .weapon-skins__quality {
@@ -2116,8 +2136,8 @@ b {
 }
 
 .profile-another__suite {
-    display: grid;
-    row-gap: 5em;
+    display: flex;
+    align-items: flex-end;
 }
 
 .profile-another__section {
@@ -2492,7 +2512,7 @@ input.promocode__input:focus::placeholder {
 
 .top-up__text {
     padding: 1em;
-    width: 10em;
+    width: 7em;
     background: #1b1d1f;
     font-weight: 700;
     font-style: italic;

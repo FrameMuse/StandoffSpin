@@ -7,7 +7,7 @@ var config = {},
         history: 1,
         battles: 1,
     },
-    sorted_skin_html = `<div class="sorted-skins__unit"><div class="sorted-skins__marks"><span class="sorted-skins__cost skewed-element"></span><div class="sorted-skins__icons"><div class="sorted-skins__icon sorted-skins__icon--green skewed-element js-item-withdraw"><span class="sorted-skins__icon--arrow"></span></div><div class="sorted-skins__icon sorted-skins__icon--orange skewed-element js-item-sell"><span class="sorted-skins__icon--dollar"></span></div></div></div><div class="weapon-skins__weapon"><img src="" class="weapon-skins__image"></div><div class="sorted-skins__skin-title"><span class="sorted-skins__skin-title--0"></span><span class="sorted-skins__skin-title--1"></span></div></div>`,
+    sorted_skin_html = `<div class="sorted-skins__unit"><div class="sorted-skins__marks"><span class="sorted-skins__cost skewed-element"></span><div class="sorted-skins__icons"><div class="sorted-skins__icon sorted-skins__icon--green skewed-element js-item-withdraw"><span class="sorted-skins__icon--arrow"></span></div><div class="sorted-skins__icon sorted-skins__icon--orange skewed-element js-item-sell"><span class="sorted-skins__icon--dollar"></span></div></div></div><div class="weapon-skins__weapon"><img src="" class="weapon-skins__image"><img class="weapon-skins__case"><a class="ghost"></a></div><div class="sorted-skins__skin-title"><span class="sorted-skins__skin-title--0"></span><span class="sorted-skins__skin-title--1"></span></div></div>`,
     sorted_contract_html = `<div class="sorted-contracts__unit"><div class="sorted-contracts__extend"><div class="sorted-contracts__skins"></div><div class="sorted-contracts__text gray">Стоимость контракта <span class="white skewed-text"></span></div></div></div>`,
     sorted_battle_html = `<div class="sorted-battles__battle"><div class="sorted-battles-player"><div class="weapon-skins__weapon"><img src="" class="weapon-skins__image"><span class="weapon-skins__quality weapon-skins__quality--skyblue"></span></div><div class="sorted-battles-player__info"><img src="" alt="" class="sorted-battles-player__image"><span class="sorted-battles-player__price"></span></div></div><img src="" alt="" class="sorted-battles__case-image"><div class="sorted-battles-player"><div class="weapon-skins__weapon"><img src="" class="weapon-skins__image"><span class="weapon-skins__quality weapon-skins__quality--pink"></span></div><div class="sorted-battles-player__info"><img src="" alt="" class="sorted-battles-player__image"><span class="sorted-battles-player__price"></span></div></div></div>`;
 // Extending Functions
@@ -66,7 +66,7 @@ Array.prototype.last = function (argument1) {
 window.getLanguage = (param) => {
     var split = param.split(".");
     var result = window._language;
-
+    if (result == undefined) return false;
     for (var v of split) {
         if (!result[v]) {
             result = "not found " + param;
@@ -117,8 +117,10 @@ $.Postpone = function () {
 $.Defered = class {
     constructor() {
         this.promise = new Promise((resolve, reject) => {
-            this.$resolve = resolve;
-            this.$reject = reject;
+            this.promiseTools = {
+                resolve: resolve,
+                reject: reject,
+            };
             this.status = "pending";
             this.value = "";
         });
@@ -132,13 +134,13 @@ $.Defered = class {
 
     resolve(value = "") {
         this.status = "resolved";
-        this.$resolve(value);
+        this.promiseTools.resolve(value);
         return this.deconstruct(value);
     }
 
     reject(value = "") {
         this.status = "rejected";
-        this.$reject(value);
+        this.promiseTools.reject(value);
         this.deconstruct(value);
     }
 
@@ -179,7 +181,7 @@ $.fn.extend({
             config.intervals = [];
         })();
         this.each(function (i) {
-            var data_time = $(this).attr("data-time");
+            var data_time = $(this).attr("data-time").replace(/-/g, '/').replace('T', ' ');
             var data_days = $(this).data("days");
 
             config.intervals.push(setInterval(() => {
@@ -190,11 +192,12 @@ $.fn.extend({
                 }
 
                 if (days_on || +data_days) {
-                    var time = timestamp.toISOString().substr(8, 11).replace("T", ":");
-                } else {
-                    var time = timestamp.toISOString().substr(11, 8);
-                }
+                    var time = Math.floor(timestamp.getTime() / (1000 * 60 * 60 * 24));
+                    if (time == 0) time += "0";
+                    time += ":";
+                } else var time = "";
 
+                time += timestamp.toISOString().substr(11, 8);
 
                 if (timestamp < 0) {
                     clearInterval(config.intervals[i]);
@@ -238,7 +241,7 @@ class ProgressBar {
         ];
         $(".load-indicator").css({ opacity: 1 });
         $(".load-indicator__fill").css({ width: 15 + "%" });
-        $("body, button, input, a").css({ cursor: "wait" });
+        //$("body, button, input, a").css({ cursor: "wait" });
 
         for (var i = 0; i < this.TimerSteps.length; i++) {
             await delay(this.TimerSteps[i]["time"]);
@@ -253,7 +256,7 @@ class ProgressBar {
         setTimeout(() => {
             $(".load-indicator__fill").css({ width: "" });
             $(".load-indicator").css({ opacity: 0 });
-            $("body, button, input, a").css({ cursor: "" });
+            //$("body, button, input, a").css({ cursor: "" });
         }, 350);
     }
 }
@@ -416,7 +419,7 @@ class features_lang {
 
 class features_sound {
     constructor() {
-        this.tap = "on"; // Default "on"
+        this.tap = true; // Default is on
         this.onclick = function () { };
         const $this = this;
 
@@ -427,7 +430,7 @@ class features_sound {
                 .toggleClass("stndfspin-features__icon--green")
                 .parent().find(".stndfspin-features__column > span")
                 .toggleText("Вкл.", "Выкл.");
-            $this.onclick($this.toggleTap("on", "off"));
+            $this.onclick($this.toggleTap(true, false));
         });
     }
 
@@ -491,6 +494,7 @@ class features_timer {
 class features_wheel {
     constructor() {
         this.promise = new $.Defered();
+        this.xer = [];
         this.reopen = {
             onclick: function () { },
         }
@@ -499,6 +503,7 @@ class features_wheel {
             animation: "16s cubic-bezier(.1, 0, 0, 1) transform",
             duration: 16 * 1000,
             only: true,
+            items: {},
             multiplies: {
                 0: 1,
                 1: 2,
@@ -507,15 +512,28 @@ class features_wheel {
                 4: 5,
                 5: 10,
             },
-        }
+        };
+        this.sounds = {
+            "roll": new Audio("/assets/sounds/Roll_Sound.wav"),
+            "win": new Audio("/assets/sounds/Win_Sound.wav"),
+            "half": new Audio("/assets/sounds/Half_Sound.wav"),
+        };
+        this.sounds.roll.setAttribute("controls", "true");
+        this.sounds.win.setAttribute("controls", "true");
+        this.sounds.half.setAttribute("controls", "true");
     }
 
-    __init() {
-        ProgressBar.start();
+    __init(ProgressStart = true) {
+        if (ProgressStart) ProgressBar.start();
         this.promise = new $.Defered();
+        this.xer.filter(function (anime) {
+            anime.reset();
+        });
+        this.xer = [];
+        this.data.spins = 4;
         this.data.current = {
             items: [],
-        };
+        }
         this.count(12);
     }
 
@@ -530,28 +548,28 @@ class features_wheel {
         this.box_view(null);
     }
 
-    getRotationDegrees(obj) {
-        var matrix = obj.css("-webkit-transform") ||
-            obj.css("-moz-transform") ||
-            obj.css("-ms-transform") ||
-            obj.css("-o-transform") ||
-            obj.css("transform");
-        if (matrix !== 'none') {
+    getRotationDegrees(obj, matrix = false, round = true) {
+        var matrix = matrix ? matrix : obj.css("transform");
+        if (matrix !== "none") {
             var values = matrix.split('(')[1].split(')')[0].split(',');
             var a = values[0];
             var b = values[1];
-            var angle = Math.round(Math.atan2(b, a) * (180 / Math.PI));
+            var angle = Math.atan2(b, a) * (180 / Math.PI);
 
         } else { var angle = 0; }
-        return (angle < 0) ? angle + 360 : angle;
+        var result = (angle < 0) ? angle + 360 : angle;
+        if (round) return Math.round(result);
+        return result;
     }
 
     stop_wheel() {
-        var circle = $(".fortune__circle");
-        var startPosition = this.getRotationDegrees(circle);
-        circle.css({
-            animation: "unset",
-            transform: `rotate(${startPosition}deg)`,
+        $(".fortune__circle").each(function () {
+            var circle = $(this);
+            var startPosition = page.wheel.getRotationDegrees(circle);
+            circle.css({
+                animation: "unset",
+                transform: `rotate(${startPosition}deg)`,
+            });
         });
     }
 
@@ -560,16 +578,34 @@ class features_wheel {
         var random = random ? get_random_int(-this.data.degrees_per_block / 2, this.data.degrees_per_block / 2) : 0;
         var degrees = (this.data.spins * 360) - this.getRotationDegrees(block) + random;
         var circle = block.parent();
+        var styles = window.getComputedStyle(circle[0]);
+        var last = 0;
 
         this.stop_wheel();
-
-        anime({
+        this.xer.push(anime({
             targets: circle.get(),
             rotate: (reverse ? -degrees - 60 : degrees) + "deg",
             easing: 'cubicBezier(.1, 0, 0, 1)',
             duration: 16000,
+            begin: () => {
+                if (page.sound.tap == false) return;
+                this.sounds.half.play();
+            },
+            change: async anim => {
+                if (page.sound.tap == false || anim.progress < 35) return;
+                var degree = page.wheel.getRotationDegrees(null, styles.transform, false);
+                var number = Math.trunc(degree);
+
+                if (last == number) {
+                    return;
+                } else last = number;
+
+                if ((number % 15 == 0 || number % 45 == 0) && number % 30 != 0) {
+                    await this.sounds.roll.play();
+                }
+            },
             complete: () => this.promise.resolve(),
-        });
+        }));
 
         return block;
     }
@@ -639,6 +675,10 @@ class features_wheel {
             //$(".fortune-wheel__buttons").parent().not(".hidden").scrollTo();
             // Remove box--no-indent Class
             $(".box").removeClass("box--no-indent");
+
+            if (page.sound.tap) {
+                this.sounds.win.play();
+            }
         });
         // Progress
         ProgressBar.end();
@@ -678,8 +718,23 @@ class features_wheel {
         var fortune = $(".fortune-wheel"),
             box = fortune.parent();
 
-        for (var i = 1; i < x; i++) {
-            box.append(fortune.clone().attr("data-id", i))
+        for (var id = 1; id < x; id++) {
+            var wheel = fortune.clone();
+            var items = [];
+
+            for (var i = 0; i <= 11; i++) {
+                items.push(page.wheel.data.items[parseInt(Math.random() * page.wheel.data.items.length)]);
+            }
+
+            wheel.attr("data-id", id);
+            wheel.find(".fortune__item").each(function (index) {
+                let item = items[index];
+                $(this).attr({ class: "fortune__item" }).addClass("weapon-skins__quality--" + item.item.class_name);
+                $(this).find(".sorted-skins__skin-title--0").html(item.item.name);
+                $(this).find(".sorted-skins__skin-title--1").html(item.item.subname);
+                $(this).find(".weapon-skins__image").attr({ src: "/img/" + item.item.image });
+            });
+            box.append(wheel);
         }
 
         $(".fortune-wheel:not([data-id])").remove();
@@ -716,6 +771,7 @@ class features_popup {
     constructor() {
         this.on = {};
         this.tmp = {};
+        this.forceOnly = false;
         this.closed = new $.Defered();
     }
 
@@ -773,8 +829,10 @@ class features_popup {
     }
 
     close(force = false) {
-        if (force) this.fadeOut();
-        this.fadeOut();
+        if (!this.forceOnly || force) {
+            this.fadeOut();
+            this.forceOnly = false;
+        }
         setTimeout(() => this.closed.resolve(), 500);
     }
 }
@@ -789,6 +847,7 @@ class features_referal {
         this.counter_indent = 1;
         this.goal = {
             width: $(".goal").outerWidth(),
+            last: $(".goal").last().data("goal-id"),
             height: $(".goal__image").outerHeight(),
             indent: $(".goal[data-goal-id='2']").css("margin-left").replace("px", "").intConvert(),
             image_width: $(".goal__image").outerWidth(),
@@ -796,9 +855,15 @@ class features_referal {
         };
         this.goals = {
             number: $(".goal").length,
+            offsets: [
+                $(".goal").first().offset().left,
+                $(".goal").last().offset().left,
+            ],
         };
+        // OBSOLETE -> 
         this.goals.width = (this.goal.width * this.goals.number) + (this.goal.indent * (this.goals.number - 1));
-        $(".goal__line").css({ width: this.goals.width - (15.85).toPx() + "px" })
+        //this.goals.width = this.goal.width + (this.goals.offsets[1] - this.goals.offsets[0]);
+        $(".goal__line").css({ width: this.goals.width - (15.85).toPx("body") + "px" })
     }
 
     create_progress_block() {
@@ -833,6 +898,10 @@ class features_referal {
     }
 
     commit_progress(goal_number, percent, counter) {
+        if (goal_number >= this.goal.last) {
+            goal_number = this.goal.last - 1;
+            percent = 100;
+        }
         var progress = this.get_progress(goal_number, percent);
         if (progress > this.width) {
 
@@ -1151,6 +1220,7 @@ class features_paging {
         this.ScrollInspector = {};
         this.actionOnLoaded = [];
         this.AbleScrollDown = true;
+        this.any = "any";
         this.pageLoading = new $.Defered();
         this.onPageLoaded = () => { };
 
@@ -1181,16 +1251,17 @@ class features_paging {
 
     load(url, hashAction = false) {
         ProgressBar.start();
-        this.dynamic_request(url, (result) => {
+        const key = url.split("/")[1];
+        this.dynamic_request(url, result => {
             // Histoty Push
             if (history.state == null) {
                 history.replaceState({ href: url, data: result }, "", url);
             } else {
                 history.pushState({ href: url, data: result }, "", url);
             }
-            if (hashAction) this.save_hash(hashAction); else this.save_hash();
+            this.save_hash(hashAction);
             this.final(result, url);
-        });
+        }, key in this.pages ? key : "any");
         return this.pageLoading = new $.Defered();
     }
 
@@ -1208,7 +1279,9 @@ class features_paging {
         } else this.load(window.location.pathname);
     }
 
-    dynamic_request(url, $success) {
+    dynamic_request(url, $success, key) {
+        this.cache = new PageCache(url, $success);
+        if (this.cache.status) return;
         $.ajax({
             url: url,
             headers: {
@@ -1220,9 +1293,10 @@ class features_paging {
             error: (error) => {
                 this.pageLoading.reject();
                 ProgressBar.end();
-                console.warn("Page Loading Error:", error);
+                //console.warn("Page Loading Error:", error);
+                this.notify("error", "Code" + error.statusCode);
             },
-            statusCode: this.errors[url.split("/")[1]],
+            statusCode: this.errors[key],
         });
 
     }
@@ -1248,7 +1322,7 @@ class features_paging {
     }
 
     __addPage(settings) {
-        settings.page = settings.page.replace("/", "");
+        if (settings.page != this.any) settings.page = settings.page.replace("/", "");
         if ("ScrollInspector" in settings) {
             this.ScrollInspector[settings.page] = function () {
                 try {
@@ -1258,12 +1332,16 @@ class features_paging {
                 }
             };
         }
-        this.pages[settings.page + (settings.device != undefined ? "__mobile" : "")] = settings.action;
+        var device = (settings.device != undefined ? "__mobile" : "");
+        this.pages[settings.page + device] = settings.action;
         this.errors[settings.page] = settings.errors;
     }
 
     EventPageLoaded(url, DeviceType = false) {
-        url[1] += DeviceType ? "__" + DeviceType : "";
+        if (this.pages["any"] != undefined) {
+            this.pages["any"].apply(this, [url, DeviceType]);
+        }
+        if (DeviceType) url[1] += "__" + DeviceType;
         if (url[1] in this.pages) try {
             this.pages[url[1]].apply(this, [url[2]]);
         } catch (error) {
@@ -1283,8 +1361,9 @@ class features_paging {
 
     set active_page(url) {
         // Jquery Event
-        $("[class *= 'menu']").each(function () {
-            var active_name = $(this).attr("class") + "__link--active";
+        $(`[class $= "menu"]`).each(function () {
+            var current_name = $(this).attr("class").split(" ").pop();
+            var active_name = current_name + "__link--active";
             $(this).find("a").removeClass(active_name);
             $(this).find("a[href='" + url + "']").addClass(active_name);
         });
@@ -1351,7 +1430,7 @@ class features_paging {
 
 class features_liveFeed {
     constructor() {
-        this.singleItem = `<div class="weapon-skins__weapon"><img class="weapon-skins__image"><span class="weapon-skins__quality"></span><div class="weapon-skins-owner"><img class="weapon-skins-owner__case-image"><span class="weapon-skins-owner__name"></span><a class="ghost ajax-link"></a></div></div>`;
+        this.singleItem = `<div class="weapon-skins__weapon"><img class="weapon-skins__image"><span class="weapon-skins__quality"></span><div class="weapon-skins-owner"><img class="weapon-skins-owner__case-image"><span class="weapon-skins-owner__name"></span><a class="ghost ajax-link"></a></div><a class="ghost ajax-link"></a></div>`;
         this.parsedItem = $.parseHTML(this.singleItem);
     }
 
@@ -1361,7 +1440,8 @@ class features_liveFeed {
         $(this.item).find(".weapon-skins__image").attr({ src: "/img/" + data.item_src });
         $(this.item).find(".weapon-skins-owner__case-image").attr({ src: "/img/" + data.case_image });
         $(this.item).find(".weapon-skins-owner__name").html(data.name);
-        $(this.item).find("a.ghost").attr({ href: data.user_id });
+        $(this.item).find("a.ghost").first().attr({ href: "/case/" + data.case_id });
+        $(this.item).find("a.ghost").last().attr({ href: "/profile/" + data.user_id });
     }
 
     AddToFeed() {
@@ -1419,13 +1499,35 @@ const page = new class {
     setup(objectArray) {
         config = objectArray;
     }
+
+    generateSecret() {
+        return new Date().getTime();
+    }
 }
 
 class STNDFItems {
     static Sell(argument1, callback = false) {
-        api.post("/item/sell", {
-            id: typeof argument1 == "number" ? argument1 : +$(argument1).attr("weapon-id")
-        }, callback ? callback : this.Callback);
+        var callback = callback ? callback : this.Callback;
+        switch (getType(argument1)) {
+            case "number":
+                api.post("/item/sell", {
+                    id: argument1,
+                }, callback);
+                break;
+
+            case "string":
+            case "object":
+                api.post("/item/sell", {
+                    id: +$(argument1).attr("weapon-id"),
+                }, callback);
+                break;
+
+            case "array":
+                api.post("/item/sell_items", {
+                    items: argument1,
+                }, callback);
+                break;
+        }
     }
 
     static sellAll() {
@@ -1483,14 +1585,16 @@ class ItemsController extends STNDFItems {
     }
 
     static ModifyItemByData(data = {}) {
-        const params = this.parseData(data, { item_id: data.id, status: data.status });
+        const params = this.parseData(data, { item_id: data.id, status: data.status, case_id: data.case_id });
         const StatusMap = this.StatusMap;
         this.items.last(function () {
             this.attr({ "weapon-id": params.item_id });
             this.find(".sorted-skins__cost").html(alter_by_currency(params.price, true));
             this.find(".sorted-skins__skin-title--0").html(params.name);
             this.find(".sorted-skins__skin-title--1").html(params.subname);
-            this.find(".weapon-skins__image:only-child").attr({ src: "/img/" + params.image });
+            this.find(".weapon-skins__image").attr({ src: "/img/" + params.image });
+            this.find(".weapon-skins__case").attr({ src: "/api/v1/case/image/" + params.case_id });
+            this.find("a.ghost").attr({ href: "/case/" + params.case_id });
             this.addClass("sorted-skins__unit--" + params.class_name);
             // ---------------------------------------------------------------------------
             if (params.status != "NOTHING") {
@@ -1518,12 +1622,13 @@ class ItemsController extends STNDFItems {
             user_0_item: data.owner_item,
             user_1_item: data.rival_item,
         });
+
         this.battles.last(function () {
             this.attr({ "data-id": params.case_id });
             if (params.user_0_item.price > params.user_1_item.price) var status = 0; else
                 if (params.user_0_item.price < params.user_1_item.price) var status = 1; else var status = 2;
             this.addClass("sorted-battles__battle--" + status);
-            this.find(".sorted-battles__case-image").attr({ src: "/img/" + params.image });
+            this.find(".sorted-battles__case-image").attr({ src: "/img/" + params.case.image });
             // ---------------------------------------------------------------
             this.find(".sorted-battles-player").each(function (i) {
                 var user = params["user_" + i];
@@ -1685,8 +1790,58 @@ class ServiceController {
     }
 }
 
-class cache {
+class PageCache {
+    constructor(url, success) {
+        this.page = url.split("/")[1];
+        this.localCache = this.getCache(this.page);
 
+        if (PageCache.CachePages != undefined && PageCache.CachePages.includes(this.page)) {
+
+            if (this.localCache == false) {
+                this.status = false;
+                this.do();
+            } else {
+                success(this.localCache);
+                this.status = true;
+            }
+        } else {
+            this.status = false;
+        }
+    }
+
+    do() {
+        var interval = setInterval(() => {
+            if (page.support.pageLoading.status == "resolved") {
+                localStorage.setItem(this.page, JSON.stringify({
+                    content: this.cache(),
+                    date: new Date(),
+                }));
+                clearInterval(interval);
+            }
+        }, 50);
+    }
+
+    cache() {
+        var contrainer = $(page.support.fickle);
+        return contrainer.html();
+    }
+
+    getCache(page) {
+        var raw_data = localStorage.getItem(page);
+        if (raw_data == null) return false;
+
+        var data = JSON.parse(raw_data);
+        var content = data.content;
+
+        return content;
+    }
+
+    static clear() {
+        for (let i = 0; i < PageCache.CachePages.length; i++) {
+            const element = PageCache.CachePages[i];
+            localStorage.removeItem(element);
+        }
+    }
 }
 
 class filter {
@@ -1811,8 +1966,14 @@ function prevent_error_function($function, ...$args) {
     }
 }
 
-async function delay(ms) {
-    return new Promise(resolve => setTimeout(resolve, ms));
+function delay(ms, boundary = false) {
+    return new Promise(async function (resolve) {
+        setTimeout(resolve, ms);
+        if (boundary) {
+            await boundary.promise;
+            resolve();
+        }
+    });
 }
 
 function split_number(x) {
@@ -1822,7 +1983,9 @@ function split_number(x) {
 function alter_by_currency(param, appendCurrency = false) {
     var multiplier = getLanguage('settings.multiplier'),
         currency = getLanguage('settings.currency'),
-        number = (param.toString().multiReplace([" ", currency], "")) * multiplier;
+        string = (param.toString().split(" ")[0]),
+        number = string * multiplier;
+    if (appendCurrency == null) return string;
     if (isFloat(number)) number = number.toFixed(2);
     return appendCurrency ? (number + ' ' + currency) : number;
 }
@@ -1858,4 +2021,38 @@ function IsDefined($this) {
 function img_error(element, isAvatar = false) {
     element.src = '/assets/img/guest.png';
     page.popup.tmp.NeedsToSetAvatar = isAvatar;
+}
+
+function getType(variable) {
+    if (variable instanceof Array) return "array";
+    return typeof variable;
+}
+
+/**
+ * Shuffles array in place.
+ * @param {Array} a items An array containing the items.
+ */
+function shuffle(a) {
+    var j, x, i;
+    for (i = a.length - 1; i > 0; i--) {
+        j = Math.floor(Math.random() * (i + 1));
+        x = a[i];
+        a[i] = a[j];
+        a[j] = x;
+    }
+    return a;
+}
+
+function factorial(number) {
+    let factorial = 1;
+    for (let i = 1; i <= number; i++) {
+        factorial *= i;
+    }
+    return factorial;
+}
+
+function C(mutations = 3, combinations = 3) {
+    var fact_muts = factorial(mutations);
+    var fact_combs = factorial(combinations);
+    return fact_muts / fact_combs * factorial(mutations - combinations);
 }

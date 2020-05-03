@@ -287,12 +287,52 @@ a.ghost {
 }
 
 .topbar__logo {
+    display: flex;
+    align-items: center;
+    height: 2em;
     align-self: center;
-    font-size: 0.75em;
 }
 
 .topbar__logo--logo {
     width: 6.75em;
+    position: absolute;
+    display: none;
+}
+
+.topbar__logo--0, .topbar__logo--1, .topbar__logo--2, .topbar__logo--3 {
+    background-image: url("/assets/img/icons/logo/1.png");
+    background-size: 7em;
+    background-position: -0.25em 36%;
+    width: 3.8em;
+    height: 1.25em;
+    margin-top: -1em;
+}
+
+.topbar__logo--1 {
+    left: -2%;
+    background-image: url("/assets/img/icons/logo/2.png");
+    background-color: #18191b;
+    background-position: -3.375em 36%;
+    background-size: 6em;
+    border-radius: 100%;
+    width: 1.25em;
+    animation: 10s spinning infinite;
+}
+
+.topbar__logo--2 {
+    left: -3.5%;
+    background-image: url("/assets/img/icons/logo/3.png");
+    background-position: -5.25em 36%;
+    width: 1.5em;
+}
+
+.topbar__logo--3 {
+    position: absolute;
+    bottom: -2.5%;
+    right: 9%;
+    background-image: url("/assets/img/icons/logo/4.png");
+    background-position: -1.25em 80%;
+    width: 5em;
 }
 
 .topbar-menu {
@@ -647,13 +687,34 @@ a.ghost {
     cursor: pointer;
 }
 
+.weapon-skins__image, .weapon-skins__case {
+    opacity: 0;
+    transition: 0.175s linear opacity;
+}
+
 .weapon-skins__image {
     width: 6.7em;
+    height: 3.8em;
+    margin: auto;
+    opacity: 1;
+}
+
+.weapon-skins__case {
+    position: absolute;
+    justify-self: center;
     height: 3.8em;
 }
 
 .weapon-skins__unit .weapon-skins__image, .weapon-skins__unit .weapon-skins__quality {
     z-index: 13;
+}
+
+[class *="js-tab"] .sorted-skins__unit .weapon-skins__weapon:hover .weapon-skins__image {
+    opacity: 0;
+}
+
+.weapon-skins__weapon:hover .weapon-skins__case {
+    opacity: 1;
 }
 
 .weapon-skins__quality {
@@ -1212,10 +1273,6 @@ article {
     font-size: var(--wheel-font-size);
     overflow: hidden;
     will-change: contents;
-    perspective: 1000;
-    backface-visibility: hidden;
-    -webkit-perspective: 1000;
-    -webkit-backface-visibility: hidden;
 }
 
 .fortune-wheel::before {
@@ -2199,6 +2256,7 @@ b {
     display: flex;
     align-items: center;
     justify-content: center;
+    overflow: auto;
 }
 
 .popup__cover {
@@ -2207,7 +2265,6 @@ b {
 }
 
 .popup-window {
-    position: absolute;
     width: 50em;
     padding: 3em;
     background: url("../img/bg2.png"), linear-gradient(to top, #14161a 0%, #151618 100%);
@@ -2366,6 +2423,7 @@ button.popup-window__button.button2 {
     font-size: 1.5em;
     font-weight: 600;
     text-transform: uppercase;
+    text-decoration: none;
     text-align: center;
     color: #88cc31;
 }
@@ -2394,7 +2452,7 @@ input.promocode__input:focus::placeholder {
 
 .top-up__text {
     padding: 1em;
-    width: 10em;
+    width: 7em;
     background: #1b1d1f;
     font-weight: 700;
     font-style: italic;
@@ -2413,26 +2471,34 @@ input.promocode__input:focus::placeholder {
 }
 
 .avatar-change {
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    display: grid;
+    row-gap: 2em;
+    justify-items: center;
 }
 
 .avatar-change__title {
-    flex: 0 140px;
-    text-align: right;
+    text-align: center;
+}
+
+.avatar-change__title>br {
+    display: none;
 }
 
 .avatar-change__avatar {
-    width: 100px;
-    height: 100px;
-    margin: 0 40px;
+    width: 8em;
+    height: 8em;
 }
 
 .avatar-change__input {
-    padding: 18px 30px;
-    /* background: #ccc; */
-    /* border-radius: 6px; */
+    padding: 1.25em 2.25em;
+    border-radius: 0.25em;
+    font-size: 0.85em;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.avatar-change__input::before {
+    background: #88cc31;
 }
 
 /* Contacts */
@@ -2535,8 +2601,10 @@ input.promocode__input:focus::placeholder {
 /* Contract Window */
 
 .contract-window {
+    position: absolute;
     display: grid;
-    width: 82em;
+    width: 100vw;
+    margin: 5em auto;
     background: linear-gradient(to top, #14161a 0%, #151618 100%);
     opacity: 0;
     transform: scale(0.75);
@@ -2666,6 +2734,7 @@ span.contract-window__bill--numeric {
 
 .contract-window__result {
     padding: 3em;
+    padding-bottom: 0;
 }
 
 .contract-result {
@@ -2821,7 +2890,7 @@ span.contract-window__bill--numeric {
 }
 
 .width150 {
-    width: 150px !important;
+    width: 180px !important;
 }
 
 /* Referal */
@@ -3290,6 +3359,10 @@ span.contract-window__bill--numeric {
     justify-content: space-between;
     overflow: hidden;
     margin-bottom: -9em;
+}
+
+.battle[class *="battle__over"] .battle__inner::before, .battle[class *="battle__over"] .battle__inner::after {
+    content: none;
 }
 
 .battle::before, .battle::after {
