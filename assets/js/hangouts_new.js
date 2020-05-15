@@ -498,6 +498,7 @@ class features_wheel {
         this.reopen = {
             onclick: function () { },
         }
+
         this.data = {
             spins: 4, // Кол-во оборотов перед тем как дойдёт до нужного блока
             animation: "16s cubic-bezier(.1, 0, 0, 1) transform",
@@ -512,15 +513,13 @@ class features_wheel {
                 4: 5,
                 5: 10,
             },
-        };
+        }
+
         this.sounds = {
             "roll": new Audio("/assets/sounds/Roll_Sound.wav"),
             "win": new Audio("/assets/sounds/Win_Sound.wav"),
             "half": new Audio("/assets/sounds/Half_Sound.wav"),
-        };
-        this.sounds.roll.setAttribute("controls", "true");
-        this.sounds.win.setAttribute("controls", "true");
-        this.sounds.half.setAttribute("controls", "true");
+        }
     }
 
     __init(ProgressStart = true) {
@@ -552,9 +551,7 @@ class features_wheel {
         var matrix = matrix ? matrix : obj.css("transform");
         if (matrix !== "none") {
             var values = matrix.split('(')[1].split(')')[0].split(',');
-            var a = values[0];
-            var b = values[1];
-            var angle = Math.atan2(b, a) * (180 / Math.PI);
+            var angle = Math.atan2(values[0], values[1]) * (180 / Math.PI);
 
         } else { var angle = 0; }
         var result = (angle < 0) ? angle + 360 : angle;
@@ -651,7 +648,7 @@ class features_wheel {
         // Vars
         this.sum = 0;
         this.data.current = data;
-        data.filter(async (item, id) => {
+        data.filter((item, id) => {
             this.win(item, id, fast);
             this.sum += item.item.price;
             // Setting Inner Price
@@ -1585,25 +1582,30 @@ class ItemsController extends STNDFItems {
     }
 
     static ModifyItemByData(data = {}) {
-        const params = this.parseData(data, { item_id: data.id, status: data.status, case_id: data.case_id });
+
+        const {status, case_id, item_id, price, name, subname, image, class_name} = data;
         const StatusMap = this.StatusMap;
+
         this.items.last(function () {
-            this.attr({ "weapon-id": params.item_id });
-            this.find(".sorted-skins__cost").html(alter_by_currency(params.price, true));
-            this.find(".sorted-skins__skin-title--0").html(params.name);
-            this.find(".sorted-skins__skin-title--1").html(params.subname);
-            this.find(".weapon-skins__image").attr({ src: "/img/" + params.image });
-            this.find(".weapon-skins__case").attr({ src: "/api/v1/case/image/" + params.case_id });
-            this.find("a.ghost").attr({ href: "/case/" + params.case_id });
-            this.addClass("sorted-skins__unit--" + params.class_name);
+            this.attr({ "weapon-id": item_id });
+
+            this.find(".sorted-skins__cost").html(alter_by_currency(price, true));
+            this.find(".sorted-skins__skin-title--0").html(name);
+            this.find(".sorted-skins__skin-title--1").html(subname);
+            this.find(".weapon-skins__image").attr({ src: "/img/" + image });
+            this.find(".weapon-skins__case").attr({ src: "/api/v1/case/image/" + case_id });
+            this.find("a.ghost").attr({ href: "/case/" + case_id });
+
+            this.addClass("sorted-skins__unit--" + class_name);
             // ---------------------------------------------------------------------------
-            if (params.status != "NOTHING") {
-                $(this).find(".sorted-skins__icons").empty().append(StatusMap(params.status));
+            if (status != "NOTHING") {
+                $(this).find(".sorted-skins__icons").empty().append(StatusMap(status));
             }
         });
     }
 
     static ModifyContractByData(params = {}) {
+
         this.ModifyItemByData(params);
         this.contracts.last(($this) => {
             params.item_list.filter((weapon) => {
@@ -1615,24 +1617,21 @@ class ItemsController extends STNDFItems {
     }
 
     static ModifyBattleByData(data = {}) {
-        const params = this.parseData(data, {
-            case_id: data.case_id,
-            user_0: data.owner,
-            user_1: data.rival,
-            user_0_item: data.owner_item,
-            user_1_item: data.rival_item,
-        });
+
+        const {case_id, owner, rival, owner_item, rival_item} = data;
 
         this.battles.last(function () {
             this.attr({ "data-id": params.case_id });
-            if (params.user_0_item.price > params.user_1_item.price) var status = 0; else
-                if (params.user_0_item.price < params.user_1_item.price) var status = 1; else var status = 2;
+            if (owner_item.price > rival_item.price) var status = 0;
+            if (owner_item.price < rival_item.price) var status = 1;
+            if (owner_item.price == rival_item.price) var status = 2;
+            
             this.addClass("sorted-battles__battle--" + status);
-            this.find(".sorted-battles__case-image").attr({ src: "/img/" + params.case.image });
+            this.find(".sorted-battles__case-image").attr({ src: "/img/" + data.case.image });
             // ---------------------------------------------------------------
             this.find(".sorted-battles-player").each(function (i) {
-                var user = params["user_" + i];
-                var item = params["user_" + i + "_item"];
+                var user = i == 0 ? owner : rival;
+                var item = i == 0 ? owner_item : rival_item;
                 // ---------------------------------------------------------------
                 $(this).append(`<a href="/profile/${user.id}" class="ghost ajax-link"></a>`);
                 $(this).find(".sorted-battles-player__image").attr({ src: user["photo"] });
@@ -1687,14 +1686,6 @@ class ItemsController extends STNDFItems {
                 if (config.item.events == false) $this.find(".sorted-skins__icon").removeClass("js-item-withdraw js-item-sell");
             });
         }
-    }
-
-    static parseData(data, modifications = {}) {
-        var data = "item" in data ? data.item : "win" in data ? data.win : "_case" in data ? data._case : data;
-        for (const key in modifications) {
-            data[key] = modifications[key];
-        }
-        return data;
     }
 
     static CreateWeapon(params = {}) {
